@@ -1,0 +1,32 @@
+var photoData = {
+    photo:"040-img_2235.jpg.medium.jpeg",
+    width:"600",
+    height:"800",
+    prev:"img000.jpeg",
+    prevThumb:"img000.jpeg.small.jpeg",
+    prevThumbOrientation:"horizontal",
+    next:"img_0281.jpg",
+    nextThumb:"096-img_0281.jpg.small.jpeg",
+    nextThumbOrientation:"horizontal",
+    index:"2",
+    count:"3",
+    title:"Test Album",
+    footer:"Copyright &copy; Rennie deGraaf 2007. All rights reserved.",
+    caption:[
+        "Tower Lake and Eisenhower Peak.",
+        "Banff National Park, Alberta",
+        "01 July 2007, 11:52",
+    ],
+    properties:{
+        "File":"img_2235.jpg", 
+        "File size":"1.9 MB",
+        "Dimensions":"1704x2272 pixels",
+        "Exposure time":"1/499 sec",
+        "Aperture value":"f/5.6",
+        "Camera model":"Canon PowerShot A80",
+        "Focal length":"7.8 mm",
+        "Exposure mode":"Auto exposure",
+        "Flash":"Flash did not fire; auto mode",
+        "Shutter speed":"287/32 sec. (APEX: 22)",
+    }
+};

@@ -1,0 +1,61 @@
+/* override colours and borders in stylesheet for debugging purposes */
+html, body {
+  color: black;
+  background-color: white;
+}
+a:link {
+  color: blue;
+}
+a:visited {
+  color: blue;
+}
+a:hover {
+  color: green;
+}
+td {
+  color: black;
+}
+img.navigation {
+  border-color: black;
+  background-color: white;
+}
+#indexPanel, #navigationPanel, #prevThumbPanel, #nextThumbPanel {
+  border: 1px solid blue;
+}
+#titlePanel {
+  border: 1px solid #786345;
+}
+#captionPanel {
+  border: 1px solid #98072b;
+}
+#propertyPanel {
+  border: 1px solid #386698;
+}
+#photoPanel {
+  border: 1px solid #178634;
+}
+#footerPanel {
+  border: 1px solid #e80972;
+}
+#thumbnailPanel {
+  border: 1px solid #178634;
+}
+li.thumbnail {
+  border: 1px solid red;
+}
+.centeredObj {
+  border: 1px solid #a0a0a0;
+}
+#warning {
+  color: #AAAAAA;
+}
+
+#debugPanel {
+  text-align: center;
+  position: absolute;
+  width: 20%;
+  top: 0;
+  height: 22px; /* fit above indexPanel */
+  left: 0;
+  font-size: 8pt;
+}
