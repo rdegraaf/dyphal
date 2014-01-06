@@ -1,0 +1,88 @@
+
+html, body {
+  color: #FFFFFF;
+  background-color: #4b4b4b;
+  margin: 0;
+  font-family: serif;
+  padding: 0;
+}
+
+h1 {
+  margin: 0;
+  font-size: 24pt;
+  font-family: sans-serif;
+  font-weight: bold;
+}
+
+a:link { 
+  font-weight: bold; 
+  text-decoration: none;
+  color: white;
+  background-color: inherit;   
+}
+
+a:visited { 
+  font-weight: bold; 
+  text-decoration: none;
+  color: white;
+  background-color: inherit;   
+}
+
+a:hover { 
+  font-weight: bold; 
+  text-decoration: none; 
+  color: yellow;
+  background-color: inherit;   
+}
+
+img {
+  border-style: none;
+}
+
+#titlePanel {
+  top: 0;
+  margin-left: 20%;
+  margin-right: 20%;
+  height: 80px;
+}
+
+#footerPanel {
+  position: absolute;
+  height: 80px;
+  bottom: 0;
+  right: 20%;
+  left: 20%;
+  width: 60%; /* hack for MSIE */
+}
+
+#warning {
+  height: 1.5em;
+  line-height: 1em;
+  font-size: 10pt;
+  text-align: center;
+  vertical-align: top;
+  border-width: 1px;
+  border-style: solid;
+  color: #7FFF00;
+  background-color: inherit;
+}
+
+/* From http://css-tricks.com/centering-in-the-unknown/ */
+div.centerBlock {
+  text-align: center;
+}
+div.centerBlock:before {
+  content: '';
+  display: inline-block;
+  height: 100%; 
+  vertical-align: middle;
+  margin-right: -0.25em; /* Adjusts for spacing */
+}
+.centeredObj {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+#footerContent {
+  font-size: 10pt;
+}

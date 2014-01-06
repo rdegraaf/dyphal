@@ -1,57 +1,42 @@
 /*************************************************
 * lib.js
 * Copyright (c) Rennie deGraaf, 2005-2013.  All rights reserved.
-* Last modified: 05 January 2013
+* Last modified: 24 May 2013
 *
 * Scripts for DHTML photo album
 * Various library routines used by other scripts
 *************************************************/
 
-// Load the debug stylesheet and create a link to disable it
-function loadDebug()
+// Retrieves and parses a JSON object, then makes a callback with the result 
+// and any supplied arguments.  Catches any exceptions thrown by the callback, 
+// which can be treated as fatal errors or as warnings.
+function getJSON(object, callback, fatalErrors, args)
 {
-    var cssElement = document.createElement("link");
-    cssElement.setAttribute("rel", "stylesheet");
-    cssElement.setAttribute("href", "debug.css");
-    document.getElementsByTagName("head")[0].appendChild(cssElement);
-        
-    var link = window.location.href;
-    link = link.replace(/([?&])debug=true&/, "$1", "g");
-    link = link.replace(/[?&]debug=true($|#)/, "$1");
-    var debugPanel = document.createElement("div");
-    debugPanel.setAttribute("id", "debugPanel");
-    var debugLink = document.createElement("a");
-    debugLink.setAttribute("href", link);
-    debugLink.innerHTML = "Leave debug mode";
-    debugPanel.appendChild(debugLink);
-    document.getElementsByTagName("body")[0].appendChild(debugPanel);
-}
-
-// Return the value of a query string parameter, or null if the parameter isn't 
-// present.
-function getQueryParam(key)
-{
-    var regex = new RegExp(key+"=([^&#]*)");
-    var result = regex.exec(window.location.search);
-    if (null == result)
-        return null;
-    else
-        return result[1];
-}
-
-// Return a URL to a photo.
-function generatePhotoURL(name)
-{
-    var link = "photo.html?photo=" + name;
-    if (true == debug)
-        link += "&debug=true";
-    return link;
-}
-
-// delete an object from within its parent
-function deleteObject ( parentObj, obj )
-{
-    parentObj.removeChild(obj);
+    req = new XMLHttpRequest();
+    req.open("GET", object, true);
+    req.onreadystatechange = function() {
+        try
+        {
+            if (4 == req.readyState)
+            {
+                if (200 != req.status)
+                    callback(req.status, null, args);
+                else
+                    callback(req.status, JSON.parse(req.response), args);
+            }
+        }
+        catch (e)
+        {
+            if (fatalErrors)
+            {
+                error(e.name + ": " + e.message);
+                throw e;
+            }
+            else
+                warning(e.name + ": " + e.message);
+        }
+    };
+    req.send();
 }
 
 // returns all elements of a certain type (tag) and class
@@ -67,15 +52,6 @@ function getElementsByClass ( tag, classname )
     return objs;
 }
 
-// set a property to a given value on an object
-function setProperty ( obj, prop, val )
-{
-    if (obj.style.setProperty) // W3C
-        obj.style.setProperty(prop, val, null);
-    else // MSIE
-        eval("obj.style." + prop + " = \"" + val + "\"");
-}
- 
 // gets a style property for an object
 function getProperty ( obj, prop )
 {
@@ -106,81 +82,6 @@ function getChildren ( obj )
     }
     
     return children;
-}
-
-function getPropertyPx ( obj, prop )
-{
-    var w = getProperty(obj, prop);
-
-    // find the begining of the number, after a space
-    var a = w.indexOf(" ");
-    if (a == -1)
-        a = 0;
-    // find the end of the number, before "px"
-    var b = w.indexOf("px");
-    
-    if (b != -1)
-        return parseInt(w.substr(a, b-a));
-    else
-        return 0;
-}
-        
-// gets the offset from the top of the screen to the top of an object
-function getTopOffset ( obj )
-{
-    var offset = getProperty(obj, "top");
-    
-    // find the beginning of the number, after a space
-    var a = offset.indexOf(" ");
-    if (a == -1)
-        a = 0;
-    // find the end of the number, before "px"
-    var b = offset.indexOf("px");
-    
-    if (b != -1)
-        return parseInt(offset.substr(a, b-a));
-    else // value not returned in pixels
-        return obj.offsetTop;
-}
-
-// gets the offset from the left of the screen to the left of an object
-function getLeftOffset ( obj )
-{
-    var offset = getProperty(obj, "left");
-    
-    // find the beginning of the number, after a space
-    var a = offset.indexOf(" ");
-    if (a == -1)
-        a = 0;
-    // find the end of the number, before "px"
-    var b = offset.indexOf("px");
-    
-    if (b != -1)
-        return parseInt(offset.substr(a, b-a));
-    else // value not returned in pixels
-        return obj.offsetLeft;
-}
-
-// gets the height of the current window, in pixels
-function getWindowHeight ()
-{
-    if (document.defaultView && document.defaultView.innerHeight)
-        return document.defaultView.innerHeight;
-    else if (window.innerHeight) // Konqueror
-        return window.innerHeight;
-    else if (document.body.offsetHeight) // MSIE
-        return document.body.offsetHeight;
-}
-
-// gets the width of the current window, in pixels
-function getWindowWidth ()
-{
-    if (document.defaultView && document.defaultView.innerWidth)
-        return document.defaultView.innerWidth;
-    else if (window.innerWidth) // Konqueror
-        return window.innerWidth;
-    else if (document.body.clientWidth) // MSIE
-        return document.body.clientWidth;
 }
 
 // gets the width of an object, in pixels
@@ -263,25 +164,4 @@ function getVBorder ( obj )
     return topBorder + topPad + bottomPad + bottomBorder;
 }
 
-function getTotalWidth ( obj )
-{
-    var wid = 0;
-    if (obj.offsetWidth)
-        wid = obj.offsetWidth;
-    else
-    {
-        // need to add object, padding, and border widths
-        wid += getPropertyPx(obj, "border-left-width");
-        wid += getPropertyPx(obj, "padding-left");
-        wid += getPropertyPx(obj, "width");
-        wid += getPropertyPx(obj, "padding-right");
-        wid += getPropertyPx(obj, "border-right-width");
-    }
-    
-    // add margin widths
-    wid += getPropertyPx(obj, "margin-left");
-    wid += getPropertyPx(obj, "margin-right");
-    
-    return wid;
-}
 

@@ -3,45 +3,79 @@
 <!--
   index.html
   Copyright (c) Rennie deGraaf, 2005-2013.  All rights reserved.
-  Last modified: 05 January, 2013
+  Last modified: 24 May, 2013
 
-  Thumbnail index page for DHTML photo album.
+  Master page for DHTML photo album.
 -->
   <head>
     <meta charset="UTF-8"/>
     <meta name="Author" content="Rennie deGraaf" />
-    <link rel="stylesheet" href="photo.css" />
-    <script type="text/javascript" src="album.js"></script>
+    <link rel="stylesheet" href="common.css" />
+    <link id="stylesheet" rel="stylesheet" href="album.css" />
     <script type="text/javascript" src="lib.js"></script>
     <script type="text/javascript" src="index.js"></script>
     <title>Photo Album</title>
   </head>
 
-  <body onload="start();">
+  <body>
     <div id="contents">
 
       <div id="titlePanel" class="centerBlock">
         <h1 id="titleContent" class="centeredObj"></h1>
       </div>
 
-      <div id="thumbnailPanel">
-        <div id="warning">
-          This page required JavaScript, but it appears to be disabled in your browser.
-        </div>
-        <ul id="thumbnailList">
-
-          <!-- Template for generated thumbnails.  Gets duplicated and modified by script. -->
-          <li class="thumbnail" id="thumbnailTemplate">
-            <a href="broken_link.html">
-              <img src="broken_link.jpeg" alt="Photo thumbnail" class="hthumbnail" />
-            </a>
-          </li>
-
-        </ul>
-      </div>
-
       <div id="footerPanel" class="centerBlock">
         <div id="footerContent" class="centeredObj"></div>
+      </div>
+
+      <div id="indexPanel">
+        <a id="indexLink" href="#">
+          <img src="back.png" alt="Back to index" title="Return to thumbnail index" class="back"/>
+        </a>
+      </div>
+
+      <div id="navigationPanel">
+        <a id="prevLink" class="navigationlink" href="broken_link.html">
+          <img src="prev.png" alt="Previous photo link" title="Previous photo" class="prev"/>
+        </a>
+        <span id="index"></span>
+        <a id="nextLink" class="navigationlink" href="broken_link.html">
+          <img src="next.png" alt="Next photo link" title="Next photo" class="next"/>
+        </a>
+      </div>
+
+      <div id="prevThumbPanel">
+        <a id="prevThumbLink" class="navigationlink" href="broken_link.html">
+          <img id="prevThumbImage" class="hnavigation" src="" alt="Previous photo thumbnail" title="Previous photo"/>
+        </a>
+      </div>
+
+      <div id="nextThumbPanel">
+        <a id="nextThumbLink" class="navigationlink" href="broken_link.html">
+          <img id="nextThumbImage" class="hnavigation" src="" alt="Next photo thumbnail" title="Next photo"/>
+        </a>
+      </div>
+
+      <div id="captionPanel" class="caption">
+        <!-- Photo caption -->
+      </div>
+
+      <div id="propertyPanel" class="caption">
+        <table id="propertyTable" style="padding: 1ex;">
+          <col width="0*" />
+          <col width="100%" />
+          <!-- Photo properties -->
+        </table>
+      </div>
+
+      <div id="contentPanel">
+        <div id="warning">
+          This page requires JavaScript, but it appears to be disabled in your browser.
+        </div>
+        <img id="photo" class="photo" src="" alt="Photo" width="50" height="50"/>
+        <ul id="thumbnailList">
+          <!-- Photo thumbnails -->
+        </ul>
       </div>
 
     </div>

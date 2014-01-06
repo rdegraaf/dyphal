@@ -31,14 +31,11 @@ img.navigation {
 #propertyPanel {
   border: 1px solid #386698;
 }
-#photoPanel {
+#contentPanel {
   border: 1px solid #178634;
 }
 #footerPanel {
   border: 1px solid #e80972;
-}
-#thumbnailPanel {
-  border: 1px solid #178634;
 }
 li.thumbnail {
   border: 1px solid red;

@@ -1,46 +1,10 @@
 /*************************************************
   photo.css
   Copyright (c) Rennie deGraaf, 2005-2013.  All rights reserved.
-  Last modified: 06 January 2013
+  Last modified: 23 May 2013
  
-  Stylesheet for DHTML photo album.
+  Photo stylesheet for DHTML photo album.
 *************************************************/
-
-html, body {
-  color: #FFFFFF;
-  background-color: #4b4b4b;
-  margin: 0;
-  font-family: serif;
-  padding: 0;
-}
-
-h1 {
-  margin: 0;
-  font-size: 24pt;
-  font-family: sans-serif;
-  font-weight: bold;
-}
-
-a:link { 
-  font-weight: bold; 
-  text-decoration: none;
-  color: white;
-  background-color: inherit;   
-}
-
-a:visited { 
-  font-weight: bold; 
-  text-decoration: none;
-  color: white;
-  background-color: inherit;   
-}
-
-a:hover { 
-  font-weight: bold; 
-  text-decoration: none; 
-  color: yellow;
-  background-color: inherit;   
-}
 
 table {
   border-style: none;
@@ -51,10 +15,6 @@ td {
   background-color: inherit;
   font-size: 10pt;
   line-height: 10pt;
-}
-
-img {
-  border-style: none;
 }
 
 img.hnavigation, img.vnavigation {
@@ -84,54 +44,10 @@ img.photo {
   visibility: hidden;
 }
 
-img.hthumbnail, img.vthumbnail {
-  vertical-align: middle;
-  border: 9px solid #CCCCCC;
-  display: block;
-  box-shadow: 3px 3px 4px #000000;
-  border-radius: 10px;
-  margin-left: auto;
-  margin-right: auto;
-}
-img.hthumbnail {
-  width: 160px;
-  height: 120px;
-}
-img.vthumbnail {
-  width: 120px;
-  height: 160px;
-}
-
-#thumbnailList {
-  padding-left: 0px;
-}
-
-#thumbnailTemplate {
-  visibility: hidden;
-}
-
-li.thumbnail {
-  margin: 10px;
-  width: 181px; /* img.hthumbnail.width + 2*img.hthumbnail.border + img.hthumbnail.box-shadow */
-  min-height: 141px; /* img.hthumbnail.height + 2* img.hthumbnail.border + img.hthumbnail.box-shadow */
-  text-align: center;
-  vertical-align: top;
-  float: none;
-  display: inline-block;
-}
-
 div.caption {
   font-size: 12pt;
   line-height: 12pt;
   text-align: left;
-}
-
-div.centerh {
-  height: 100%;
-  width: 100%;
-  margin-left: auto;
-  margin-right: auto;
-  text-align: center;
 }
 
 div.captionItem {
@@ -187,15 +103,8 @@ span.property {
   line-height: 0px;
 }
 
-#captionPanel, #propertyPanel, #photoPanel {
+#captionPanel, #propertyPanel, #contentPanel {
   position: absolute;
-}
-
-#titlePanel {
-  top: 0;
-  margin-left: 20%;
-  margin-right: 20%;
-  height: 80px;
 }
 
 #captionPanel {
@@ -212,7 +121,7 @@ span.property {
   bottom: 0;
 }
 
-#photoPanel {
+#contentPanel {
   top: 80px;
   left: 20%;
   right: 20%;
@@ -221,69 +130,7 @@ span.property {
   line-height: 0px;
 }
 
-#footerPanel {
-  position: absolute;
-  height: 80px;
-  bottom: 0;
-  right: 20%;
-  left: 20%;
-  width: 60%; /* hack for MSIE */
+#thumbnailList {
+  display: none;
 }
 
-#warning {
-  height: 1.5em;
-  line-height: 1em;
-  font-size: 10pt;
-  text-align: center;
-  vertical-align: top;
-  border-width: 1px;
-  border-style: solid;
-  color: #7FFF00;
-  background-color: inherit;
-}
-
-#thumbnailPanel {
-  margin-left: 80px;
-  margin-right: 80px;
-  /*margin-bottom: 80px;*/ /* this is the best way, but breaks in Opera 8.0 */
-  padding-bottom: 80px; /* hack for Opera 8.0, breaks MSIE 6.0 */
-  text-align: center;
-  line-height: 0px;
-}
-
-html, body, #contents {
-  min-height: 100%;
-  width: 100%;
-  height: 100%; /* hack for MSIE - should be auto */
-}
-
-/* hack for MSIE */
-html>body, html>body #contents {
-  height: auto;
-}
-
-#contents {
-  position: absolute;
-  top: 0;
-  left: 0;
-}
-
-/* From http://css-tricks.com/centering-in-the-unknown/ */
-div.centerBlock {
-  text-align: center;
-}
-div.centerBlock:before {
-  content: '';
-  display: inline-block;
-  height: 100%; 
-  vertical-align: middle;
-  margin-right: -0.25em; /* Adjusts for spacing */
-}
-.centeredObj {
-  display: inline-block;
-  vertical-align: middle;
-}
-
-#footerContent {
-  font-size: 10pt;
-}
