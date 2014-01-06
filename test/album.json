@@ -1,6 +1,8 @@
 {
     "title" : "Test Album",
     "footer" : "Copyright &copy; \"Rennie deGraaf\" 2005-2013. All rights reserved.<br/>       Blah blah blah<br/>    Blah",
+    "description" : "",
+    "thumbnail" : "img000.jpeg.small.jpeg",
     "photos" : [
         {
             "name" : "img000.jpeg",

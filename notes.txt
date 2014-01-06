@@ -45,7 +45,7 @@
 | | Add list...  |V|                           | Load Album... |     |
 | +--------------+-+                           +---------------+     |
 |                                                                    |
-======================================================================
+----------------------------------------------------------------------
 
 * Scan photos on selection for available tags
 * Tag lists are populated from all available image tags

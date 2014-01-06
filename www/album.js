@@ -14,8 +14,8 @@ Design goals:
   - Safari won't be tested because it's no longer available on Windows and I 
     don't have a Mac.
   - All style in CSS.  Changes to CSS should not require script changes.
-  - All content in HTML or generated from photo properties
-  - Support CSP and other modern web security
+  - All content in HTML or generated from photo properties.
+  - Support CSP and other modern web security.
 */
 
 // TODO: generation tool for JSON files

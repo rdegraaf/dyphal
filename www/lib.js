@@ -55,6 +55,8 @@ function getElementsByClass ( tag, classname )
 // gets a style property for an object
 function getProperty ( obj, prop )
 {
+    // The eval() fallbacks will run afoul of CSP, but any browser that doesn't support 
+    // getComputedStyle() properly probably doesn't support CSP anyway.
     if (document.defaultView && document.defaultView.getComputedStyle)
     {
         var val = document.defaultView.getComputedStyle(obj,null).getPropertyValue(prop)
@@ -124,10 +126,10 @@ function getObjHeight ( obj )
 function getHBorder ( obj )
 {
     // this won't work if the units aren't pixels
-    var leftBorder = parseInt(getProperty(obj, "borderLeftWidth").replace(/[^0-9\.]/gi, ""));
-    var leftPad = parseInt(getProperty(obj, "paddingLeft").replace(/[^0-9\.]/gi, ""));
-    var rightPad = parseInt(getProperty(obj, "paddingRight").replace(/[^0-9\.]/gi, ""));
-    var rightBorder = parseInt(getProperty(obj, "borderRightWidth").replace(/[^0-9\.]/gi, ""));
+    var leftBorder = parseInt(getProperty(obj, "border-left-width").replace(/[^0-9\.]/gi, ""));
+    var leftPad = parseInt(getProperty(obj, "padding-left").replace(/[^0-9\.]/gi, ""));
+    var rightPad = parseInt(getProperty(obj, "padding-right").replace(/[^0-9\.]/gi, ""));
+    var rightBorder = parseInt(getProperty(obj, "border-right-width").replace(/[^0-9\.]/gi, ""));
             
     // assign a sane value if the unit wasn't in pixels
     if (isNaN(leftBorder))
@@ -146,10 +148,10 @@ function getHBorder ( obj )
 function getVBorder ( obj )
 {
     // this won't work if the units aren't pixels
-    var topBorder = parseInt(getProperty(obj, "borderTopWidth").replace(/[^0-9\.]/gi, ""));
-    var topPad = parseInt(getProperty(obj, "paddingTop").replace(/[^0-9\.]/gi, ""));
-    var bottomPad = parseInt(getProperty(obj, "paddingBottom").replace(/[^0-9\.]/gi, ""));
-    var bottomBorder = parseInt(getProperty(obj, "borderBottomWidth").replace(/[^0-9\.]/gi, ""));
+    var topBorder = parseInt(getProperty(obj, "border-top-width").replace(/[^0-9\.]/gi, ""));
+    var topPad = parseInt(getProperty(obj, "padding-top").replace(/[^0-9\.]/gi, ""));
+    var bottomPad = parseInt(getProperty(obj, "padding-bottom").replace(/[^0-9\.]/gi, ""));
+    var bottomBorder = parseInt(getProperty(obj, "border-bottom-width").replace(/[^0-9\.]/gi, ""));
 
     // assign a sane value if the unit wasn't in pixels
     if (isNaN(topBorder))

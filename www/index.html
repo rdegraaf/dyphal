@@ -10,6 +10,7 @@
   <head>
     <meta charset="UTF-8"/>
     <meta name="Author" content="Rennie deGraaf" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'self';"/>
     <link rel="stylesheet" href="common.css" />
     <link id="stylesheet" rel="stylesheet" href="album.css" />
     <script type="text/javascript" src="lib.js"></script>
@@ -61,7 +62,7 @@
       </div>
 
       <div id="propertyPanel" class="caption">
-        <table id="propertyTable" style="padding: 1ex;">
+        <table id="propertyTable">
           <col width="0*" />
           <col width="100%" />
           <!-- Photo properties -->
