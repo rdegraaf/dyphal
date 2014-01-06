@@ -1,0 +1,17 @@
+[project]
+name=photo_album
+description=
+base_path=./
+run_cmd=
+regenerate=false
+type=All
+
+[files]
+file0=www/index.html
+file1=www/lib.js
+file2=www/debug.css
+file3=www/album.css
+file4=www/album_generator.py
+file5=www/photo.css
+file6=www/album.js
+file7=www/common.css

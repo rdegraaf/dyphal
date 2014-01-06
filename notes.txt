@@ -1,0 +1,66 @@
+======================================================================
+|                                                                    |
+|--------------------------------------------------------------------|
+|                                                                    |
+| Photos                                        Description          |
+| +-------------------------------------+      +----------------+-+  |
+| |                                     |      | Tag group      |V|  |
+| | List of photos                      |      +----------------+-+  |
+| |  * selectable (one only)            |      | # tag 1        |*|  |
+| |  * drag to change order             |      | # tag 2        |*|  |
+| |  * right-click to see tags          |      | # ...          |*|  |
+| |                                     |      | # ...          |*|  |
+| |                                     |      | # ...          | |  |
+| |                                     |      | # ...          | |  |
+| |                                     |      | # ...          | |  |
+| |                                     |      +----------------+-+  |
+| |                                     |                            |
+| |                                     |       Properties           |
+| |                                     |      +----------------+-+  |
+| |                                     |      | Tag group      |V|  |
+| |                                     |      +----------------+-+  |
+| |                                     |      | # tag 1        |*|  |
+| |                                     |      | # tag 2        |*|  |
+| |                                     |      | # ...          |*|  |
+| |                                     |      | # ...          |*|  |
+| |                                     |      | # ...          | |  |
+| |                                     |      | # ...          | |  |
+| |                                     |      | # ...          | |  |
+| |                                     |      +----------------+-+  |
+| |                                     |                            |
+| |                                     |      Album Title           |
+| |                                     |      --------------------  |
+| |                                     |      [                  ]  |
+| |                                     |      --------------------  |
+| |                                     |                            |
+| |                                     |      Copyright notice      |
+| |                                     |      --------------------  |
+| |                                     |      [                  ]  |
+| +-------------------------------------+      --------------------  |
+|                                                                    |
+| +---------------+   +--------------+         +---------------+     |
+| | Add photos... |   | Remove photo |         | Save Album... |     |
+| +---------------+   +--------------+         +---------------+     |
+| +--------------+-+                           +---------------+     |
+| | Add list...  |V|                           | Load Album... |     |
+| +--------------+-+                           +---------------+     |
+|                                                                    |
+======================================================================
+
+* Scan photos on selection for available tags
+* Tag lists are populated from all available image tags
+* Tag lists are disabled until photos have been selected
+* Selected description and properties tags are stored in album JSON
+* Add gthumb lists; gthumb 3 stores lists at ~/.local/share/gthumb/catalogs in *.catalog XML files
+* Progress bar on album generation; phases:
+*    Generating thumbnails
+*    Copying photos
+*    Generating album
+* File layout:
+*    /index.html
+*    /<album>/index.html
+*    /<album>/index.json
+*    /<album>/<photos>.json
+*    /thumbnails/...
+*    /photos/...
+
