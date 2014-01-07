@@ -2,17 +2,18 @@
   album.js
   Version 3.0
   Copyright (c) Rennie deGraaf, 2005-2013.  All rights reserved.
-  Last modified: 24 May 2013
+  Last modified: 06 Jan 2014
  
   Scripts for DHTML photo album.
 *************************************************/
 
 /*
 Design goals: 
-  - Works in current major browsers (Firefox, Chrome, IE)
+  - Works in current major browsers (Firefox, Chrome, IE, Android)
   - Not badly broken in recent (IE 8) and minor (Opera, Konqueror) browsers
   - Safari won't be tested because it's no longer available on Windows and I 
-    don't have a Mac.
+    don't have a Mac.  Likewise, IOS won't be tested because I don't have an 
+    iPhone.
   - All style in CSS.  Changes to CSS should not require script changes.
   - All content in HTML or generated from photo properties.
   - Support CSP and other modern web security.
@@ -22,13 +23,17 @@ Design goals:
 // TODO: look for and strip out unnecessary CSS
 // TODO: test IE, write compat shims for IE 8
 // TODO: get rid of "contents" div?  Better strategy for the sticky footer?
-// TODO: Konqueror: text is too big
 // TODO: center photo vertically?
 // TODO: click on photo or press key to show photo at highest available resolution, overlayed over the page
 // TODO: index of albums?
 // TODO: double-scale the photo if the screen is big enough to fit it
 // TODO: Is it a bug that the master stylesheet can be loaded after the debug stylesheet when switching to photo view from thumbnail view with debug enabled?
-// TODO: use generatePhotoURL for index URLs as well
+// TODO: mobile stylesheet
+// TODO: gestures for navigation on mobile
+
+// BUG: old page contents remain visible when a hash change results in a load error (WONTFIX?)
+// BUG: font is too big in Konqueror and Opera
+// BUG: backspace doesn't work for navigation in Konqueror or Opera
 
 /*
 Notes:
@@ -36,6 +41,7 @@ Notes:
 */
 
 var debug=false;
+var albumName=null; // name of the current album
 var album=null; // object describing the current album
 var page=null; // number of the current page, 0 for the album thumbnail view
 var pages=[]; // objects describing all pages that have been retrieved.  Corresponds to album.photos.
@@ -44,10 +50,8 @@ var pages=[]; // objects describing all pages that have been retrieved.  Corresp
 // Set up event listeners
 window.addEventListener("load", start, false);
 window.addEventListener("hashchange", start, false);
-document.addEventListener("DOMContentLoaded", function() {
-    // Since JavaScript is clearly enabled, hide the warning as early as possible
-    document.getElementById("warning").style["display"] = "none";
-}, false);
+// Since JavaScript is clearly enabled, hide the warning as early as possible
+document.addEventListener("DOMContentLoaded", suppressWarning, false);
 
 
 // Display an error message in the warning panel
@@ -71,23 +75,44 @@ function warning(msg)
 }
 
 
+// Hide the warning panel
+function suppressWarning()
+{
+    document.getElementById("warning").style["display"] = "none";
+}
+
+
 // Called when the document loads.  Display the requested page.
 function start()
 {
+    // DomContentLoaded doesn't get signalled when only the hash changes, but this does.
+    // So let's make sure it's hidden.
+    suppressWarning();
+    
     try
     {
         // Parse the page arguments
+        var albumNameNew = null;
         var debugNew = false;
         var pageNew = 0;
         var args = window.location.hash.substring(1).split(",");
-        for (i=0; i<args.length; ++i)
+        if ((1 > args.length) || (3 < args.length) || ("" == args[0]))
+            throw new Error("Incorrect page arguments");
+        albumNameNew = args[0];
+        if ((2 == args.length) && ("debug" == args[1]))
+            debugNew = true;
+        else if (2 <= args.length)
         {
-            if (("debug" == args[i]) && (false == debugNew))
-                debugNew = true;
-            else if (/^[0-9]+$/.test(args[i]))
-                pageNew = parseInt(args[i]);
-            else if ("" != args[i])
-                warning("Unrecognized or duplicate page argument: " + args[i])
+            if (/^[0-9]+$/.test(args[1]))
+            {
+                pageNew = parseInt(args[1])
+                if ((3 == args.length) && ("debug" == args[2]))
+                    debugNew = true;
+                else if (3 <= args.length)
+                    throw new Error("Incorrect page arguments");
+            }
+            else
+                throw new Error("Incorrect page arguments");
         }
 
         if (debug != debugNew)
@@ -98,12 +123,19 @@ function start()
             else
                 unloadDebug();
         }
+        
+        if (albumName != albumNameNew)
+        {
+            albumName = albumNameNew;
+            album = null;
+            page = null;
+        }
     
         if (page != pageNew)
         {
             page = pageNew;
             if (null == album)
-                getJSON("album.json", loadAlbum, true, null);
+                getJSON("./" + albumName + ".json", loadAlbum, true, null);
             else if (0 == page)
                 loadAlbumContent();
             else if (page > album.photos.length)
@@ -137,13 +169,12 @@ function loadDebug()
     debugPanel.setAttribute("id", "debugPanel");
     var debugLink = document.createElement("a");
     debugLink.setAttribute("id", "debugLink");
-    debugLink.setAttribute("href", "broken_link.html");
+    debugLink.setAttribute("href", generatePhotoURL(page, true));
     debugLink.textContent = "Leave debug mode";
     debugPanel.appendChild(debugLink);
     document.getElementsByTagName("body")[0].appendChild(debugPanel);
 
     // Add the debug keyword to navigation links
-    document.getElementById("indexLink").setAttribute("href", "#debug");
     var links = getElementsByClass("a", "navigationlink");
     for (var i=0; i<links.length; ++i)
         links[i].setAttribute("href", generatePhotoURL(links[i].getAttribute("data-target")));
@@ -162,7 +193,6 @@ function unloadDebug()
     debugPanel.parentNode.removeChild(debugPanel);
 
     // Remove the debug keyword from navivation links
-    document.getElementById("indexLink").setAttribute("href", "#");
     var links = getElementsByClass("a", "navigationlink");
     for (var i=0; i<links.length; ++i)
         links[i].setAttribute("href", generatePhotoURL(links[i].getAttribute("data-target")));
@@ -256,7 +286,7 @@ function loadAlbumContent()
     }
 
     if (debug)
-        document.getElementById("debugLink").setAttribute("href", "#");
+        document.getElementById("debugLink").setAttribute("href", generatePhotoURL(0, true));
 
     cacheNext();
 }
@@ -363,7 +393,7 @@ function loadPhotoContent()
     }
 
     if (debug)
-        document.getElementById("debugLink").setAttribute("href", "#"+page);
+        document.getElementById("debugLink").setAttribute("href", generatePhotoURL(page, true));
 
     if (1 == page)
     {
@@ -418,6 +448,9 @@ function loadPhotoContent()
         nextLinkElement.setAttribute("data-target", page+1);
         nextLinkElement.style["visibility"] = "visible";
     }
+    
+    indexLinkElement = document.getElementById("indexLink");
+    indexLinkElement.setAttribute("href", generatePhotoURL(0));
     
     cacheNext();
 }
@@ -499,10 +532,12 @@ function fitPhoto()
 
 
 // Return a URL to a photo.
-function generatePhotoURL(index)
+function generatePhotoURL(index, suppressDebug)
 {
-    var link = "#" + index;
-    if (debug)
+    var link = "#" + albumName;
+    if (0 != index)
+        link += "," + index;
+    if (debug && (true != suppressDebug))
         link += ",debug";
     return link;
 }
@@ -544,28 +579,28 @@ function keyHandler(e)
         if (0 < page)
         {
             // On a photo page
-            if (34 == e.keyCode) // page down
+            if ((34 /*page down*/ == e.keyCode) || (32 /*space*/ == e.keyCode))
             {
                 if (page != album.photos.length)
                     document.location.href = generatePhotoURL(page+1);
                 return false;
             }
-            else if (33 == e.keyCode) // page up
+            else if ((33 /*page up*/ == e.keyCode) || (8 /*backspace*/ == e.keyCode))
             {
                 if (page != 1)
                     document.location.href = generatePhotoURL(page-1);
                 return false;
             }
-            else if (36 == e.keyCode) // home
+            else if ((36 /*home*/ == e.keyCode) || (27 /*escape*/ == e.keyCode))
             {
-                document.location.href = "#" + (debug?"debug":"");
+                document.location.href = generatePhotoURL(0);
                 return false;
             }
         }
         else if (0 == page)
         {
             // On an album page
-            if (13 == e.keyCode) // enter
+            if (13 /*enter*/ == e.keyCode)
             {
                 document.location.href = generatePhotoURL(1);
                 return false;
