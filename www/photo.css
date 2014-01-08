@@ -1,7 +1,7 @@
 /*************************************************
   photo.css
-  Copyright (c) Rennie deGraaf, 2005-2013.  All rights reserved.
-  Last modified: 23 May 2013
+  Copyright (c) Rennie deGraaf, 2005-2014.  All rights reserved.
+  Last modified: 07 January 2014
  
   Photo stylesheet for DHTML photo album.
 *************************************************/
@@ -29,16 +29,6 @@ img.vnavigation {
   height: 100px;
 }
 
-img.back {
-  width: 30px;
-  height: 30px;
-}
-
-img.next, img.prev {
-  width: 40px;
-  height: 30px;
-}
-
 img.photo {
   border: 3px solid black;
   visibility: hidden;
@@ -60,8 +50,7 @@ div.captionItem {
 
 #index {
   font-weight: bold;
-  font-size: 10pt;
-  vertical-align: 9px;
+  font-size: 12pt;
 }
 
 span.property {
@@ -134,3 +123,25 @@ span.property {
   display: none;
 }
 
+#prevImage,#nextImage {
+  display: inline-block;
+  width: 40px;
+  height: 30px;
+  margin: 0px;
+}
+
+#prevImage {
+  background: url(prev.png);
+}
+
+#nextImage {
+  background: url(next.png);
+}
+
+#prevLink, #nextLink {
+  display: inline-block;
+  width: 100%;
+  height: 100%;
+  font-size: 0pt;
+  vertical-align: text-top;
+}

@@ -1,7 +1,7 @@
 /*************************************************
   album.js
   Version 3.0
-  Copyright (c) Rennie deGraaf, 2005-2013.  All rights reserved.
+  Copyright (c) Rennie deGraaf, 2005-2014.  All rights reserved.
   Last modified: 06 Jan 2014
  
   Scripts for DHTML photo album.
@@ -19,17 +19,19 @@ Design goals:
   - Support CSP and other modern web security.
 */
 
-// TODO: generation tool for JSON files
+// TODO: generation tool for JSON files, scalled photos
 // TODO: look for and strip out unnecessary CSS
 // TODO: test IE, write compat shims for IE 8
-// TODO: get rid of "contents" div?  Better strategy for the sticky footer?
+// TODO: less dodgy strategy for centering in the header and footer?
 // TODO: center photo vertically?
 // TODO: click on photo or press key to show photo at highest available resolution, overlayed over the page
 // TODO: index of albums?
 // TODO: double-scale the photo if the screen is big enough to fit it
 // TODO: Is it a bug that the master stylesheet can be loaded after the debug stylesheet when switching to photo view from thumbnail view with debug enabled?
-// TODO: mobile stylesheet
+// TODO: mobile stylesheet?
 // TODO: gestures for navigation on mobile
+// TODO: hover tooltips on navigation arrows
+// TODO: index link on album page
 
 // BUG: old page contents remain visible when a hash change results in a load error (WONTFIX?)
 // BUG: font is too big in Konqueror and Opera
@@ -399,7 +401,7 @@ function loadPhotoContent()
     {
         // No previous photo
         document.getElementById("prevThumbPanel").style["visibility"] = "hidden";
-        document.getElementById("prevLink").style["visibility"] = "hidden";
+        document.getElementById("prevImage").style["visibility"] = "hidden";
     }
     else
     {
@@ -419,14 +421,14 @@ function loadPhotoContent()
         prevLinkElement = document.getElementById("prevLink");
         prevLinkElement.setAttribute("href", generatePhotoURL(page-1));
         prevLinkElement.setAttribute("data-target", page-1);
-        prevLinkElement.style["visibility"] = "visible";
+        document.getElementById("prevImage").style["visibility"] = "visible";
     }
             
     if (page == album.photos.length)
     {
         // No next photo
         document.getElementById("nextThumbPanel").style["visibility"] = "hidden";
-        document.getElementById("nextLink").style["visibility"] = "hidden";
+        document.getElementById("nextImage").style["visibility"] = "hidden";
     }
     else
     {
@@ -446,7 +448,7 @@ function loadPhotoContent()
         nextLinkElement = document.getElementById("nextLink");
         nextLinkElement.setAttribute("href", generatePhotoURL(page+1));
         nextLinkElement.setAttribute("data-target", page+1);
-        nextLinkElement.style["visibility"] = "visible";
+        document.getElementById("nextImage").style["visibility"] = "visible";
     }
     
     indexLinkElement = document.getElementById("indexLink");

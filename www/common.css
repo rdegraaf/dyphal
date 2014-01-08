@@ -1,3 +1,10 @@
+/*************************************************
+  common.css
+  Copyright (c) Rennie deGraaf, 2005-2014.  All rights reserved.
+  Last modified: 07 January 2014
+ 
+  Stylesheet for DHTML photo album.
+*************************************************/
 
 html, body {
   color: #FFFFFF;
@@ -52,7 +59,7 @@ img {
   bottom: 0;
   right: 20%;
   left: 20%;
-  width: 60%; /* hack for MSIE */
+  /*width: 60%; /* hack for MSIE */
 }
 
 #warning {
@@ -85,4 +92,20 @@ div.centerBlock:before {
 
 #footerContent {
   font-size: 10pt;
+}
+
+#indexImage {
+  display: inline-block;
+  width: 30px;
+  height: 30px;
+  background: url(back.png);
+  margin: 0px;
+}
+
+#indexLink {
+  display: inline-block;
+  width: 100%;
+  height: 100%;
+  font-size: 0pt;
+  vertical-align: text-top
 }

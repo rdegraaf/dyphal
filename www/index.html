@@ -2,8 +2,8 @@
 <html>
 <!--
   index.html
-  Copyright (c) Rennie deGraaf, 2005-2013.  All rights reserved.
-  Last modified: 06 Jan 2014
+  Copyright (c) Rennie deGraaf, 2005-2014.  All rights reserved.
+  Last modified: 07 Jan 2014
 
   Master page for DHTML photo album.
 -->
@@ -19,66 +19,64 @@
   </head>
 
   <body>
-    <div id="contents">
 
-      <div id="titlePanel" class="centerBlock">
-        <h1 id="titleContent" class="centeredObj"></h1>
-      </div>
-
-      <div id="footerPanel" class="centerBlock">
-        <div id="footerContent" class="centeredObj"></div>
-      </div>
-
-      <div id="indexPanel">
-        <a id="indexLink" class="navigationlink" href="broken_link.html">
-          <img src="back.png" alt="Back to index" title="Return to thumbnail index" class="back"/>
-        </a>
-      </div>
-
-      <div id="navigationPanel">
-        <a id="prevLink" class="navigationlink" href="broken_link.html">
-          <img src="prev.png" alt="Previous photo link" title="Previous photo" class="prev"/>
-        </a>
-        <span id="index"></span>
-        <a id="nextLink" class="navigationlink" href="broken_link.html">
-          <img src="next.png" alt="Next photo link" title="Next photo" class="next"/>
-        </a>
-      </div>
-
-      <div id="prevThumbPanel">
-        <a id="prevThumbLink" class="navigationlink" href="broken_link.html">
-          <img id="prevThumbImage" class="hnavigation" src="" alt="Previous photo thumbnail" title="Previous photo"/>
-        </a>
-      </div>
-
-      <div id="nextThumbPanel">
-        <a id="nextThumbLink" class="navigationlink" href="broken_link.html">
-          <img id="nextThumbImage" class="hnavigation" src="" alt="Next photo thumbnail" title="Next photo"/>
-        </a>
-      </div>
-
-      <div id="captionPanel" class="caption">
-        <!-- Photo caption -->
-      </div>
-
-      <div id="propertyPanel" class="caption">
-        <table id="propertyTable">
-          <col width="0*" />
-          <col width="100%" />
-          <!-- Photo properties -->
-        </table>
-      </div>
-
-      <div id="contentPanel">
-        <div id="warning">
-          This page requires JavaScript, but it appears to be disabled in your browser.
-        </div>
-        <img id="photo" class="photo" src="" alt="Photo" width="50" height="50"/>
-        <ul id="thumbnailList">
-          <!-- Photo thumbnails -->
-        </ul>
-      </div>
-
+    <div id="titlePanel" class="centerBlock">
+      <h1 id="titleContent" class="centeredObj"></h1>
     </div>
+
+    <div id="footerPanel" class="centerBlock">
+      <div id="footerContent" class="centeredObj"></div>
+    </div>
+
+    <div id="indexPanel">
+      <h2 id="indexImage">
+        <a id="indexLink" class="navigationlink" href="broken_link.html">Return to thumbnail index</a>
+      </h2>
+    </div>
+
+    <div id="navigationPanel">
+      <h2 id="prevImage">
+        <a id="prevLink" class="navigationlink" href="broken_link.html">Previous photo</a>
+      </h2>
+      <span id="index"></span>
+      <h2 id="nextImage">
+        <a id="nextLink" class="navigationlink" href="broken_link.html">Next photo</a>
+      </h2>
+    </div>
+
+    <div id="prevThumbPanel">
+      <a id="prevThumbLink" class="navigationlink" href="broken_link.html">
+        <img id="prevThumbImage" class="hnavigation" src="" alt="Previous photo thumbnail" title="Previous photo"/>
+      </a>
+    </div>
+
+    <div id="nextThumbPanel">
+      <a id="nextThumbLink" class="navigationlink" href="broken_link.html">
+        <img id="nextThumbImage" class="hnavigation" src="" alt="Next photo thumbnail" title="Next photo"/>
+      </a>
+    </div>
+
+    <div id="captionPanel" class="caption">
+      <!-- Photo caption -->
+    </div>
+
+    <div id="propertyPanel" class="caption">
+      <table id="propertyTable">
+        <col width="0*" />
+        <col width="100%" />
+        <!-- Photo properties -->
+      </table>
+    </div>
+
+    <div id="contentPanel">
+      <div id="warning">
+        This page requires JavaScript, but it appears to be disabled in your browser.
+      </div>
+      <img id="photo" class="photo" src="" alt="Photo" width="50" height="50"/>
+      <ul id="thumbnailList">
+        <!-- Photo thumbnails -->
+      </ul>
+    </div>
+
   </body>
 </html>
