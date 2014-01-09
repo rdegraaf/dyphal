@@ -1,7 +1,7 @@
 /*************************************************
   album.css
   Copyright (c) Rennie deGraaf, 2005-2014.  All rights reserved.
-  Last modified: 07 January 2014
+  Last modified: 08 January 2014
  
   Album stylesheet for DHTML photo album.
 *************************************************/
@@ -47,7 +47,7 @@ li.thumbnail {
   line-height: 0px;
 }
 
-#indexPanel,#navigationPanel,#prevThumbPanel,#nextThumbPanel,#captionPanel,#propertyPanel,#photo {
+#navigationPanel,#prevThumbPanel,#nextThumbPanel,#captionPanel,#propertyPanel,#photo,#overlay {
   display: none;
   width: 0;
   height: 0;
@@ -63,3 +63,9 @@ html, body {
 /*html>body {
   height: auto;
 }*/
+
+#description {
+  line-height: 1em;
+  font-size: 12pt;
+  text-align: justify;
+}

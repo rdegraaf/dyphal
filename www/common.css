@@ -1,7 +1,7 @@
 /*************************************************
   common.css
   Copyright (c) Rennie deGraaf, 2005-2014.  All rights reserved.
-  Last modified: 07 January 2014
+  Last modified: 08 January 2014
  
   Stylesheet for DHTML photo album.
 *************************************************/
@@ -92,6 +92,15 @@ div.centerBlock:before {
 
 #footerContent {
   font-size: 10pt;
+}
+
+#indexPanel {
+  text-align: center;
+  position: absolute;
+  width: 20%;
+  top: 22px;
+  height: 30px; /* img.back.height */
+  left: 0;
 }
 
 #indexImage {

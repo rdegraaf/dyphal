@@ -1,8 +1,7 @@
 {
     "title" : "Test Album",
     "footer" : "Copyright &copy; \"Rennie deGraaf\" 2005-2013. All rights reserved.<br/>       Blah blah blah<br/>    Blah",
-    "description" : "",
-    "thumbnail" : "img000.jpeg.small.jpeg",
+    "description" : "These are some of my best photos ever. And here's some more text, because I want this to be really long.  I want it to wrap around at least once; preferrably more than once.  But apparently it takes a lot of text to fill in a line.",
     "photos" : [
         {
             "name" : "img000.jpeg",

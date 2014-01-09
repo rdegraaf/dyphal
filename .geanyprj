@@ -8,14 +8,15 @@ type=All
 
 [files]
 file0=test/img000.jpeg.json
-file1=www/debug.css
-file2=www/album.css
-file3=www/photo.css
-file4=test/img_2235.jpg.json
-file5=www/lib.js
-file6=test/img_0281.jpg.json
-file7=notes.txt
-file8=www/common.css
-file9=test/album.json
-file10=www/album.js
-file11=www/index.html
+file1=test/index.json
+file2=www/debug.css
+file3=www/album.css
+file4=www/photo.css
+file5=test/img_2235.jpg.json
+file6=www/lib.js
+file7=test/img_0281.jpg.json
+file8=notes.txt
+file9=www/common.css
+file10=test/album.json
+file11=www/album.js
+file12=www/index.html

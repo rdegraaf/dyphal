@@ -1,7 +1,7 @@
 /*************************************************
   photo.css
   Copyright (c) Rennie deGraaf, 2005-2014.  All rights reserved.
-  Last modified: 07 January 2014
+  Last modified: 08 January 2014
  
   Photo stylesheet for DHTML photo album.
 *************************************************/
@@ -60,16 +60,10 @@ span.property {
   font-weight: bold;
 }
 
-#indexPanel, #navigationPanel, #prevThumbPanel, #nextThumbPanel {
+#navigationPanel, #prevThumbPanel, #nextThumbPanel {
   text-align: center;
   position: absolute;
   width: 20%;
-}
-
-#indexPanel {
-  top: 22px;
-  height: 30px; /* img.back.height */
-  left: 0;
 }
 
 #navigationPanel {
@@ -145,3 +139,24 @@ span.property {
   font-size: 0pt;
   vertical-align: text-top;
 }
+
+#description {
+  display: none;
+}
+
+#overlay {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+}
+
+#photoOverlay {
+  border: 3px solid black;
+  margin: 0;
+  padding: 0;
+}
+

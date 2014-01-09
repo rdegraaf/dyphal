@@ -3,7 +3,7 @@
 <!--
   index.html
   Copyright (c) Rennie deGraaf, 2005-2014.  All rights reserved.
-  Last modified: 07 Jan 2014
+  Last modified: 08 Jan 2014
 
   Master page for DHTML photo album.
 -->
@@ -25,21 +25,21 @@
     </div>
 
     <div id="footerPanel" class="centerBlock">
-      <div id="footerContent" class="centeredObj"></div>
+      <p id="footerContent" class="centeredObj"></p>
     </div>
 
     <div id="indexPanel">
-      <h2 id="indexImage">
+      <h2 id="indexImage" title="Return to thumbnail index">
         <a id="indexLink" class="navigationlink" href="broken_link.html">Return to thumbnail index</a>
       </h2>
     </div>
 
     <div id="navigationPanel">
-      <h2 id="prevImage">
+      <h2 id="prevImage" title="Previous photo">
         <a id="prevLink" class="navigationlink" href="broken_link.html">Previous photo</a>
       </h2>
       <span id="index"></span>
-      <h2 id="nextImage">
+      <h2 id="nextImage" title="Next photo">
         <a id="nextLink" class="navigationlink" href="broken_link.html">Next photo</a>
       </h2>
     </div>
@@ -72,10 +72,15 @@
       <div id="warning">
         This page requires JavaScript, but it appears to be disabled in your browser.
       </div>
-      <img id="photo" class="photo" src="" alt="Photo" width="50" height="50"/>
+      <p id="description"></p>
       <ul id="thumbnailList">
         <!-- Photo thumbnails -->
       </ul>
+      <img id="photo" class="photo" src="" alt="Photo" width="50" height="50"/>
+    </div>
+    
+    <div id="overlay" class="centerBlock">
+      <p id="photoOverlay" class="centeredObj"></p>
     </div>
 
   </body>

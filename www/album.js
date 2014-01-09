@@ -2,7 +2,7 @@
   album.js
   Version 3.0
   Copyright (c) Rennie deGraaf, 2005-2014.  All rights reserved.
-  Last modified: 06 Jan 2014
+  Last modified: 08 Jan 2014
  
   Scripts for DHTML photo album.
 *************************************************/
@@ -19,23 +19,19 @@ Design goals:
   - Support CSP and other modern web security.
 */
 
-// TODO: generation tool for JSON files, scalled photos
+// TODO: generation tool for JSON files, scaled photos
 // TODO: look for and strip out unnecessary CSS
 // TODO: test IE, write compat shims for IE 8
 // TODO: less dodgy strategy for centering in the header and footer?
-// TODO: center photo vertically?
-// TODO: click on photo or press key to show photo at highest available resolution, overlayed over the page
 // TODO: index of albums?
-// TODO: double-scale the photo if the screen is big enough to fit it
 // TODO: Is it a bug that the master stylesheet can be loaded after the debug stylesheet when switching to photo view from thumbnail view with debug enabled?
 // TODO: mobile stylesheet?
-// TODO: gestures for navigation on mobile
-// TODO: hover tooltips on navigation arrows
-// TODO: index link on album page
+// TODO: gestures for navigation on mobile?
 
 // BUG: old page contents remain visible when a hash change results in a load error (WONTFIX?)
 // BUG: font is too big in Konqueror and Opera
 // BUG: backspace doesn't work for navigation in Konqueror or Opera
+// BUG: overlay doesn't work properly on Opera
 
 /*
 Notes:
@@ -47,6 +43,7 @@ var albumName=null; // name of the current album
 var album=null; // object describing the current album
 var page=null; // number of the current page, 0 for the album thumbnail view
 var pages=[]; // objects describing all pages that have been retrieved.  Corresponds to album.photos.
+var overlayVisible=false;
 
 
 // Set up event listeners
@@ -90,6 +87,8 @@ function start()
     // DomContentLoaded doesn't get signalled when only the hash changes, but this does.
     // So let's make sure it's hidden.
     suppressWarning();
+    
+    hidePhotoOverlay();
     
     try
     {
@@ -258,6 +257,7 @@ function loadAlbumContent()
     document.title = album.title;
     document.getElementById("titleContent").innerHTML = album.title;
     document.getElementById("footerContent").innerHTML = album.footer;
+    document.getElementById("description").innerHTML = album.description;
 
     var listElement = document.getElementById("thumbnailList");
     while (null != listElement.firstChild)
@@ -287,6 +287,7 @@ function loadAlbumContent()
         listElement.appendChild(itemElement);
     }
 
+    document.getElementById("indexLink").setAttribute("href", ".");
     if (debug)
         document.getElementById("debugLink").setAttribute("href", generatePhotoURL(0, true));
 
@@ -394,9 +395,6 @@ function loadPhotoContent()
         propertyTable.appendChild(rowElement);
     }
 
-    if (debug)
-        document.getElementById("debugLink").setAttribute("href", generatePhotoURL(page, true));
-
     if (1 == page)
     {
         // No previous photo
@@ -451,9 +449,10 @@ function loadPhotoContent()
         document.getElementById("nextImage").style["visibility"] = "visible";
     }
     
-    indexLinkElement = document.getElementById("indexLink");
-    indexLinkElement.setAttribute("href", generatePhotoURL(0));
-    
+    document.getElementById("indexLink").setAttribute("href", generatePhotoURL(0));
+    if (debug)
+        document.getElementById("debugLink").setAttribute("href", generatePhotoURL(page, true));
+
     cacheNext();
 }
 
@@ -473,6 +472,10 @@ function loadPhotoAfterStylesheet()
             photoElement.setAttribute("height", photoData.height);
             photoElement.addEventListener("load", fitPhoto, false);
             window.addEventListener("resize", fitPhoto, false);
+            
+            // It might be better to use contents for this, but that doesn't work on Firefox and Opera
+            document.getElementById("photoOverlay").style["background"] = "url("+photoData.photo+") no-repeat";
+            document.getElementById("photoOverlay").style["background-size"] = "contain";
         }
     }
     catch (e)
@@ -488,6 +491,8 @@ function fitPhoto()
 {
     try
     {
+        hidePhotoOverlay();
+
         if (0 < page)
         {
             var photoData = pages[page-1];
@@ -498,8 +503,13 @@ function fitPhoto()
             var panelWidth;     // the current width of photoPanel, in pixels
             var panelHeight;    // the current height of photoPanel, in pixels
             var panelAspect;    // the current aspect ratio of photoPanel
+            var windowWidth;    // the width of the window
+            var windowHeight;   // the height of the window
+            var photoOverlay;   // the overlay photo
+
             
             photo = document.getElementById("photo");
+            photoOverlay = document.getElementById("photoOverlay");
             photoAspect = photoData.width/photoData.height;
             photoPanel = document.getElementById("contentPanel");
 
@@ -507,19 +517,35 @@ function fitPhoto()
             panelWidth = getObjWidth(photoPanel) - getHBorder(photo);
             panelHeight = getObjHeight(photoPanel) - getVBorder(photo);
             panelAspect = panelWidth/panelHeight;
+            
+            windowWidth = (window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth) - 6;
+            windowHeight = (window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight) - 6;
 
             // set the width and height of the photo
-            if (photoAspect >= panelAspect)
+            if ((panelWidth >= photoData.width) && (panelHeight >= photoData.height))
+            {
+                // unconstrained
+                photo.width = photoData.width;
+                photo.height = photoData.height;
+                photo.removeEventListener("click", showPhotoOverlay, false);
+            }
+            else if (photoAspect >= panelAspect)
             {
                 // constrained by width
                 photo.width = Math.min(panelWidth, photoData.width);
                 photo.height = Math.min((photoData.height*panelWidth/photoData.width), photoData.height);
+                photo.addEventListener("click", showPhotoOverlay, false);
+                photoOverlay.style["width"] = Math.min(windowWidth, photoData.width) + "px";
+                photoOverlay.style["height"] = Math.min((photoData.height*windowWidth/photoData.width), photoData.height) + "px";
             }
             else
             {
                 // constrained by height
                 photo.height = Math.min(panelHeight, photoData.height);
                 photo.width = Math.min((photoData.width*panelHeight/photoData.height), photoData.width);
+                photo.addEventListener("click", showPhotoOverlay, false);
+                photoOverlay.style["height"] = Math.min(windowHeight, photoData.height) + "px";
+                photoOverlay.style["width"] = Math.min((photoData.width*windowHeight/photoData.height), photoData.width) + "px";
             }
 
             photo.style["visibility"] = "visible";
@@ -581,7 +607,20 @@ function keyHandler(e)
         if (0 < page)
         {
             // On a photo page
-            if ((34 /*page down*/ == e.keyCode) || (32 /*space*/ == e.keyCode))
+            if (overlayVisible && (27 /*escape*/ == e.keyCode))
+            {
+                hidePhotoOverlay();
+                return false;
+            }
+            else if (13 /*enter*/ == e.keyCode)
+            {
+                if (overlayVisible)
+                    hidePhotoOverlay();
+                else
+                    document.getElementById("photo").click();
+                return false;
+            }
+            else if ((34 /*page down*/ == e.keyCode) || (32 /*space*/ == e.keyCode))
             {
                 if (page != album.photos.length)
                     document.location.href = generatePhotoURL(page+1);
@@ -615,3 +654,23 @@ function keyHandler(e)
     }
 }
 
+
+// Show the full-screen photo overlay
+function showPhotoOverlay()
+{
+    overlay = document.getElementById("overlay");
+    overlay.style["display"] = "block";
+    overlay.addEventListener("click", hidePhotoOverlay, false);
+    overlayVisible = true;
+}
+
+
+// Hide the full-screen photo overlay
+function hidePhotoOverlay()
+{
+    if (overlayVisible)
+    {
+        document.getElementById("overlay").style["display"] = "none";
+        overlayVisible = false;
+    }
+}
