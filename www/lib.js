@@ -1,7 +1,7 @@
 /*************************************************
 * lib.js
-* Copyright (c) Rennie deGraaf, 2005-2013.  All rights reserved.
-* Last modified: 24 May 2013
+* Copyright (c) Rennie deGraaf, 2005-2014.  All rights reserved.
+* Last modified: 09 January 2014
 *
 * Scripts for DHTML photo album
 * Various library routines used by other scripts
@@ -42,6 +42,7 @@ function getJSON(object, callback, fatalErrors, args)
 // returns all elements of a certain type (tag) and class
 function getElementsByClass ( tag, classname )
 {
+    // Note: MSIE 8 doesn't support getElementsByClassName()
     var objs = new Array();
     var all = document.getElementsByTagName(tag);
     for (var i=0; i<all.length; i++)

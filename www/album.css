@@ -1,7 +1,7 @@
 /*************************************************
   album.css
   Copyright (c) Rennie deGraaf, 2005-2014.  All rights reserved.
-  Last modified: 08 January 2014
+  Last modified: 09 January 2014
  
   Album stylesheet for DHTML photo album.
 *************************************************/
@@ -41,8 +41,7 @@ li.thumbnail {
 #contentPanel {
   margin-left: 80px;
   margin-right: 80px;
-  margin-bottom: 80px; /* this is the best way, but breaks in Opera 8.0 */
-  /*padding-bottom: 80px; /* hack for Opera 8.0, breaks MSIE 6.0 */
+  margin-bottom: 80px; 
   text-align: center;
   line-height: 0px;
 }
@@ -56,16 +55,11 @@ li.thumbnail {
 html, body {
   min-height: 100%;
   width: 100%;
-  height: auto; /*100%; /* hack for MSIE - should be auto */
+  height: auto;
 }
 
-/* hack for MSIE */
-/*html>body {
-  height: auto;
-}*/
-
 #description {
-  line-height: 1em;
+  line-height: normal;
   font-size: 12pt;
   text-align: justify;
 }

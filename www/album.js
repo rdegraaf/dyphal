@@ -2,7 +2,7 @@
   album.js
   Version 3.0
   Copyright (c) Rennie deGraaf, 2005-2014.  All rights reserved.
-  Last modified: 08 Jan 2014
+  Last modified: 09 Jan 2014
  
   Scripts for DHTML photo album.
 *************************************************/
@@ -20,9 +20,7 @@ Design goals:
 */
 
 // TODO: generation tool for JSON files, scaled photos
-// TODO: look for and strip out unnecessary CSS
 // TODO: test IE, write compat shims for IE 8
-// TODO: less dodgy strategy for centering in the header and footer?
 // TODO: index of albums?
 // TODO: Is it a bug that the master stylesheet can be loaded after the debug stylesheet when switching to photo view from thumbnail view with debug enabled?
 // TODO: mobile stylesheet?
@@ -255,9 +253,9 @@ function loadAlbumContent()
 
     // Set the title
     document.title = album.title;
-    document.getElementById("titleContent").innerHTML = album.title;
-    document.getElementById("footerContent").innerHTML = album.footer;
-    document.getElementById("description").innerHTML = album.description;
+    document.getElementById("titleContent").textContent = album.title;
+    document.getElementById("footerContent").textContent = album.footer;
+    document.getElementById("description").textContent = album.description;
 
     var listElement = document.getElementById("thumbnailList");
     while (null != listElement.firstChild)
@@ -355,11 +353,11 @@ function loadPhotoContent()
 
     // Set the title
     document.title = album.title + " (" + page + "/" + album.photos.length + ")";
-    document.getElementById("titleContent").innerHTML = album.title;
-    document.getElementById("footerContent").innerHTML = album.footer;
+    document.getElementById("titleContent").textContent = album.title;
+    document.getElementById("footerContent").textContent = album.footer;
 
     // Set the photo index
-    document.getElementById("index").innerHTML = page + "/" + album.photos.length;
+    document.getElementById("index").textContent = page + "/" + album.photos.length;
 
     // Load photo caption
     var captionElement = document.getElementById("captionPanel");
@@ -382,10 +380,8 @@ function loadPhotoContent()
     {
         var rowElement = document.createElement("tr");
         var cellElement = document.createElement("td");
-        var spanElement = document.createElement("span");
-        spanElement.setAttribute("class", "property");
-        spanElement.textContent = propName;
-        cellElement.appendChild(spanElement);
+        cellElement.setAttribute("class", "property");
+        cellElement.textContent = propName;
         rowElement.appendChild(cellElement);
 
         cellElement = document.createElement("td");
@@ -474,8 +470,7 @@ function loadPhotoAfterStylesheet()
             window.addEventListener("resize", fitPhoto, false);
             
             // It might be better to use contents for this, but that doesn't work on Firefox and Opera
-            document.getElementById("photoOverlay").style["background"] = "url("+photoData.photo+") no-repeat";
-            document.getElementById("photoOverlay").style["background-size"] = "contain";
+            document.getElementById("photoOverlay").style["background-image"] = "url("+photoData.photo+")";
         }
     }
     catch (e)
@@ -507,7 +502,6 @@ function fitPhoto()
             var windowHeight;   // the height of the window
             var photoOverlay;   // the overlay photo
 
-            
             photo = document.getElementById("photo");
             photoOverlay = document.getElementById("photoOverlay");
             photoAspect = photoData.width/photoData.height;

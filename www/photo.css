@@ -1,7 +1,7 @@
 /*************************************************
   photo.css
   Copyright (c) Rennie deGraaf, 2005-2014.  All rights reserved.
-  Last modified: 08 January 2014
+  Last modified: 09 January 2014
  
   Photo stylesheet for DHTML photo album.
 *************************************************/
@@ -11,10 +11,7 @@ table {
 }
 
 td {
-  color: white;
-  background-color: inherit;
-  font-size: 10pt;
-  line-height: 10pt;
+  line-height: 100%;
 }
 
 img.hnavigation, img.vnavigation {
@@ -36,15 +33,9 @@ img.photo {
 
 div.caption {
   font-size: 12pt;
-  line-height: 12pt;
-  text-align: left;
 }
 
-div.captionItem {
-  padding: 1ex;
-}
-
-#propertyTable {
+div.captionItem, #propertyTable {
   padding: 1ex;
 }
 
@@ -53,10 +44,8 @@ div.captionItem {
   font-size: 12pt;
 }
 
-span.property {
-  font-size: 10pt;
+td.property {
   color: #AAAAAA;
-  background-color: inherit;
   font-weight: bold;
 }
 
@@ -67,22 +56,14 @@ span.property {
 }
 
 #navigationPanel {
-  top: 22px;
+  top: 25px; /* 0.5*(titlePanel.height - height) */
   height: 30px; /* img.prev.height */
   right: 0;
 }
 
-#prevThumbPanel {
-  top: 80px;
-  height: 106px; /* img.vnagication.height + 2*img.vnavigation.border */
-  left: 0;
-  line-height: 0px;
-}
-
-#nextThumbPanel {
-  top: 80px;
+#prevThumbPanel, #nextThumbPanel {
+  top: 80px; /* titlePanel.height */
   height: 106px; /* img.vnavigation.height + 2*img.vnavigation.border */
-  right: 0;
   line-height: 0px;
 }
 
@@ -90,37 +71,37 @@ span.property {
   position: absolute;
 }
 
-#captionPanel {
-  top: 190px;
-  left: 0;
+#captionPanel, #propertyPanel {
+  top: 186px; /* titlePanel.height + prevThumbPanel.height */
   width: 20%;
   bottom: 0;
 }
 
-#propertyPanel {
-  top: 190px;
+#prevThumbPanel, #captionPanel {
+  left: 0;
+}
+
+#nextThumbPanel, #propertyPanel {
   right: 0;
-  width: 20%;
-  bottom: 0;
 }
 
 #contentPanel {
-  top: 80px;
+  top: 80px; /* titlePanel.height */
   left: 20%;
   right: 20%;
-  bottom: 80px;
+  bottom: 80px; /* footerPanel.height */
   text-align: center;
   line-height: 0px;
 }
 
-#thumbnailList {
+#thumbnailList, #description {
   display: none;
 }
 
 #prevImage,#nextImage {
   display: inline-block;
-  width: 40px;
-  height: 30px;
+  width: 40px; /* prevImage.width */
+  height: 30px; /* prevImage.height */
   margin: 0px;
 }
 
@@ -140,10 +121,6 @@ span.property {
   vertical-align: text-top;
 }
 
-#description {
-  display: none;
-}
-
 #overlay {
   display: none;
   position: absolute;
@@ -158,5 +135,7 @@ span.property {
   border: 3px solid black;
   margin: 0;
   padding: 0;
+  background-size: contain;
+  background-repeat: no-repeat;
 }
 

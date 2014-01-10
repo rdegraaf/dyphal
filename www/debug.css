@@ -52,7 +52,7 @@ li.thumbnail {
   position: absolute;
   width: 20%;
   top: 0;
-  height: 22px; /* fit above indexPanel */
+  height: 25px; /* fit above indexPanel */
   left: 0;
   font-size: 8pt;
 }

@@ -1,17 +1,18 @@
 /*************************************************
   common.css
   Copyright (c) Rennie deGraaf, 2005-2014.  All rights reserved.
-  Last modified: 08 January 2014
+  Last modified: 09 January 2014
  
   Stylesheet for DHTML photo album.
 *************************************************/
 
 html, body {
-  color: #FFFFFF;
+  color: white;
   background-color: #4b4b4b;
   margin: 0;
   font-family: serif;
   padding: 0;
+  font-size: 10pt;
 }
 
 h1 {
@@ -42,10 +43,6 @@ a:hover {
   background-color: inherit;   
 }
 
-img {
-  border-style: none;
-}
-
 #titlePanel {
   top: 0;
   margin-left: 20%;
@@ -59,19 +56,15 @@ img {
   bottom: 0;
   right: 20%;
   left: 20%;
-  /*width: 60%; /* hack for MSIE */
 }
 
 #warning {
-  height: 1.5em;
-  line-height: 1em;
-  font-size: 10pt;
+  line-height: normal;
   text-align: center;
   vertical-align: top;
   border-width: 1px;
   border-style: solid;
   color: #7FFF00;
-  background-color: inherit;
 }
 
 /* From http://css-tricks.com/centering-in-the-unknown/ */
@@ -90,15 +83,11 @@ div.centerBlock:before {
   vertical-align: middle;
 }
 
-#footerContent {
-  font-size: 10pt;
-}
-
 #indexPanel {
   text-align: center;
   position: absolute;
   width: 20%;
-  top: 22px;
+  top: 25px; /* 0.5*(titlePanel.height - height) */
   height: 30px; /* img.back.height */
   left: 0;
 }
@@ -117,4 +106,8 @@ div.centerBlock:before {
   height: 100%;
   font-size: 0pt;
   vertical-align: text-top
+}
+
+#footerContent {
+  white-space: pre-line;
 }
