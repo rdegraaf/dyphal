@@ -1,7 +1,7 @@
 /*************************************************
   photo.css
   Copyright (c) Rennie deGraaf, 2005-2014.  All rights reserved.
-  Last modified: 09 January 2014
+  Last modified: 10 January 2014
  
   Photo stylesheet for DHTML photo album.
 *************************************************/
@@ -35,8 +35,9 @@ div.caption {
   font-size: 12pt;
 }
 
-div.captionItem, #propertyTable {
+p.captionItem, #propertyTable {
   padding: 1ex;
+  margin: 0;
 }
 
 #index {
@@ -106,11 +107,11 @@ td.property {
 }
 
 #prevImage {
-  background: url(prev.png);
+  background-image: url(prev.png);
 }
 
 #nextImage {
-  background: url(next.png);
+  background-image: url(next.png);
 }
 
 #prevLink, #nextLink {

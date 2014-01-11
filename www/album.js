@@ -2,7 +2,7 @@
   album.js
   Version 3.0
   Copyright (c) Rennie deGraaf, 2005-2014.  All rights reserved.
-  Last modified: 09 Jan 2014
+  Last modified: 10 Jan 2014
  
   Scripts for DHTML photo album.
 *************************************************/
@@ -22,14 +22,16 @@ Design goals:
 // TODO: generation tool for JSON files, scaled photos
 // TODO: test IE, write compat shims for IE 8
 // TODO: index of albums?
-// TODO: Is it a bug that the master stylesheet can be loaded after the debug stylesheet when switching to photo view from thumbnail view with debug enabled?
 // TODO: mobile stylesheet?
 // TODO: gestures for navigation on mobile?
+// TODO: move col width to CSS
+// TODO: look for other HTML attributes that need to be switched to CSS
 
-// BUG: old page contents remain visible when a hash change results in a load error (WONTFIX?)
-// BUG: font is too big in Konqueror and Opera
-// BUG: backspace doesn't work for navigation in Konqueror or Opera
-// BUG: overlay doesn't work properly on Opera
+// BUG: old page contents remain visible when a hash change results in a load error (WONTFIX)
+// BUG: font is bigger than expected in Konqueror and Opera (WONTFIX)
+// BUG: backspace doesn't work for navigation in Konqueror or Opera (WONTFIX)
+// BUG: overlay doesn't work properly in Opera (WONTFIX)
+// BUG: The error event doesn't fire if the debug stylesheet fails to load in Opera (WONTFIX)
 
 /*
 Notes:
@@ -42,6 +44,7 @@ var album=null; // object describing the current album
 var page=null; // number of the current page, 0 for the album thumbnail view
 var pages=[]; // objects describing all pages that have been retrieved.  Corresponds to album.photos.
 var overlayVisible=false;
+var helpVisible = false;
 
 
 // Set up event listeners
@@ -82,14 +85,17 @@ function suppressWarning()
 // Called when the document loads.  Display the requested page.
 function start()
 {
-    // DomContentLoaded doesn't get signalled when only the hash changes, but this does.
-    // So let's make sure it's hidden.
-    suppressWarning();
-    
-    hidePhotoOverlay();
-    
     try
     {
+        // DomContentLoaded doesn't get signalled when only the hash changes, but this does.
+        // So let's make sure it's hidden.
+        suppressWarning();
+    
+        hidePhotoOverlay();
+        hideHelp();
+        
+        document.getElementById("helpLink").addEventListener("click", showHelp, false);
+    
         // Parse the page arguments
         var albumNameNew = null;
         var debugNew = false;
@@ -161,22 +167,60 @@ function loadDebug()
     cssElement.setAttribute("rel", "stylesheet");
     cssElement.setAttribute("href", "debug.css");
     cssElement.setAttribute("id", "debugStylesheet");
+    // We'll only update the links if the stylesheet loads correctly.
+    cssElement.addEventListener("load", loadDebugAfterStylesheet, false);
+    cssElement.addEventListener("error", loadDebugError, false);
     document.getElementsByTagName("head")[0].appendChild(cssElement);
+}
 
-    // Create a link to leave debug mode
-    var debugPanel = document.createElement("div");
-    debugPanel.setAttribute("id", "debugPanel");
-    var debugLink = document.createElement("a");
-    debugLink.setAttribute("id", "debugLink");
-    debugLink.setAttribute("href", generatePhotoURL(page, true));
-    debugLink.textContent = "Leave debug mode";
-    debugPanel.appendChild(debugLink);
-    document.getElementsByTagName("body")[0].appendChild(debugPanel);
 
-    // Add the debug keyword to navigation links
-    var links = getElementsByClass("a", "navigationlink");
-    for (var i=0; i<links.length; ++i)
-        links[i].setAttribute("href", generatePhotoURL(links[i].getAttribute("data-target")));
+// Update the page after the debug stylesheet has loaded
+function loadDebugAfterStylesheet()
+{
+    try
+    {
+        // Create a link to leave debug mode
+        var debugPanel = document.createElement("div");
+        debugPanel.setAttribute("id", "debugPanel");
+        var debugLink = document.createElement("a");
+        debugLink.setAttribute("id", "debugLink");
+        debugLink.setAttribute("href", generatePhotoURL(page, true));
+        debugLink.textContent = "Leave debug mode";
+        debugPanel.appendChild(debugLink);
+        document.getElementsByTagName("body")[0].appendChild(debugPanel);
+
+        // Add the debug keyword to navigation links
+        var links = getElementsByClass("a", "navigationlink");
+        for (var i=0; i<links.length; ++i)
+            links[i].setAttribute("href", generatePhotoURL(links[i].getAttribute("data-target")));
+    }
+    catch (e)
+    {
+        error(e.name + ": " + e.message);
+        throw e;
+    }
+}
+
+
+// Leave debug mode due to failure of the debug stylesheet to load
+function loadDebugError()
+{
+    try
+    {
+        debug = false;
+    
+        // Unload the debug stylesheet
+        var cssElement = document.getElementById("debugStylesheet");
+        cssElement.parentNode.removeChild(cssElement);
+
+        // Remove the debug tag from the URL
+        window.location.hash = generatePhotoURL(page, false);
+    }
+    catch (e)
+    {
+        error(e.name + ": " + e.message);
+        throw e;
+    }
 }
 
 
@@ -340,13 +384,10 @@ function loadPhotoContent()
     var cssElement = document.getElementById("stylesheet");
     if ("photo.css" != cssElement.getAttribute("href"))
     {
-        cssElement.parentNode.removeChild(cssElement);
-        cssElement = document.createElement("link");
-        cssElement.setAttribute("rel", "stylesheet");
-        cssElement.setAttribute("href", "photo.css");
-        cssElement.setAttribute("id", "stylesheet");
-        cssElement.addEventListener("load", loadPhotoAfterStylesheet, false);
-        document.getElementsByTagName("head")[0].appendChild(cssElement);
+        var cssElementNew = cssElement.cloneNode();
+        cssElementNew.setAttribute("href", "photo.css");
+        cssElementNew.addEventListener("load", loadPhotoAfterStylesheet, false);
+        cssElement.parentNode.replaceChild(cssElementNew, cssElement);
     }
     else
         loadPhotoAfterStylesheet();
@@ -365,7 +406,7 @@ function loadPhotoContent()
         captionPanel.removeChild(captionPanel.firstChild);
     for (idx in photoData.caption)
     {
-        var captionElement = document.createElement("div");
+        var captionElement = document.createElement("p");
         captionElement.setAttribute("class", "captionItem");
         captionElement.textContent = photoData.caption[idx];
         captionPanel.appendChild(captionElement);
@@ -487,6 +528,7 @@ function fitPhoto()
     try
     {
         hidePhotoOverlay();
+        hideHelp();
 
         if (0 < page)
         {
@@ -598,7 +640,12 @@ function keyHandler(e)
 {
     try
     {
-        if (0 < page)
+        if (helpVisible && (27 /*escape*/ == e.keyCode))
+        {
+            hideHelp();
+            return false;
+        }
+        else if (0 < page)
         {
             // On a photo page
             if (overlayVisible && (27 /*escape*/ == e.keyCode))
@@ -610,7 +657,7 @@ function keyHandler(e)
             {
                 if (overlayVisible)
                     hidePhotoOverlay();
-                else
+                else if (!helpVisible)
                     document.getElementById("photo").click();
                 return false;
             }
@@ -635,7 +682,7 @@ function keyHandler(e)
         else if (0 == page)
         {
             // On an album page
-            if (13 /*enter*/ == e.keyCode)
+            if (!helpVisible && (13 /*enter*/ == e.keyCode))
             {
                 document.location.href = generatePhotoURL(1);
                 return false;
@@ -652,19 +699,68 @@ function keyHandler(e)
 // Show the full-screen photo overlay
 function showPhotoOverlay()
 {
-    overlay = document.getElementById("overlay");
-    overlay.style["display"] = "block";
-    overlay.addEventListener("click", hidePhotoOverlay, false);
-    overlayVisible = true;
+    try
+    {
+        var overlay = document.getElementById("overlay");
+        overlay.style["display"] = "block";
+        overlay.addEventListener("click", hidePhotoOverlay, false);
+        overlayVisible = true;
+    }
+    catch (e)
+    {
+        error(e.name + ": " + e.message);
+    }
 }
 
 
 // Hide the full-screen photo overlay
 function hidePhotoOverlay()
 {
-    if (overlayVisible)
+    try
     {
-        document.getElementById("overlay").style["display"] = "none";
-        overlayVisible = false;
+        if (overlayVisible)
+        {
+            document.getElementById("overlay").style["display"] = "none";
+            overlayVisible = false;
+        }
+    }
+    catch (e)
+    {
+        error(e.name + ": " + e.message);
+    }
+}
+
+
+// Show the full-screen help overlay
+function showHelp()
+{
+    try
+    {
+        var help = document.getElementById("helpTextPanel");
+        help.style["display"] = "block";
+        help.addEventListener("click", hideHelp, false);
+        helpVisible = true;
+    }
+    catch (e)
+    {
+        error(e.name + ": " + e.message);
+    }
+}
+
+
+// Hide the full-screen help overlay
+function hideHelp()
+{
+    try
+    {
+        if (helpVisible)
+        {
+            document.getElementById("helpTextPanel").style["display"] = "none";
+            helpVisible = false;
+        }
+    }
+    catch (e)
+    {
+        error(e.name + ": " + e.message);
     }
 }

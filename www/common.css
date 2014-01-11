@@ -1,7 +1,7 @@
 /*************************************************
   common.css
   Copyright (c) Rennie deGraaf, 2005-2014.  All rights reserved.
-  Last modified: 09 January 2014
+  Last modified: 10 January 2014
  
   Stylesheet for DHTML photo album.
 *************************************************/
@@ -96,7 +96,7 @@ div.centerBlock:before {
   display: inline-block;
   width: 30px;
   height: 30px;
-  background: url(back.png);
+  background-image: url(back.png);
   margin: 0px;
 }
 
@@ -111,3 +111,66 @@ div.centerBlock:before {
 #footerContent {
   white-space: pre-line;
 }
+
+#helpLink {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 16px;
+  height: 16px;
+  padding: 1ex;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-image: url(help.png);
+}
+
+#helpTextPanel {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  min-height: 100%;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+}
+
+#helpText{
+  border: 3px solid #AAAAAA;
+  border-radius: 10px;
+  background-color: #4b4b4b;
+  max-width: 800px;
+  text-align: justify;
+  margin-left: 20%;
+  margin-right: 20%;
+  padding-left: 1em;
+  padding-right: 1em;
+  padding-bottom: 1em;
+}
+
+#helpText table {
+  border-collapse: collapse;
+}
+
+#helpText td, #helpText th {
+  border: 1px solid #AAAAAA;
+  padding: 1ex;
+  width: 50%;
+}
+
+#helpText td:first-child, #helpText th:first-child {
+  border-left: 0;
+  width: 0%;
+}
+#helpText td:last-child, #helpText th:last-child {
+  border-right: 0;
+}
+#helpText tr:first-child>th {
+  border-top: 0;
+  border-bottom-width: 3px;
+  border-bottom-style: double;
+}
+#helpText tr:last-child>td {
+  border-bottom: 0;
+}
+
+

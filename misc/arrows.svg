@@ -81,6 +81,18 @@
          stdDeviation="3"
          id="feGaussianBlur3845-0-1-0" />
     </filter>
+    <filter
+       inkscape:collect="always"
+       id="filter3813"
+       x="-0.1425794"
+       width="1.2851588"
+       y="-0.10359441"
+       height="1.2071888">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="1.2055664"
+         id="feGaussianBlur3815" />
+    </filter>
   </defs>
   <sodipodi:namedview
      id="base"
@@ -90,7 +102,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1"
-     inkscape:cx="348.89476"
+     inkscape:cx="344.95236"
      inkscape:cy="751.10959"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
@@ -98,8 +110,8 @@
      showguides="true"
      inkscape:window-width="1138"
      inkscape:window-height="802"
-     inkscape:window-x="966"
-     inkscape:window-y="172"
+     inkscape:window-x="876"
+     inkscape:window-y="317"
      inkscape:window-maximized="0">
     <inkscape:grid
        type="xygrid"
@@ -113,7 +125,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -211,5 +223,42 @@
          d="m 53,324.36218 40,-40 40,40"
          style="fill:none;stroke:#ffefe5;stroke-width:25;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
     </g>
+    <g
+       id="g3829"
+       transform="translate(-71.898943,81.623996)">
+      <flowRoot
+         transform="matrix(2.8643357,0,0,2.8643357,-857.15283,-222.82482)"
+         style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;opacity:0.33300003;fill:#000000;fill-opacity:1;stroke:none;filter:url(#filter3813);font-family:Sans"
+         id="flowRoot3010-9"
+         xml:space="preserve"><flowRegion
+           id="flowRegion3012-5"><rect
+             style="fill:#000000;fill-opacity:1"
+             y="83.362183"
+             x="459"
+             height="90"
+             width="121"
+             id="rect3014-3" /></flowRegion><flowPara
+           style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#000000;fill-opacity:1;font-family:Liberation Sans;-inkscape-font-specification:Liberation Sans Bold"
+           id="flowPara3016-1">?</flowPara></flowRoot>      <flowRoot
+         transform="matrix(2.8643357,0,0,2.8643357,-859.15318,-228.82488)"
+         style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#ffefe5;fill-opacity:1;stroke:none;font-family:Sans"
+         id="flowRoot3010"
+         xml:space="preserve"><flowRegion
+           id="flowRegion3012"><rect
+             style="fill:#ffefe5;fill-opacity:1"
+             y="83.362183"
+             x="459"
+             height="90"
+             width="121"
+             id="rect3014" /></flowRegion><flowPara
+           style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#ffefe5;fill-opacity:1;font-family:Liberation Sans;-inkscape-font-specification:Liberation Sans Bold"
+           id="flowPara3016">?</flowPara></flowRoot>    </g>
+    <rect
+       style="fill:#ffffff;fill-opacity:0;stroke:#000000;stroke-width:1.00990105;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect3827"
+       width="100.9901"
+       height="100.9901"
+       x="369.50494"
+       y="119.86713" />
   </g>
 </svg>
