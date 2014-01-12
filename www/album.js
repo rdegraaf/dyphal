@@ -25,7 +25,6 @@ Design goals:
 // TODO: index of albums?
 // TODO: mobile stylesheet?
 // TODO: gestures for navigation on mobile?
-// TODO: rename index.html to album.html
 // TODO: minifier?
 
 // BUG: old page contents remain visible when a hash change results in a load error (WONTFIX)
