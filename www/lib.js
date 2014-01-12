@@ -4,7 +4,7 @@
 * Last modified: 09 January 2014
 *
 * Scripts for DHTML photo album
-* Various library routines used by other scripts
+* Various library routines used by other scripts.
 *************************************************/
 
 // Retrieves and parses a JSON object, then makes a callback with the result 
@@ -22,7 +22,14 @@ function getJSON(object, callback, fatalErrors, args)
                 if (200 != req.status)
                     callback(req.status, null, args);
                 else
-                    callback(req.status, JSON.parse(req.response), args);
+                {
+                    var response;
+                    if (req.response) // W3C
+                        response = req.response;
+                    else // MSIE
+                        response = req.responseText;
+                    callback(req.status, JSON.parse(response), args);
+                }
             }
         }
         catch (e)
@@ -39,6 +46,7 @@ function getJSON(object, callback, fatalErrors, args)
     req.send();
 }
 
+
 // returns all elements of a certain type (tag) and class
 function getElementsByClass ( tag, classname )
 {
@@ -53,6 +61,32 @@ function getElementsByClass ( tag, classname )
     return objs;
 }
 
+
+// Convert a dashed-lowercase string to camelCase.
+function camel(str)
+{
+    var newstr="";
+    var state=0;
+    for (var i=0; i<str.length; ++i)
+    {
+        if (0 == state)
+        {
+            if ('-' == str[i])
+                state = 1;
+            else
+                newstr += str[i];
+        }
+        else
+        {
+            newstr += str[i].toUpperCase();
+            state = 0;
+        }
+    }
+    
+    return newstr;
+}
+
+
 // gets a style property for an object
 function getProperty ( obj, prop )
 {
@@ -64,28 +98,14 @@ function getProperty ( obj, prop )
         if (val)
             return val;
         else
-            return eval("document.defaultView.getComputedStyle(obj,null)." + prop);
+            return eval("document.defaultView.getComputedStyle(obj,null)." + camel(prop));
     }
     else if (window.getComputedStyle) // Konqueror
         return window.getComputedStyle(obj,null).getPropertyValue(prop);
     else if (obj.currentStyle) // MSIE
-        return eval('obj.currentStyle.' + prop);
+        return eval('obj.currentStyle.' + camel(prop));
 }
 
-function getChildren ( obj )
-{
-    if (obj.children)
-        return obj.children;
-    
-    var children = new Array();
-    for (var i=0; i<obj.childNodes.length; i++)
-    {
-        if (obj.childNodes[i].nodeName.charAt(0) != '#')
-            children[children.length] = obj.childNodes[i];
-    }
-    
-    return children;
-}
 
 // gets the width of an object, in pixels
 function getObjWidth ( obj )
@@ -104,7 +124,8 @@ function getObjWidth ( obj )
     else // value not returned in pixels
         return obj.clientWidth;
 }
-        
+
+
 // gets the height of an object, in pixels
 function getObjHeight ( obj )
 {
@@ -122,7 +143,8 @@ function getObjHeight ( obj )
     else // value not returned in pixels
         return obj.clientHeight;
 }
-        
+
+
 // gets the total width of all horizontal borders and padding of an object
 function getHBorder ( obj )
 {
@@ -144,7 +166,8 @@ function getHBorder ( obj )
     
     return leftBorder + leftPad + rightPad + rightBorder;
 }
-        
+
+
 // gets the total width of all vertical borders and padding of an object
 function getVBorder ( obj )
 {
@@ -166,5 +189,3 @@ function getVBorder ( obj )
     
     return topBorder + topPad + bottomPad + bottomBorder;
 }
-
-

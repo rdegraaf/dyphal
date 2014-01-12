@@ -20,7 +20,7 @@ Design goals:
 */
 
 // TODO: generation tool for JSON files, scaled photos
-// TODO: test IE, write compat shims for IE 8
+// TODO: test IE 11
 // TODO: test Android
 // TODO: index of albums?
 // TODO: mobile stylesheet?
@@ -33,8 +33,9 @@ Design goals:
 // BUG: overlay doesn't work properly in Opera (WONTFIX)
 // BUG: The error event doesn't fire if the debug stylesheet fails to load in Opera (WONTFIX)
 // BUG: Setting the initial image src to placeholder.png results in failure to load the first photo 
-//      loaded from album view in Opera (and possibly Chrome some of the time?).  Cloning the img 
-//      node rather than modifying fixes the problem in Opera, but causes a CSP violation in Chrome.
+//      loaded from album view in ie8 and Opera (and possibly Chrome some of the time?).  Cloning 
+//      the img node rather than modifying fixes the problem in Opera, but causes a CSP violation 
+//      in Chrome.
 
 var debug=false;
 var albumName=null; // name of the current album
@@ -126,6 +127,10 @@ function start()
                 loadDebug();
             else
                 unloadDebug();
+            
+            // These methods register load callbacks that change the DOM, so we need to wait until 
+            // they complete before we can finish loading
+            return;
         }
         
         if (albumName != albumNameNew)
@@ -193,6 +198,9 @@ function loadDebugAfterStylesheet()
         var links = getElementsByClass("a", "navigationlink");
         for (var i=0; i<links.length; ++i)
             links[i].setAttribute("href", generatePhotoURL(links[i].getAttribute("data-target")));
+
+        // resume the load process, now that we have the debug document elements.
+        start();
     }
     catch (e)
     {
@@ -239,6 +247,9 @@ function unloadDebug()
     var links = getElementsByClass("a", "navigationlink");
     for (var i=0; i<links.length; ++i)
         links[i].setAttribute("href", generatePhotoURL(links[i].getAttribute("data-target")));
+
+    // resume the load process, now that we've removed the debug document elements.
+    start();
 }
 
 
@@ -509,8 +520,8 @@ function loadPhotoAfterStylesheet()
             photoElement.addEventListener("load", fitPhoto, false);
             window.addEventListener("resize", fitPhoto, false);
             
-            // Apparently background-image is called backgroundImage to JavaScript?
-            photoOverlay = document.getElementById("photoOverlay").style["backgroundImage"] = "url(" + albumPath + photoData.photo + ")";
+            // Firefox (and probably IE8) requires that background-image be camelCased
+            document.getElementById("photoOverlay").style["backgroundImage"] = "url(" + albumPath + photoData.photo + ")";
         }
     }
     catch (e)
@@ -738,7 +749,10 @@ function showHelp()
         var help = document.getElementById("helpTextPanel");
         help.style["display"] = "block";
         help.addEventListener("click", hideHelp, false);
-        helpVisible = true;
+        
+        // Displaying the help text may resize the window.  Delay setting helpVisible to ensure 
+        // that the call to fitPhoto() on the initial resize doesn't immediately suppress help.
+        setTimeout( function() { helpVisible = true; }, 50);
     }
     catch (e)
     {
