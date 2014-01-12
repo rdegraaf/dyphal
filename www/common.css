@@ -1,7 +1,7 @@
 /*************************************************
   common.css
   Copyright (c) Rennie deGraaf, 2005-2014.  All rights reserved.
-  Last modified: 10 January 2014
+  Last modified: 11 January 2014
  
   Stylesheet for DHTML photo album.
 *************************************************/
@@ -20,27 +20,6 @@ h1 {
   font-size: 24pt;
   font-family: sans-serif;
   font-weight: bold;
-}
-
-a:link { 
-  font-weight: bold; 
-  text-decoration: none;
-  color: white;
-  background-color: inherit;   
-}
-
-a:visited { 
-  font-weight: bold; 
-  text-decoration: none;
-  color: white;
-  background-color: inherit;   
-}
-
-a:hover { 
-  font-weight: bold; 
-  text-decoration: none; 
-  color: yellow;
-  background-color: inherit;   
 }
 
 #titlePanel {
@@ -78,7 +57,7 @@ div.centerBlock:before {
   vertical-align: middle;
   margin-right: -0.25em; /* Adjusts for spacing */
 }
-.centeredObj {
+div.centerBlock>*:first-child {
   display: inline-block;
   vertical-align: middle;
 }
@@ -92,7 +71,7 @@ div.centerBlock:before {
   left: 0;
 }
 
-#indexImage {
+#indexPanel>h2 {
   display: inline-block;
   width: 30px;
   height: 30px;
@@ -105,6 +84,7 @@ div.centerBlock:before {
   width: 100%;
   height: 100%;
   font-size: 0pt;
+  color: #4b4b4b; /* same as background; hide text in Opera */
   vertical-align: text-top
 }
 

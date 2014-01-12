@@ -2,7 +2,7 @@
   album.js
   Version 3.0
   Copyright (c) Rennie deGraaf, 2005-2014.  All rights reserved.
-  Last modified: 10 Jan 2014
+  Last modified: 11 Jan 2014
  
   Scripts for DHTML photo album.
 *************************************************/
@@ -21,25 +21,25 @@ Design goals:
 
 // TODO: generation tool for JSON files, scaled photos
 // TODO: test IE, write compat shims for IE 8
+// TODO: test Android
 // TODO: index of albums?
 // TODO: mobile stylesheet?
 // TODO: gestures for navigation on mobile?
-// TODO: move col width to CSS
-// TODO: look for other HTML attributes that need to be switched to CSS
+// TODO: rename index.html to album.html
+// TODO: minifier?
 
 // BUG: old page contents remain visible when a hash change results in a load error (WONTFIX)
 // BUG: font is bigger than expected in Konqueror and Opera (WONTFIX)
 // BUG: backspace doesn't work for navigation in Konqueror or Opera (WONTFIX)
 // BUG: overlay doesn't work properly in Opera (WONTFIX)
 // BUG: The error event doesn't fire if the debug stylesheet fails to load in Opera (WONTFIX)
-
-/*
-Notes:
-  - Need to HTML-encode all strings.  Does textContent support HTML entities?
-*/
+// BUG: Setting the initial image src to placeholder.png results in failure to load the first photo 
+//      loaded from album view in Opera (and possibly Chrome some of the time?).  Cloning the img 
+//      node rather than modifying fixes the problem in Opera, but causes a CSP violation in Chrome.
 
 var debug=false;
 var albumName=null; // name of the current album
+var albumPath=null;
 var album=null; // object describing the current album
 var page=null; // number of the current page, 0 for the album thumbnail view
 var pages=[]; // objects describing all pages that have been retrieved.  Corresponds to album.photos.
@@ -132,6 +132,7 @@ function start()
         if (albumName != albumNameNew)
         {
             albumName = albumNameNew;
+            albumPath = "./" + albumName.replace(/[^\/]+$/, '');
             album = null;
             page = null;
         }
@@ -146,7 +147,7 @@ function start()
             else if (page > album.photos.length)
                 error("Photo number out of range");
             else if (null == pages[page-1])
-                getJSON("./" +  album.photos[page-1].name + ".json", loadPhoto, true, {"page":page});
+                getJSON(albumPath + album.photos[page-1].name + ".json", loadPhoto, true, {"page":page});
             else
                 loadPhotoContent();
         }
@@ -258,7 +259,7 @@ function loadAlbum(status, albumData, args)
         else if (page > album.photos.length)
             throw new Error("Photo number out of range");
         else if (null == pages[page-1])
-            getJSON("./" +  album.photos[page-1].name + ".json", loadPhoto, true, {"page":page});
+            getJSON(albumPath + album.photos[page-1].name + ".json", loadPhoto, true, {"page":page});
         else
             loadPhotoContent();
     }
@@ -321,7 +322,7 @@ function loadAlbumContent()
         linkElement.setAttribute("href", generatePhotoURL(i+1));
         linkElement.setAttribute("class", "navigationlink");
         linkElement.setAttribute("data-target", i+1);
-        photoElement.setAttribute("src", album.photos[i].thumbnail);
+        photoElement.setAttribute("src", albumPath + album.photos[i].thumbnail);
         if ("vertical" == album.photos[i].orientation)
             photoElement.setAttribute("class", "vthumbnail");
         else
@@ -421,7 +422,6 @@ function loadPhotoContent()
     {
         var rowElement = document.createElement("tr");
         var cellElement = document.createElement("td");
-        cellElement.setAttribute("class", "property");
         cellElement.textContent = propName;
         rowElement.appendChild(cellElement);
 
@@ -445,7 +445,7 @@ function loadPhotoContent()
         prevLinkElement.setAttribute("href", generatePhotoURL(page-1));
         prevLinkElement.setAttribute("data-target", page-1);
         var prevThumbElement = document.getElementById("prevThumbImage");
-        prevThumbElement.setAttribute("src", album.photos[page-1-1].thumbnail);
+        prevThumbElement.setAttribute("src", albumPath + album.photos[page-1-1].thumbnail);
         if ("vertical" == album.photos[page-1-1].orientation)
             prevThumbElement.setAttribute("class", "vnavigation");
         else
@@ -472,7 +472,7 @@ function loadPhotoContent()
         nextLinkElement.setAttribute("href", generatePhotoURL(page+1));
         nextLinkElement.setAttribute("data-target", page+1);
         var nextThumbElement = document.getElementById("nextThumbImage");
-        nextThumbElement.setAttribute("src", album.photos[page-1+1].thumbnail);
+        nextThumbElement.setAttribute("src", albumPath + album.photos[page-1+1].thumbnail);
         if ("vertical" == album.photos[page-1+1].orientation)
             nextThumbElement.setAttribute("class", "vnavigation");
         else
@@ -504,14 +504,14 @@ function loadPhotoAfterStylesheet()
             // Load the photo.  Run "fitPhoto()" when it's ready.
             photoData = pages[page-1];
             var photoElement = document.getElementById("photo");
-            photoElement.setAttribute("src", photoData.photo);
-            photoElement.setAttribute("width", photoData.width);
-            photoElement.setAttribute("height", photoData.height);
+            photoElement.setAttribute("src", albumPath + photoData.photo);
+            photoElement.style["width"] = photoData.width + "px";
+            photoElement.style["height"] = photoData.height + "px"
             photoElement.addEventListener("load", fitPhoto, false);
             window.addEventListener("resize", fitPhoto, false);
             
-            // It might be better to use contents for this, but that doesn't work on Firefox and Opera
-            document.getElementById("photoOverlay").style["background-image"] = "url("+photoData.photo+")";
+            // Apparently background-image is called backgroundImage to JavaScript?
+            photoOverlay = document.getElementById("photoOverlay").style["backgroundImage"] = "url(" + albumPath + photoData.photo + ")";
         }
     }
     catch (e)
@@ -561,15 +561,15 @@ function fitPhoto()
             if ((panelWidth >= photoData.width) && (panelHeight >= photoData.height))
             {
                 // unconstrained
-                photo.width = photoData.width;
-                photo.height = photoData.height;
+                photo.style["width"] = photoData.width + "px";
+                photo.style["height"] = photoData.height + "px";
                 photo.removeEventListener("click", showPhotoOverlay, false);
             }
             else if (photoAspect >= panelAspect)
             {
                 // constrained by width
-                photo.width = Math.min(panelWidth, photoData.width);
-                photo.height = Math.min((photoData.height*panelWidth/photoData.width), photoData.height);
+                photo.style["width"] = Math.min(panelWidth, photoData.width) + "px";
+                photo.style["height"] = Math.min((photoData.height*panelWidth/photoData.width), photoData.height) + "px";
                 photo.addEventListener("click", showPhotoOverlay, false);
                 photoOverlay.style["width"] = Math.min(windowWidth, photoData.width) + "px";
                 photoOverlay.style["height"] = Math.min((photoData.height*windowWidth/photoData.width), photoData.height) + "px";
@@ -577,8 +577,8 @@ function fitPhoto()
             else
             {
                 // constrained by height
-                photo.height = Math.min(panelHeight, photoData.height);
-                photo.width = Math.min((photoData.width*panelHeight/photoData.height), photoData.width);
+                photo.style["height"] = Math.min(panelHeight, photoData.height) + "px";
+                photo.style["width"] = Math.min((photoData.width*panelHeight/photoData.height), photoData.width) + "px";
                 photo.addEventListener("click", showPhotoOverlay, false);
                 photoOverlay.style["height"] = Math.min(windowHeight, photoData.height) + "px";
                 photoOverlay.style["width"] = Math.min((photoData.width*windowHeight/photoData.height), photoData.width) + "px";
@@ -612,7 +612,7 @@ function cacheNext()
 {
     if (null != page && page < album.photos.length && null == pages[page])
     {
-        getJSON("./" +  album.photos[page].name + ".json", cachePhoto, false, {"page" : page});
+        getJSON(albumPath + album.photos[page].name + ".json", cachePhoto, false, {"page" : page});
     }
 }
 
@@ -629,7 +629,7 @@ function cachePhoto(status, photoData, args)
             verifyPhoto(photoData);
             pages[args.page] = photoData;
             var preload = new Image();
-            preload.src = photoData.photo;
+            preload.src = albumPath + photoData.photo;
         }
     }
 }
@@ -701,10 +701,10 @@ function showPhotoOverlay()
 {
     try
     {
+        overlayVisible = true;
         var overlay = document.getElementById("overlay");
         overlay.style["display"] = "block";
         overlay.addEventListener("click", hidePhotoOverlay, false);
-        overlayVisible = true;
     }
     catch (e)
     {

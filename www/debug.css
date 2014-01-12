@@ -3,21 +3,14 @@ html, body {
   color: black;
   background-color: white;
 }
-a:link {
+a {
   color: blue;
-}
-a:visited {
-  color: blue;
-}
-a:hover {
-  color: green;
 }
 td {
   color: black;
 }
-img.navigation {
-  border-color: black;
-  background-color: white;
+#indexPanel>h2, #prevImage, #nextImage {
+  border: 1px solid black;
 }
 #indexPanel, #navigationPanel, #prevThumbPanel, #nextThumbPanel {
   border: 1px solid blue;
@@ -37,12 +30,16 @@ img.navigation {
 #footerPanel {
   border: 1px solid #e80972;
 }
+#description {
+  border: 1px solid #23d95d;
+}
 li.thumbnail {
   border: 1px solid red;
 }
-.centeredObj {
+div.centerBlock>*:first-child {
   border: 1px solid #a0a0a0;
 }
+
 #warning {
   color: #AAAAAA;
 }
@@ -55,4 +52,8 @@ li.thumbnail {
   height: 25px; /* fit above indexPanel */
   left: 0;
   font-size: 8pt;
+}
+
+#helpText {
+  background-color: white;
 }

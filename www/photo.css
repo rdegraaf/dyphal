@@ -1,21 +1,33 @@
 /*************************************************
   photo.css
   Copyright (c) Rennie deGraaf, 2005-2014.  All rights reserved.
-  Last modified: 10 January 2014
+  Last modified: 11 January 2014
  
   Photo stylesheet for DHTML photo album.
 *************************************************/
 
-table {
+#propertyTable {
   border-style: none;
 }
 
-td {
+#propertyTable td {
   line-height: 100%;
 }
 
+#propertyTable td:first-child {
+  color: #AAAAAA;
+  font-weight: bold;
+  width: 0%;
+}
+
+#propertyTable td:last-child {
+  width: 100%;
+}
+
 img.hnavigation, img.vnavigation {
-  border: 3px solid white;
+  border: 3px solid #AAAAAA;
+  border-radius: 5px;
+  box-shadow: 2px 2px 4px #000000;
 }
 img.hnavigation {
   width: 100px;
@@ -26,7 +38,7 @@ img.vnavigation {
   height: 100px;
 }
 
-img.photo {
+#photo {
   border: 3px solid black;
   visibility: hidden;
 }
@@ -43,11 +55,6 @@ p.captionItem, #propertyTable {
 #index {
   font-weight: bold;
   font-size: 12pt;
-}
-
-td.property {
-  color: #AAAAAA;
-  font-weight: bold;
 }
 
 #navigationPanel, #prevThumbPanel, #nextThumbPanel {
@@ -120,6 +127,7 @@ td.property {
   height: 100%;
   font-size: 0pt;
   vertical-align: text-top;
+  color: #4b4b4b; /* same as background; hide text in Opera */
 }
 
 #overlay {

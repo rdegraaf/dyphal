@@ -6,8 +6,5 @@ WWWROOT=~/www/misc/photo_album/
 
 umask 0022
 mkdir -p $WWWROOT
-for f in www/* test/*
-do
-	cp --no-preserve=mode "$f" "$WWWROOT"
-done
-
+cp --no-preserve=mode www/* "$WWWROOT"
+cp -r --no-preserve=mode test/ "$WWWROOT"

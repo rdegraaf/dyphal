@@ -1,14 +1,14 @@
 /*************************************************
   album.css
   Copyright (c) Rennie deGraaf, 2005-2014.  All rights reserved.
-  Last modified: 10 January 2014
+  Last modified: 11 January 2014
  
   Album stylesheet for DHTML photo album.
 *************************************************/
 
 img.hthumbnail, img.vthumbnail {
   vertical-align: middle;
-  border: 9px solid #CCCCCC;
+  border: 9px solid #AAAAAA;
   display: block;
   box-shadow: 3px 3px 4px #000000;
   border-radius: 10px;

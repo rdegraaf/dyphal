@@ -1,7 +1,7 @@
 {
     "title" : "Test Album",
     "footer" : "Copyright © \"Rennie deGraaf\" 2005-2013. All rights reserved.\n       Blah blah blah\n    Blah",
-    "description" : "These are some of my best photos ever. And here's some more text, because I want this to be really long.  I want it to wrap around at least once; preferrably more than once.  But apparently it takes a lot of text to fill in a line.",
+    "description" : "These are some of my best photos ever. And here's some more text, because I want this to be really long.  I want it to wrap around at least once; preferrably more than once.  But apparently it takes a lot of text to fill in a line.  Now that I limited the width of this field, it should wrap for reasonable window widths.",
     "photos" : [
         {
             "name" : "img000.jpeg",

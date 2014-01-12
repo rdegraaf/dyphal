@@ -3,17 +3,17 @@
 <!--
   index.html
   Copyright (c) Rennie deGraaf, 2005-2014.  All rights reserved.
-  Last modified: 10 Jan 2014
+  Last modified: 11 Jan 2014
 
   Master page for DHTML photo album.
 -->
   <head>
     <meta charset="UTF-8"/>
-    <meta name="Author" content="Rennie deGraaf" />
+    <meta name="Author" content="Rennie deGraaf"/>
     <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'self';"/>
     <title>Photo Album</title>
-    <link rel="stylesheet" href="common.css" />
-    <link id="stylesheet" rel="stylesheet" href="album.css" />
+    <link rel="stylesheet" href="common.css"/>
+    <link id="stylesheet" rel="stylesheet" href="album.css"/>
     <script type="text/javascript" src="lib.js"></script>
     <script type="text/javascript" src="album.js"></script>
   </head>
@@ -21,38 +21,38 @@
   <body>
 
     <div id="titlePanel" class="centerBlock">
-      <h1 id="titleContent" class="centeredObj"></h1>
+      <h1 id="titleContent"></h1>
     </div>
 
     <div id="footerPanel" class="centerBlock">
-      <p id="footerContent" class="centeredObj"></p>
+      <p id="footerContent"></p> <!-- IE8 doesn't support <footer> -->
     </div>
 
     <div id="indexPanel">
-      <h2 id="indexImage" title="Return to thumbnail index">
-        <a id="indexLink" class="navigationlink" href="broken_link.html">Return to thumbnail index</a>
+      <h2 title="Return to thumbnail index">
+        <a id="indexLink" class="navigationlink" href="placeholder.png">Return to thumbnail index</a>
       </h2>
     </div>
 
     <div id="navigationPanel">
       <h2 id="prevImage" title="Previous photo">
-        <a id="prevLink" class="navigationlink" href="broken_link.html">Previous photo</a>
+        <a id="prevLink" class="navigationlink" href="placeholder.png">Previous photo</a>
       </h2>
       <span id="index"></span>
       <h2 id="nextImage" title="Next photo">
-        <a id="nextLink" class="navigationlink" href="broken_link.html">Next photo</a>
+        <a id="nextLink" class="navigationlink" href="placeholder.png">Next photo</a>
       </h2>
     </div>
 
     <div id="prevThumbPanel">
-      <a id="prevThumbLink" class="navigationlink" href="broken_link.html">
-        <img id="prevThumbImage" class="hnavigation" src="" alt="Previous photo thumbnail" title="Previous photo"/>
+      <a id="prevThumbLink" class="navigationlink" href="placeholder.png">
+        <img id="prevThumbImage" class="hnavigation" src="placeholder.png" alt="Previous photo thumbnail" title="Previous photo"/>
       </a>
     </div>
 
     <div id="nextThumbPanel">
-      <a id="nextThumbLink" class="navigationlink" href="broken_link.html">
-        <img id="nextThumbImage" class="hnavigation" src="" alt="Next photo thumbnail" title="Next photo"/>
+      <a id="nextThumbLink" class="navigationlink" href="placeholder.png">
+        <img id="nextThumbImage" class="hnavigation" src="placeholder.png" alt="Next photo thumbnail" title="Next photo"/>
       </a>
     </div>
 
@@ -62,8 +62,6 @@
 
     <div id="propertyPanel">
       <table id="propertyTable">
-        <col width="0*" />
-        <col width="100%" />
         <!-- Photo properties -->
       </table>
     </div>
@@ -76,25 +74,24 @@
       <ul id="thumbnailList">
         <!-- Photo thumbnails -->
       </ul>
-      <img id="photo" class="photo" src="" alt="Photo" width="50" height="50"/>
+      <img id="photo" src="" alt="Photo"/>
     </div>
     
     <div id="overlay" class="centerBlock">
-      <div id="photoOverlay" class="centeredObj"></div>
+      <div id="photoOverlay"></div>
     </div>
     
     <div id="helpLink"></div>
     
     <div id="helpTextPanel" class="centerBlock">
-      <div id="helpText" class="centeredObj">
+      <div id="helpText">
         <h2>Photo Album Help</h2>
-        <p>All code on this site is copyright &copy; Rennie deGraaf, 2005-2014.</p>
         <p>This photo album is designed to show photos at their optimum size for your browser 
           window.  It uses modern web standards with a minumum of hacks to support old browsers.  
           All functionality is implemented using HTML, CSS, and client-side JavaScript; the server 
           is just a plain web server.  Everything should work properly with current versions of 
-          Mozilla Firefox or Google Chrome.  It should work reasonably well with Microsoft Internet 
-          Explorer 8, but will probably fail badly with older versions of MSIE.  </p>
+          major browsers.  It should work reasonably well with Microsoft Internet Explorer 8, but 
+          will probably fail badly with older versions of MSIE.  </p>
         <p>The album has two views: album view and photo view. Navigation by mouse should be 
           straight-forward. Album view shows a list of thumbnails; click on one of them to enter 
           photo view. Photo view photos with comments and properties.  To advance to the next 
@@ -104,10 +101,10 @@
         <p>Clicking on the question mark in the top right corner in either album or photo view opens 
           this help page.  To exit help, click anywhere on the page.</p>
         <p>When in photo view, if the photo is being displayed at less than its full size, clicking 
-          the photo will open a larger.  To return to the normal photo view, click anywhere on the 
-          page.</p>
+          the photo will open a full-window view.  To return to the normal photo view, click 
+          anywhere on the page.</p>
         <h3>Key bindings</h3>
-        <p>This site can also be navigated by keyboard.</p>
+        <p>This site can also be navigated by keyboard:</p>
         <table>
           <thead>
             <tr>
@@ -151,6 +148,7 @@
             </tr>
           </tbody>
         </table>
+        <p>All code on this site is copyright &copy; Rennie deGraaf, 2005-2014.</p>
       </div>
     </div>
 
