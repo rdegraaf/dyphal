@@ -1,3 +1,12 @@
+2014-01-13  Rennie deGraaf  <rennie.degraaf@gmail.com>
+
+    * README: New file
+    
+    * album.js: moved the design goals to README.
+    
+    * album.css, album.html, album.js, common.css, debug.css, ie8compat.js, 
+      lib.js, photo.css: Changed the file header comment format.
+
 2014-01-12  Rennie deGraaf  <rennie.degraaf@gmail.com>
 
     * ChangeLog: Created a stand-along changelog.  Populated it from the svn 

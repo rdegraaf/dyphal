@@ -1,3 +1,8 @@
+/**
+  IE 8 compatiblity shims for the DHTML photo album. 
+  Copyright (c) Rennie deGraaf, 2005-2014.  All rights reserved.
+*/
+
 /*
  * Code from Eli Grey, http://eligrey.com/blog/post/textcontent-in-ie8
  */

@@ -1,10 +1,7 @@
-/*************************************************
-  photo.css
+/**
+  Styles for photo view of the DHTML photo album.
   Copyright (c) Rennie deGraaf, 2005-2014.  All rights reserved.
-  Last modified: 11 January 2014
- 
-  Photo stylesheet for DHTML photo album.
-*************************************************/
+*/
 
 #propertyTable {
   border-style: none;

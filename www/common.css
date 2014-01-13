@@ -1,10 +1,7 @@
-/*************************************************
-  common.css
+/**
+  Styles shared by all views of the DHTML photo album.
   Copyright (c) Rennie deGraaf, 2005-2014.  All rights reserved.
-  Last modified: 11 January 2014
- 
-  Stylesheet for DHTML photo album.
-*************************************************/
+*/
 
 html, body {
   color: white;

@@ -1,11 +1,7 @@
-/*************************************************
-* lib.js
-* Copyright (c) Rennie deGraaf, 2005-2014.  All rights reserved.
-* Last modified: 09 January 2014
-*
-* Scripts for DHTML photo album
-* Various library routines used by other scripts.
-*************************************************/
+/**
+  Various library routines used by the DHTML photo album.
+  Copyright (c) Rennie deGraaf, 2005-2014.  All rights reserved.
+*/
 
 // Retrieves and parses a JSON object, then makes a callback with the result 
 // and any supplied arguments.  Catches any exceptions thrown by the callback, 

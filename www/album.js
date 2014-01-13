@@ -1,23 +1,6 @@
-/*************************************************
-  album.js
-  Version 3.0
-  Copyright (c) Rennie deGraaf, 2005-2014.  All rights reserved.
-  Last modified: 11 Jan 2014
- 
+/**
   Scripts for DHTML photo album.
-*************************************************/
-
-/*
-Design goals: 
-  - Works in current major browsers (Firefox, Chrome, IE, Android)
-  - Not badly broken in recent (IE 8) and minor (Opera, Konqueror) browsers
-  - Safari won't be tested because it's no longer available on Windows and I 
-    don't have a Mac.  Likewise, IOS won't be tested because I don't have an 
-    iPhone.
-  - All style in CSS.  Changes to CSS should not require script changes.
-  - All content in HTML or generated from photo properties.
-  - Support CSP and other modern web security.
-  - Keep everything small.  No repetitive generated content.
+  Copyright (c) Rennie deGraaf, 2005-2014.  All rights reserved.
 */
 
 // TODO: generation tool for JSON files, scaled photos
@@ -25,14 +8,13 @@ Design goals:
 // TODO: index of albums?
 // TODO: mobile stylesheet?
 // TODO: gestures for navigation on mobile?
-// TODO: minifier?
-// TODO: move the design and todo list out of this file.
+// TODO: minifier?  Build system? Put the svn revision in something somewhere?
+// TODO: move the todo list out of this file.
 // TODO: test a short description string.
-// TODO: svn id strings?  Or change file headers?
 
 var debug=false;
 var albumName=null; // name of the current album
-var albumPath=null;
+var albumPath=null; // relative path to the album JSON file.  Begins with "." and ends with '/'.
 var album=null; // object describing the current album
 var page=null; // number of the current page, 0 for the album thumbnail view
 var pages=[]; // objects describing all pages that have been retrieved.  Corresponds to album.photos.

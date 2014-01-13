@@ -1,0 +1,61 @@
+DHTML Photo Album
+=================
+
+<Describe the software>
+
+Design principles
+-----------------
+
+This photo album was designed to satisfy the following goals:
+
+1.  The photo is central.  It must be the most prominent element of the page.  
+    It must be entirely visible within the browser window; scrolling is not 
+    allowed.  Do not up-scale the photo beyond its actual size.  Do down-scale 
+    the photo to fit the browser window if necessary.
+2.  Metadata is important.  Information about what is in a photo, where and 
+    when it was taken, and photographic properties such as exposure and 
+    aperture must be visible for each photo.
+3.  The album must work using a document server as the back end.
+4.  The album must be as small as possible with as many elements as possible 
+    shared between pages.  
+5.  The album must use modern web standards with a minimum of cruft to support 
+    old browsers.  It must follow security best practices and support CSP.
+6.  All features of the album must work properly on current versions of Chrome, 
+    Firefox, Internet Explorer, and Android.  There should be no major problems 
+    in minor browsers such as Opera and on old but still common browsers such 
+    as Internet Explorer 8.  
+7.  All content must be in HTML or be inserted at run-time.  All styles must be 
+    in CSS or inserted at run-time.
+8.  Album styles should be changeable without needing to change scripts.
+
+
+Technical details
+-----------------
+
+
+History
+-------
+
+The original version of this album was the BestFit template for gThumb, which 
+existed for a while starting with version 2.9.1 in 2006.  That template was 
+designed to take scale the photo to fit in the browser window and show metadata 
+around its edges; superficially, it looked a lot like this album.  However, it 
+was limited by the hacks required to support Internet Explorer 6 and albums 
+built from that template consisted of a large number of repetitive generated 
+HTML files.  
+
+At some point after 2008, gThumb dropped the BestFit template without telling 
+its author (ie, me) why.  Since working with the gThumb maintainer in the past 
+had been a pain, I opted to not try to get it reinstated.  Instead, I dropped 
+support for IE6 (simplifying the code considerably) and started work on a 
+version where photos and metadata would be inserted into a single page at run-
+time using JavaScript.  I eventually merged the album and photo pages, 
+accidentally re-invented JSON before learning how to use JSON properly, and 
+ended up with this.
+
+The main disadvantage of the new album over the old gThumb-generated one is 
+that I can no longer rely on gThumb to select the photos to include, create 
+down-sized versions of them, and extract their metadata.  Instead, I wrote my 
+own tool.  gThumb still has the best support for photo metadata of any Linux 
+photo manager that I could find, so my tool pulls metadata from the places 
+where gThumb stores it and pulls lists of photos from gThumb collections.

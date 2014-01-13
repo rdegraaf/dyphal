@@ -1,4 +1,8 @@
-/* override colours and borders in stylesheet for debugging purposes */
+/**
+  Styles to override colours and borders for debugging the layout of the DHTML 
+  photo album. 
+  Copyright (c) Rennie deGraaf, 2005-2014.  All rights reserved.
+*/
 html, body {
   color: black;
   background-color: white;

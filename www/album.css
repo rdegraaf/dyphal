@@ -1,10 +1,7 @@
-/*************************************************
-  album.css
+/**
+  Styles for album view of the DHTML photo album.
   Copyright (c) Rennie deGraaf, 2005-2014.  All rights reserved.
-  Last modified: 11 January 2014
- 
-  Album stylesheet for DHTML photo album.
-*************************************************/
+*/
 
 img.hthumbnail, img.vthumbnail {
   vertical-align: middle;
