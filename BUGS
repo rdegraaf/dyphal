@@ -1,0 +1,53 @@
+2014-01-05  Rennie deGraaf  <rennie.degraaf@gmail.com>
+    Fonts are bigger than expected in Konqueror and Opera
+
+    WONTFIX.  This appears to be due to those browsers using a default font 
+    that's larger at any specified size than the default fonts used by Firefox 
+    and Chromium, and I don't want to get in the business of requesting 
+    specific fonts by name.
+
+2014-01-06  Rennie deGraaf  <rennie.degraaf@gmail.com>
+    Old page contents remain visible when a hash change results in a load error.
+
+    WONTFIX.  Only occurs in error paths, and not worth the effort of fixing.
+
+2014-01-06  Rennie deGraaf  <rennie.degraaf@gmail.com>
+    Backspace doesn't work for navigation in Konqueror or Opera.
+
+    WONTFIX.  This is not a core feature and 100% support for Konqueror and 
+    Opera is not necessary.
+
+2014-01-08  Rennie deGraaf  <rennie.degraaf@gmail.com>
+    The full-screen photo overlay doesn't work properly in Opera when the 
+    screen is small.
+
+    WONTFIX.  This is not a core feature and 100% support for Opera is not 
+    necessary.
+
+2014-01-10  Rennie deGraaf  <rennie.degraaf@gmail.com>
+    The error event doesn't fire if the debug stylesheet fails to load in Opera.
+
+    WONTFIX.  This is not a core feature and 100% support for Opera is not 
+    necessary.  Bug reported to Opera (DSK-387854).
+    
+2014-01-11  Rennie deGraaf  <rennie.degraaf@gmail.com>
+    Setting the initial image src to placeholder.png results in failure to load 
+    the first photo loaded from album view in IE8 and Opera (and possibly 
+    Chrome some of the time?).  Cloning the img node rather than modifying 
+    fixes the problem in Opera, but causes a CSP violation in Chrome.
+
+    WORKAROUND.  I don't understand the problem, but setting the src for the 
+    photo to "" in HTML seems to make everything work, even through it's 
+    technically invalid HTML.
+
+2014-01-12  Rennie deGraaf  <rennie.degraaf@gmail.com>
+    CSS properties loaded through obj.style[prop] need to be camelCase.  The 
+    preferred way to get them is obj.style.getPropertyValue(prop), but this 
+    isn't supported by IE8 and is apparently buggy on some Firefox versions for 
+    shorthand properties (eg, "background").  Chrome does support dashed-
+    lowercase CSS properties through obj.style[prop].
+
+    WORKAROUND: This is apparently an idiosyncrasy of the standards and 
+    Chrome's behaviour is a non-standard extension.  Using obj.style[prop] and 
+    camelCasing property names as needed seems to work on all supported 
+    platforms.

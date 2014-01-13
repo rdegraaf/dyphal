@@ -1,0 +1,216 @@
+2014-01-12  Rennie deGraaf  <rennie.degraaf@gmail.com>
+
+    * ChangeLog: Created a stand-along changelog.  Populated it from the svn 
+      log.
+
+    * BUGS: Moved the list of active bugs out of album.js.
+
+2014-01-12  Rennie deGraaf  <rennie.degraaf@gmail.com>
+
+    * ie8compat.js: New file containing third-party work-arounds for IE 8's 
+      lack of support for textContent, addEventListener, and 
+      removeEventListener.
+
+    * album.html: Conditionally include ie8compat.js in IE to work around some 
+      of its limitations.
+
+    * album.html: Added an X-UA-Compatible meta header to make IE stop 
+      prompting for compatibility view.
+
+    * album.html: Made some changes to the help text to reflect the fact that 
+      there is now third-party code in the album.
+
+    * album.js: When entering or exiting debug mode, return out of start() 
+      immediately and enter it again from a callback after the debug-specific 
+      elements have been added to or removed from the DOM in order to avoid 
+      issues related to the order in which callbacks are serviced.
+
+    * album.js: Removed an unnecessary variable assignment.
+
+    * album.js: Delay setting helpVisible when showing the help screen, since 
+      making the help screen visible can change the page dimensions and we 
+      don't want the resulting call to fitPhoto() to immediately hide the help 
+      screen again.
+
+    * lib.js: Fall back to req.responseText if req.response doesn't exist on 
+      JSON response objects.
+
+    * lib.js: Convert property names from dashed-lowercase to camelCase in 
+      getProperty() when using one of the eval fallbacks, because dashes aren't 
+      valid characters in JavaScript identifiers.
+
+    * lib.js: Removed the unused function getChildren().
+
+2014-01-11  Rennie deGraaf  <rennie.degraaf@gmail.com>
+
+    * index.html: renamed to album.html
+
+2014-01-11  Rennie deGraaf  <rennie.degraaf@gmail.com>
+
+    * deploy.sh: Moved the test album into a subdirectory, rather than the same 
+      directory as the album source.
+
+    * album.json: Made the description string longer.
+
+    * album.js: Added support for albums in subdirectories.  The relative path 
+      to the album JSON file is given in the argument, and we parse out the 
+      directory and prefix it to other album objects as they are loaded.
+    
+    * album.css: Made colours more consistent between different parts of the 
+      album.
+
+    * album.js, common.css, debug.css, index.html, photo.css: Removed some 
+      unnecessary classes and ids from the HTML, replacing them with more 
+      advanced CSS selectors where necessary.
+
+    * album.js: Set the height and width of the photo as CSS properties rather 
+      than HTML properties.  I'm not sure why the HTML versions are still 
+      allowed in HTML 5.
+
+    * album.js: Apparently Firefox doesn't allow the "background-image" 
+      property to be set using JavaScript.  "backgroundImage" works, though.
+
+    * common.css, debug.css: Removed some unnecessary styles.
+
+    * common.css, photo.css: Fixed a display bug in opera where text in the 
+      navigation links would show up as little squiggles, despite using a 0-pt 
+      font.
+
+    * debug.css: Added override styles for the help screen and description.
+
+    * placeholder.png: new file, a 1x1 transparent PNG.
+
+    * index.html: Set the initial targets of all links and images to 
+      placeholder.png.
+
+    * index.html, photo.css: Moved table column widths to CSS.
+
+    * index.html: Made some changes to the help text.
+
+2014-01-11  Rennie deGraaf  <rennie.degraaf@gmail.com>
+
+    * arrows.svg: Added a question-mark icon.
+
+    * help.png: New file.
+
+    * album.js, index.html, common.css: Added a help view, which can be toggled 
+      on or off from either the album or photo view.
+
+    * album.css: Centered the description in the album view and capped its 
+      width.
+
+    * album.js: Handled the case where the debug parameter is present but the 
+      debug stylesheet cannot be loaded; we'll just drop the debug parameter 
+      and continue.
+
+    * album.js: Fixed the stylesheet load order issue.
+
+    * album.js: Put exception handlers on JavaScript callbacks that were 
+      missing them.
+
+    * common.css, photo.css: Navigation icons use the background-image property 
+      rather than background.
+
+2014-01-10  Rennie deGraaf  <rennie.degraaf@gmail.com>
+
+    * album.json: Removed all HTML from the footer.
+
+    * common.css: Set the styling on footerContent to preserve newlines from 
+      its text.
+
+    * album.js: Removed all uses of innerHTML, replacing them with textContent. 
+
+    * album.js: Removed unnecessary span elements from property table cells, 
+      instead assigning their styles to the cells themselves.
+
+      album.js, photo.css: Fixed some styling on the full-screen photo overlay.
+
+    * album.css, common.cs, debug.css, index.html, photo.css: Removed old 
+      MSIE6-compat cruft, simplified styles, and removed unnecessary styles.
+
+    * It's been a while since I've made a change that resulted in less code.
+
+2014-01-08  Rennie deGraaf  <rennie.degraaf@gmail.com>
+
+    * album.json: Added actual content to the description field.  Removed the 
+      thumbnail field, as I don't needed it for now.
+
+    * album.css, album.js, index.html: Added an album description to album 
+      view, displayed above the thumbnail list.
+
+    * album.js, index.html: Added a full-screen photo overlay to the photo 
+      view, which can be toggled on and off when the photo is displayed at less 
+      than its full size.
+
+    * album.css, album.js, common.css, photo.css: Added an index link to the 
+      album view, intended to refer to an index of albums.
+
+    * index.json: New file to support an index of albums.  Nothing uses this 
+      file at the moment.
+
+    * index.html: Added mouse-over tooltips to the navigation arrows.
+
+2014-01-07  Rennie deGraaf  <rennie.degraaf@gmail.com>
+
+    * arrows.svg: New file containing sources for arrow icons.
+
+    * back.png, next.png, prev.png: Replaced the arrow button images with new 
+      onse with transparent backgrounds. 
+
+    * album.js, index.html, photo.css: Replaced the img tags for the arrow 
+      buttons with CSS background images.
+
+    * index.html: Got rid of the "contents" div, since it didn't seem to do 
+      anything.
+
+    * album.css, common.css: Deleted and commented out some old MSIE6-compat 
+      cruft.
+
+2014-01-06  Rennie deGraaf  <rennie.degraaf@gmail.com>
+
+    * album.js: Re-wrote the argument-parsing logic.  The name of the album 
+      JSON file is now an argument.
+
+    * album.js: Fixed a bug where the warning panel wouldn't be suppressed when
+      only the hash changes.
+
+    * album.js: generatePhotoURL() is now used for all links.
+    
+    * index.html: Set the class of indexLink to navigationLink so that adding  
+      and removing the debug argument to/from it doesn't need to be handled 
+      separately from other links.
+
+    * album.js: Removed special-case logic for adding/removing the debug 
+      argument to/from indexLink.
+
+    * album.js (keyHandler): Added new alternate navigation keys.
+
+2014-01-05  Rennie deGraaf  <rennie.degraaf@gmail.com>
+
+    * index.html: Added a Content Security Policy meta header.  AFAIK, only 
+      Chrome-based browsers support CSP from meta headers at the moment.
+
+    * index.html: Removed inline styles that violate CSP.
+
+    * lib.js (getHBorder, getVBorder): Fixed property names so that 
+      getProperty() doesn't fall back to eval()-based paths in standards-
+      compliant browsers.
+
+    * album.json: Added description and thumbnail fields.  Nothing uses them at 
+      this time.
+
+2014-01-05  Rennie deGraaf  <rennie.degraaf@gmail.com>
+
+    * Imported missed files from the previous commit.
+
+    * index.js: renamed to album.js
+
+2014-01-05  Rennie deGraaf  <rennie.degraaf@gmail.com>
+
+    * Version 3, as of spring 2013.  Major changes to just about everything.
+
+    * Replaced Pseudo-JSON with real JSON
+
+2013-01-08  Rennie deGraaf  <rennie.degraaf@gmail.com>
+
+    * Initial import of photo_album.

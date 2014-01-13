@@ -17,25 +17,18 @@ Design goals:
   - All style in CSS.  Changes to CSS should not require script changes.
   - All content in HTML or generated from photo properties.
   - Support CSP and other modern web security.
+  - Keep everything small.  No repetitive generated content.
 */
 
 // TODO: generation tool for JSON files, scaled photos
-// TODO: test IE 11
 // TODO: test Android
 // TODO: index of albums?
 // TODO: mobile stylesheet?
 // TODO: gestures for navigation on mobile?
 // TODO: minifier?
-
-// BUG: old page contents remain visible when a hash change results in a load error (WONTFIX)
-// BUG: font is bigger than expected in Konqueror and Opera (WONTFIX)
-// BUG: backspace doesn't work for navigation in Konqueror or Opera (WONTFIX)
-// BUG: overlay doesn't work properly in Opera (WONTFIX)
-// BUG: The error event doesn't fire if the debug stylesheet fails to load in Opera (WONTFIX)
-// BUG: Setting the initial image src to placeholder.png results in failure to load the first photo 
-//      loaded from album view in ie8 and Opera (and possibly Chrome some of the time?).  Cloning 
-//      the img node rather than modifying fixes the problem in Opera, but causes a CSP violation 
-//      in Chrome.
+// TODO: move the design and todo list out of this file.
+// TODO: test a short description string.
+// TODO: svn id strings?  Or change file headers?
 
 var debug=false;
 var albumName=null; // name of the current album
@@ -520,7 +513,6 @@ function loadPhotoAfterStylesheet()
             photoElement.addEventListener("load", fitPhoto, false);
             window.addEventListener("resize", fitPhoto, false);
             
-            // Firefox (and probably IE8) requires that background-image be camelCased
             document.getElementById("photoOverlay").style["backgroundImage"] = "url(" + albumPath + photoData.photo + ")";
         }
     }
