@@ -11,6 +11,7 @@
 // TODO: minifier?  Build system? Put the svn revision in something somewhere?
 // TODO: move the todo list out of this file.
 // TODO: test a short description string.
+// TODO: finish README
 
 var debug=false;
 var albumName=null; // name of the current album
@@ -257,6 +258,7 @@ function verifyAlbum(albumData)
     if ((null == albumData)
         || (null == albumData.title)
         || (null == albumData.footer)
+        || (null == albumData.description)
         || (null == albumData.photos))
     {
         throw new Error("Album data is invalid");
@@ -359,6 +361,7 @@ function verifyPhoto(photoData)
 // Display a photo and its description
 function loadPhotoContent()
 {
+    if (debug) console.log("loadPhotoContent enter");
     var photoData = pages[page-1];
 
     document.getElementById("photo").style["visibility"] = "hidden";
@@ -476,12 +479,14 @@ function loadPhotoContent()
         document.getElementById("debugLink").setAttribute("href", generatePhotoURL(page, true));
 
     cacheNext();
+    if (debug) console.log("loadPhotoContent exit");
 }
 
 
 // Display a photo
 function loadPhotoAfterStylesheet()
 {
+    if (debug) console.log("loadPhotoAfterStylesheet enter");
     try
     {
         if (0 < page)
@@ -489,10 +494,14 @@ function loadPhotoAfterStylesheet()
             // Load the photo.  Run "fitPhoto()" when it's ready.
             photoData = pages[page-1];
             var photoElement = document.getElementById("photo");
-            photoElement.setAttribute("src", albumPath + photoData.photo);
+            // Remove the event listeners before we change anything so that we don't get fitPhoto storms in IE8
+            photoElement.removeEventListener("load", fitPhoto, false);
+            window.removeEventListener("resize", fitPhoto, false);
             photoElement.style["width"] = photoData.width + "px";
             photoElement.style["height"] = photoData.height + "px"
             photoElement.addEventListener("load", fitPhoto, false);
+            // Make sure that the event listener is in place before we set the photo
+            photoElement.setAttribute("src", albumPath + photoData.photo);
             window.addEventListener("resize", fitPhoto, false);
             
             document.getElementById("photoOverlay").style["backgroundImage"] = "url(" + albumPath + photoData.photo + ")";
@@ -503,12 +512,14 @@ function loadPhotoAfterStylesheet()
         error(e.name + ": " + e.message);
         throw e;
     }
+    if (debug) console.log("loadPhotoAfterStylesheet exit");
 }
 
 
 // Scale a photo to fit in its frame
 function fitPhoto()
 {
+    if (debug) console.log("fitPhoto enter");
     try
     {
         hidePhotoOverlay();
@@ -552,8 +563,8 @@ function fitPhoto()
             else if (photoAspect >= panelAspect)
             {
                 // constrained by width
-                photo.style["width"] = Math.min(panelWidth, photoData.width) + "px";
-                photo.style["height"] = Math.min((photoData.height*panelWidth/photoData.width), photoData.height) + "px";
+                photo.style["width"] = panelWidth + "px";
+                photo.style["height"] = photoData.height*panelWidth/photoData.width + "px";
                 photo.addEventListener("click", showPhotoOverlay, false);
                 photoOverlay.style["width"] = Math.min(windowWidth, photoData.width) + "px";
                 photoOverlay.style["height"] = Math.min((photoData.height*windowWidth/photoData.width), photoData.height) + "px";
@@ -561,14 +572,15 @@ function fitPhoto()
             else
             {
                 // constrained by height
-                photo.style["height"] = Math.min(panelHeight, photoData.height) + "px";
-                photo.style["width"] = Math.min((photoData.width*panelHeight/photoData.height), photoData.width) + "px";
+                photo.style["height"] = panelHeight + "px";
+                photo.style["width"] = photoData.width*panelHeight/photoData.height + "px";
                 photo.addEventListener("click", showPhotoOverlay, false);
                 photoOverlay.style["height"] = Math.min(windowHeight, photoData.height) + "px";
                 photoOverlay.style["width"] = Math.min((photoData.width*windowHeight/photoData.height), photoData.width) + "px";
             }
 
             photo.style["visibility"] = "visible";
+            if (debug) console.log("fitphoto: " + photo.style["height"] + " " + photo.style["width"]);
         }
     }
     catch (e)
@@ -576,6 +588,7 @@ function fitPhoto()
         error(e.name + ": " + e.message);
         throw e;
     }
+    if (debug) console.log("fitPhoto exit");
 }
 
 

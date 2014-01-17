@@ -1,3 +1,18 @@
+2014-01-16  Rennie deGraaf  <rennie.degraaf@gmail.com>
+
+    * album.js (loadPhotoAfterStylesheet): Fixed the intermittent failure for 
+      the first photo to load.  It seems to have been due to a race between the 
+      photo loading and the callback being registered.
+      
+    * album.js: Added some debug logging statements.
+    
+    * album.js (fitphoto): removed some unreachable logic.
+
+    * album.html: set the default src for the photo to placeholder.png.
+    
+    * ie8compat.js: switched to versions of the shims with a well-defined 
+      licence.
+    
 2014-01-13  Rennie deGraaf  <rennie.degraaf@gmail.com>
 
     * README: New file

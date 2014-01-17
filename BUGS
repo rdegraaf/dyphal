@@ -12,10 +12,11 @@
     WONTFIX.  Only occurs in error paths, and not worth the effort of fixing.
 
 2014-01-06  Rennie deGraaf  <rennie.degraaf@gmail.com>
-    Backspace doesn't work for navigation in Konqueror or Opera.
+    Backspace doesn't work for navigation in IE8, Konqueror or Opera.
 
     WONTFIX.  This is not a core feature and 100% support for Konqueror and 
-    Opera is not necessary.
+    Opera is not necessary.  It appears that backspace is tied to "back" in 
+    those browsers and cannot be handled in Javascript.
 
 2014-01-08  Rennie deGraaf  <rennie.degraaf@gmail.com>
     The full-screen photo overlay doesn't work properly in Opera when the 
@@ -30,16 +31,6 @@
     WONTFIX.  This is not a core feature and 100% support for Opera is not 
     necessary.  Bug reported to Opera (DSK-387854).
     
-2014-01-11  Rennie deGraaf  <rennie.degraaf@gmail.com>
-    Setting the initial image src to placeholder.png results in failure to load 
-    the first photo loaded from album view in IE8 and Opera (and possibly 
-    Chrome some of the time?).  Cloning the img node rather than modifying 
-    fixes the problem in Opera, but causes a CSP violation in Chrome.
-
-    WORKAROUND.  I don't understand the problem, but setting the src for the 
-    photo to "" in HTML seems to make everything work, even through it's 
-    technically invalid HTML.
-
 2014-01-12  Rennie deGraaf  <rennie.degraaf@gmail.com>
     CSS properties loaded through obj.style[prop] need to be camelCase.  The 
     preferred way to get them is obj.style.getPropertyValue(prop), but this 
