@@ -14,13 +14,13 @@
 2014-01-06  Rennie deGraaf  <rennie.degraaf@gmail.com>
     Backspace doesn't work for navigation in IE8, Konqueror or Opera.
 
-    WONTFIX.  This is not a core feature and 100% support for Konqueror and 
-    Opera is not necessary.  It appears that backspace is tied to "back" in 
+    WONTFIX.  This is not a core feature and 100% support for IE8, Konqueror, 
+    and Opera is not necessary.  It appears that backspace is tied to "back" in 
     those browsers and cannot be handled in Javascript.
 
 2014-01-08  Rennie deGraaf  <rennie.degraaf@gmail.com>
     The full-screen photo overlay doesn't work properly in Opera when the 
-    screen is small.
+    window is small.
 
     WONTFIX.  This is not a core feature and 100% support for Opera is not 
     necessary.
@@ -42,3 +42,20 @@
     Chrome's behaviour is a non-standard extension.  Using obj.style[prop] and 
     camelCasing property names as needed seems to work on all supported 
     platforms.
+
+2014-01-17  Rennie deGraaf  <rennie.degraaf@gmail.com>
+    The first photo doesn't load and debug mode doesn't work on Android 4.2.2 
+    and and earlier (I haven't tested 4.3, but 4.4.2 works).  Apparently, they 
+    don't support the load event for link elements.  The workarounds that I can 
+    find online are all horrible kludges that depend on browser version checks 
+    and either don't always work reliably or involve polling. 
+
+2014-01-17  Rennie deGraaf  <rennie.degraaf@gmail.com>
+    The footer always stays at the bottom of the screen in album view, rather 
+    than at the bottom of the page.
+
+2014-01-17  Rennie deGraaf  <rennie.degraaf@gmail.com>
+    Photos take up too little of the screen area on smartphone browsers.
+
+2014-01-17  Rennie deGraaf  <rennie.degraaf@gmail.com>
+    Text shrinks when an Android browser is rotated to vertical.

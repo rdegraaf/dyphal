@@ -12,6 +12,7 @@
 // TODO: move the todo list out of this file.
 // TODO: test a short description string.
 // TODO: finish README
+// TODO: load photos directly from cache?
 
 var debug=false;
 var albumName=null; // name of the current album
@@ -21,6 +22,7 @@ var page=null; // number of the current page, 0 for the album thumbnail view
 var pages=[]; // objects describing all pages that have been retrieved.  Corresponds to album.photos.
 var overlayVisible=false;
 var helpVisible = false;
+var logall = true;
 
 
 // Set up event listeners
@@ -29,6 +31,8 @@ window.addEventListener("hashchange", start, false);
 // Since JavaScript is clearly enabled, hide the warning as early as possible
 document.addEventListener("DOMContentLoaded", suppressWarning, false);
 
+log(navigator.appName);
+log(navigator.userAgent);
 
 // Display an error message in the warning panel
 function error(msg)
@@ -36,6 +40,19 @@ function error(msg)
     var warningPanel = document.getElementById("warning");
     warningPanel.textContent = msg;
     warningPanel.style["display"] = "block";
+}
+
+function log(msg)
+{
+    if (debug || logall)
+    {
+        try
+        {
+            console.log(msg);
+        }
+        catch (e)
+        {}
+    }
 }
 
 
@@ -61,17 +78,19 @@ function suppressWarning()
 // Called when the document loads.  Display the requested page.
 function start()
 {
+    log("start enter");
+    
     try
     {
         // DomContentLoaded doesn't get signalled when only the hash changes, but this does.
         // So let's make sure it's hidden.
         suppressWarning();
-    
+
         hidePhotoOverlay();
         hideHelp();
         
         document.getElementById("helpLink").addEventListener("click", showHelp, false);
-    
+
         // Parse the page arguments
         var albumNameNew = null;
         var debugNew = false;
@@ -108,7 +127,7 @@ function start()
             // they complete before we can finish loading
             return;
         }
-        
+
         if (albumName != albumNameNew)
         {
             albumName = albumNameNew;
@@ -137,27 +156,35 @@ function start()
         error(e.name + ": " + e.message);
         throw e;
     }
+    
+    log("start exit");
 }
 
 
 // Load the debug stylesheet and update links
 function loadDebug()
 {
+    log("loadDebug enter");
+
     // Load the debug stylesheet
     var cssElement = document.createElement("link");
-    cssElement.setAttribute("rel", "stylesheet");
-    cssElement.setAttribute("href", "debug.css");
-    cssElement.setAttribute("id", "debugStylesheet");
     // We'll only update the links if the stylesheet loads correctly.
     cssElement.addEventListener("load", loadDebugAfterStylesheet, false);
     cssElement.addEventListener("error", loadDebugError, false);
+    cssElement.setAttribute("rel", "stylesheet");
+    cssElement.setAttribute("href", "debug.css");
+    cssElement.setAttribute("id", "debugStylesheet");
     document.getElementsByTagName("head")[0].appendChild(cssElement);
+
+    log("loadDebug exit");
 }
 
 
 // Update the page after the debug stylesheet has loaded
 function loadDebugAfterStylesheet()
 {
+    log("loadDebugAfterStylesheet enter");
+
     try
     {
         // Create a link to leave debug mode
@@ -183,12 +210,16 @@ function loadDebugAfterStylesheet()
         error(e.name + ": " + e.message);
         throw e;
     }
+
+    log("loadDebugAfterStylesheet exit");
 }
 
 
 // Leave debug mode due to failure of the debug stylesheet to load
 function loadDebugError()
 {
+    log("loadDebugError enter");
+
     try
     {
         debug = false;
@@ -205,12 +236,16 @@ function loadDebugError()
         error(e.name + ": " + e.message);
         throw e;
     }
+
+    log("loadDebugError exit");
 }
 
 
 // Unload the debug stylesheet and update links
 function unloadDebug()
 {
+    log("unloadDebug enter");
+
     // Unload the debug stylesheet
     var cssElement = document.getElementById("debugStylesheet");
     cssElement.parentNode.removeChild(cssElement);
@@ -226,12 +261,16 @@ function unloadDebug()
 
     // resume the load process, now that we've removed the debug document elements.
     start();
+
+    log("unloadDebug exit");
 }
 
 
 // Load the album description, then use it to display the requested page
 function loadAlbum(status, albumData, args)
 {
+    log("loadAlbum enter");
+
     if (200 != status)
         throw new Error("Album data is missing");
     else
@@ -249,6 +288,8 @@ function loadAlbum(status, albumData, args)
         else
             loadPhotoContent();
     }
+
+    log("loadAlbum exit");
 }
 
 
@@ -281,6 +322,8 @@ function verifyAlbum(albumData)
 // Display the album contents
 function loadAlbumContent()
 {
+    log("loadAlbumContent enter");
+
     document.getElementById("stylesheet").setAttribute("href", "album.css");
 
     // Set the title
@@ -322,12 +365,16 @@ function loadAlbumContent()
         document.getElementById("debugLink").setAttribute("href", generatePhotoURL(0, true));
 
     cacheNext();
+
+    log("loadAlbumContent exit");
 }
 
 
 // Load a photo description, then display the photo.
 function loadPhoto(status, photoData, args)
 {
+    log("loadPhoto enter");
+
     if (200 != status)
         throw new Error("Photo data is missing");
     else
@@ -339,6 +386,8 @@ function loadPhoto(status, photoData, args)
             loadPhotoContent();
         }
     }
+
+    log("loadPhoto exit");
 }
 
 
@@ -361,7 +410,8 @@ function verifyPhoto(photoData)
 // Display a photo and its description
 function loadPhotoContent()
 {
-    if (debug) console.log("loadPhotoContent enter");
+    log("loadPhotoContent enter");
+
     var photoData = pages[page-1];
 
     document.getElementById("photo").style["visibility"] = "hidden";
@@ -374,8 +424,8 @@ function loadPhotoContent()
     if ("photo.css" != cssElement.getAttribute("href"))
     {
         var cssElementNew = cssElement.cloneNode();
-        cssElementNew.setAttribute("href", "photo.css");
         cssElementNew.addEventListener("load", loadPhotoAfterStylesheet, false);
+        cssElementNew.setAttribute("href", "photo.css");
         cssElement.parentNode.replaceChild(cssElementNew, cssElement);
     }
     else
@@ -479,14 +529,16 @@ function loadPhotoContent()
         document.getElementById("debugLink").setAttribute("href", generatePhotoURL(page, true));
 
     cacheNext();
-    if (debug) console.log("loadPhotoContent exit");
+
+    log("loadPhotoContent exit");
 }
 
 
 // Display a photo
 function loadPhotoAfterStylesheet()
 {
-    if (debug) console.log("loadPhotoAfterStylesheet enter");
+    log("loadPhotoAfterStylesheet enter");
+
     try
     {
         if (0 < page)
@@ -512,14 +564,16 @@ function loadPhotoAfterStylesheet()
         error(e.name + ": " + e.message);
         throw e;
     }
-    if (debug) console.log("loadPhotoAfterStylesheet exit");
+
+    log("loadPhotoAfterStylesheet exit");
 }
 
 
 // Scale a photo to fit in its frame
 function fitPhoto()
 {
-    if (debug) console.log("fitPhoto enter");
+    log("fitPhoto enter");
+
     try
     {
         hidePhotoOverlay();
@@ -580,7 +634,7 @@ function fitPhoto()
             }
 
             photo.style["visibility"] = "visible";
-            if (debug) console.log("fitphoto: " + photo.style["height"] + " " + photo.style["width"]);
+            log("fitphoto: " + photo.style["height"] + " " + photo.style["width"]);
         }
     }
     catch (e)
@@ -588,7 +642,8 @@ function fitPhoto()
         error(e.name + ": " + e.message);
         throw e;
     }
-    if (debug) console.log("fitPhoto exit");
+
+    log("fitPhoto exit");
 }
 
 
@@ -607,16 +662,22 @@ function generatePhotoURL(index, suppressDebug)
 // Fetch and cache the JSON for the next page
 function cacheNext()
 {
+    log("cacheNext enter");
+
     if (null != page && page < album.photos.length && null == pages[page])
     {
         getJSON(albumPath + album.photos[page].name + ".json", cachePhoto, false, {"page" : page});
     }
+
+    log("cacheNext exit");
 }
 
 
 // Cache a photo's JSON 
 function cachePhoto(status, photoData, args)
 {
+    log("cachePhoto enter");
+
     if (200 != req.status)
         throw new Error("Photo data is missing");
     else
@@ -629,6 +690,8 @@ function cachePhoto(status, photoData, args)
             preload.src = albumPath + photoData.photo;
         }
     }
+
+    log("cachePhoto exit");
 }
 
 
