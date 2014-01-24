@@ -1,5 +1,11 @@
 2014-01-23  Rennie deGraaf  <rennie.degraaf@gmail.com>
 
+    * README: added some more content.
+
+    * album.js, common.css: tweaked some comments
+
+2014-01-23  Rennie deGraaf  <rennie.degraaf@gmail.com>
+
     * album.css, common.css: Fixed the footer in album view.  Tested in 
       Chromium, Firefox, Konqueror, Opera, IE8, IE11, Android.
 

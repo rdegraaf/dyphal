@@ -1,7 +1,21 @@
 DHTML Photo Album
 =================
 
-<Describe the software>
+This package is a web photo album template designed to allow photographers to 
+show off their work without needing to turn to commercial providers that inject 
+advertising and may do ethically dubious things with the photos and information 
+that they host.
+
+Photo albums are shown as a list of photos; each photo can be opened to show a 
+larger view with metadata.  The photo's size scales to best fit your browser 
+window.  The album can be navigated by mouse, touch, or keyboard.
+
+The album can be hosted on any web document server; no server-side scripts or 
+databases are required.  All necessary files are generated from original 
+photographs and their metadata up front and stored on the server.  The album 
+and its metadata files are designed to require minimal storage space and 
+minimal network traffic. 
+
 
 Design principles
 -----------------
@@ -20,7 +34,7 @@ This photo album was designed to satisfy the following goals:
     shared between pages.  
 5.  The album must use modern web standards with a minimum of cruft to support 
     old browsers.  It must follow security best practices and support CSP.
-6.  All features of the album must work properly on current versions of Chrome, 
+6.  All features of the album must work properly on recent versions of Chrome, 
     Firefox, Internet Explorer, and Android.  There should be no major problems 
     in minor browsers such as Opera and on old but still common browsers such 
     as Internet Explorer 8.  
@@ -31,6 +45,70 @@ This photo album was designed to satisfy the following goals:
 
 Technical details
 -----------------
+
+The album is represented by a single web page, album.html.  JavaScript running 
+within that page determines what to display based on hash parameters.  The 
+first parameter, which must always be present, identifies the album.  It's a 
+relative path to the JSON file that describes the album with the file name 
+suffix ommitted.  If your directory structure looks like this::
+    album.css
+    album.html
+    album.js
+    common.css
+    photo.css
+    Vacation/vacation.json
+    Vacation/photo1.jpeg
+    Vacation/photo1.jpeg.json
+    ...
+then the URL to load the "Vacation" album is 
+    album.html#Vacation/vacation
+This URL will load "album view", which shows the title and description of the 
+album as a whole alongside thumbnails for every photo in the album.  Clicking 
+on any one of the thumbnails will open "photo view" for that photo, containing 
+a larger view of the selected photo and its metadata, along with controls to 
+move to the previous or next photos in the album, or to return to album view.  
+The photo will rescale to the largest size that fits in your browser window 
+without hiding the header, footer, or metadata or going beyond its physical 
+dimensions; if the photo is not shown at its full size, clicking on it will 
+open a "full-screen photo overlay" that may hide the header, footer, or 
+metadata.  There is also a "help overlay" that can be opened from either album 
+or photo view using the question mark icon.
+
+Each photo view has its own URL, consisting of the URL to the album followed by 
+the index number of the photo (indices start from 1).  For example, the URL for 
+the third photo in the "Vacation" album might be
+    album.html#Vacation/vacation,3
+The full-screen photo overlay and help overlay do not have independent URLs.
+
+Since only one HTML document is used for all views, its differences in 
+appearance are implemented by switching stylesheets and, to a lesser extent, by 
+adding and removing document elements.  Photos, thumbnails, and photo metadata 
+are not contained in the HTML; they are loaded from JSON files and their 
+contents are inserted or removed from the document when appropriate.  The album 
+JSON file (vacation.json in the above example) contains a title, footer, and 
+description of the album, plus a list of the photos in the album.  Each photo 
+has its own JSON file (the photo's name from the album JSON with ".json" 
+appended), containing the name of the photo file, its size, and its metadata.  
+JSON files, thumbnails, and photos are loaded on demand; the JSON and photo for 
+the next photo in the album are pre-cached to reduce load time.
+
+Appending ",debug" to any album or photo URL will load it in debug mode, which 
+suppresses some of the styling, outlines various document elements in various 
+colours, and logs some information to the browser console.
+
+Everything is implemented in as standards-conformant a manner as possible.  IE 
+8 has some significant issues and is handled using some wrapper logic in lib.js 
+and some IE-specific shims in ie8compat.js.  Everything should be CSP-
+compatible in browsers that support CSP; there are a few "eval" statements in 
+lib.js, but those code paths should only ever be taken on old browsers that 
+don't support CSP.  Browser-specific logic was implemented using feature 
+detection rather than browser detection where possible; browser detection is 
+only used to work around the lack of functioning load events on link elements 
+in Android browsers because no way to fix this using feature detection could be 
+found.
+
+If my JavaScript has idiosyncrasies, it's probably because I'm a C++ programmer 
+who taught himself JavaScript by trial and error.
 
 
 History
@@ -51,7 +129,7 @@ support for IE6 (simplifying the code considerably) and started work on a
 version where photos and metadata would be inserted into a single page at run-
 time using JavaScript.  I eventually merged the album and photo pages, 
 accidentally re-invented JSON before learning how to use JSON properly, and 
-ended up with this.
+ended up with this.  
 
 The main disadvantage of the new album over the old gThumb-generated one is 
 that I can no longer rely on gThumb to select the photos to include, create 

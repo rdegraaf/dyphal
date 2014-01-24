@@ -14,9 +14,10 @@ html {
   min-height: 100%;
 }
 
+/* Sticky footer styles from http://mystrd.at/modern-clean-css-sticky-footer/ */
 body {
   margin: 0;
-  margin-bottom: 80px;
+  margin-bottom: 80px; /* footerPanel.height */
 }
 
 h1 {

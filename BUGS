@@ -55,3 +55,13 @@
 
 2014-01-17  Rennie deGraaf  <rennie.degraaf@gmail.com>
     Text shrinks when an Android browser is rotated to vertical.
+
+2014-01-18  Rennie deGraaf  <rennie.degraaf@gmail.com>
+    Despite photos being cached, browsers still check the server for new 
+    versions of photos and thumbnails when displaying photo pages.  This could 
+    probably be fixed by caching Image objects for the photos and thumbnails 
+    in the scripts and creating IMG elements from them.
+
+    POSTPONED: The overhead of checking with the server for new versions should 
+    not be a big deal, and I need to stop adding unnecessary features if I'm 
+    ever going to get this to a useful state.

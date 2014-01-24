@@ -11,8 +11,7 @@
 // TODO: minifier?  Build system? Put the svn revision in something somewhere?
 // TODO: move the todo list out of this file.
 // TODO: test a short description string.
-// TODO: finish README
-// TODO: load photos directly from cache?
+// TODO: verify markdown in README
 
 var debug=false;
 var albumName=null; // name of the current album
@@ -673,7 +672,7 @@ function cacheNext()
 }
 
 
-// Cache a photo's JSON 
+// Cache a photo
 function cachePhoto(status, photoData, args)
 {
     log("cachePhoto enter");
