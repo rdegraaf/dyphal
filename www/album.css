@@ -38,7 +38,7 @@ li.thumbnail {
 #contentPanel {
   margin-left: 80px;
   margin-right: 80px;
-  margin-bottom: 80px; 
+  margin-bottom: 80px;
   text-align: center;
   line-height: 0px;
 }
@@ -47,12 +47,6 @@ li.thumbnail {
   display: none;
   width: 0;
   height: 0;
-}
-
-html, body {
-  min-height: 100%;
-  width: 100%;
-  height: auto;
 }
 
 #description {

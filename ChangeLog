@@ -1,7 +1,12 @@
+2014-01-23  Rennie deGraaf  <rennie.degraaf@gmail.com>
+
+    * album.css, common.css: Fixed the footer in album view.  Tested in 
+      Chromium, Firefox, Konqueror, Opera, IE8, IE11, Android.
+
 2014-01-18  Rennie deGraaf  <rennie.degraaf@gmail.com>
 
     * album.js: Added a bunch more debug logging
-    
+
     * album.js: Set event listeners before setting the target when loading the 
       debug and photo stylesheets.
 

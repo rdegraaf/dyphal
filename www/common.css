@@ -3,13 +3,20 @@
   Copyright (c) Rennie deGraaf, 2005-2014.  All rights reserved.
 */
 
-html, body {
+html {
   color: white;
   background-color: #4b4b4b;
   margin: 0;
   font-family: serif;
   padding: 0;
   font-size: 10pt;
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  margin-bottom: 80px;
 }
 
 h1 {
