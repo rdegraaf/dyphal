@@ -1,3 +1,9 @@
+2014-02-04  Rennie deGraaf  <rennie.degraaf@gmail.com>
+
+    * album.js, lib.js: In browsers that are known to not fire load events on 
+      link elements (ie, Android <4.4), poll for stylesheet readiness then call 
+      the load event handlers whenever a load event on a stylesheet is needed.
+
 2014-01-23  Rennie deGraaf  <rennie.degraaf@gmail.com>
 
     * README: added some more content.
@@ -42,7 +48,7 @@
 
 2014-01-12  Rennie deGraaf  <rennie.degraaf@gmail.com>
 
-    * ChangeLog: Created a stand-along changelog.  Populated it from the svn 
+    * ChangeLog: Created a stand-alone changelog.  Populated it from the svn 
       log.
 
     * BUGS: Moved the list of active bugs out of album.js.

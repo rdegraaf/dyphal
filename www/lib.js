@@ -43,6 +43,19 @@ function getJSON(object, callback, fatalErrors, args)
 }
 
 
+// Poll 'test' with an exponential backoff starting with 'interval'  milliseconds between attempts. 
+// When it returns true, call 'action'.  If it fails 'maxtries' times, call 'error'.
+function pollUntil(interval, maxtries, test, action, error)
+{
+    if (test())
+        action();
+    else if (maxtries > 0)
+        setTimeout(function() { pollUntil(interval*2, maxtries-1, test, action, error); }, interval);
+    else
+        error();
+}
+
+
 // returns all elements of a certain type (tag) and class
 function getElementsByClass ( tag, classname )
 {
@@ -78,7 +91,7 @@ function camel(str)
             state = 0;
         }
     }
-    
+
     return newstr;
 }
 
@@ -114,7 +127,7 @@ function getObjWidth ( obj )
         a = 0;
     // find the end of the number, before "px"
     var b = w.indexOf("px");
-    
+
     if (b != -1)
         return parseInt(w.substr(a, b-a));
     else // value not returned in pixels
@@ -133,7 +146,7 @@ function getObjHeight ( obj )
         a = 0;
     // find the end of the number, before "px"
     var b = w.indexOf("px");
-    
+
     if (b != -1)
         return parseInt(w.substr(a, b-a));
     else // value not returned in pixels
@@ -149,7 +162,7 @@ function getHBorder ( obj )
     var leftPad = parseInt(getProperty(obj, "padding-left").replace(/[^0-9\.]/gi, ""));
     var rightPad = parseInt(getProperty(obj, "padding-right").replace(/[^0-9\.]/gi, ""));
     var rightBorder = parseInt(getProperty(obj, "border-right-width").replace(/[^0-9\.]/gi, ""));
-            
+
     // assign a sane value if the unit wasn't in pixels
     if (isNaN(leftBorder))
         leftBorder = 0;
@@ -159,7 +172,7 @@ function getHBorder ( obj )
         rightPad = 0;
     if (isNaN(rightBorder))
         rightBorder = 0;
-    
+
     return leftBorder + leftPad + rightPad + rightBorder;
 }
 
@@ -182,6 +195,14 @@ function getVBorder ( obj )
         bottomPad = 0;
     if (isNaN(bottomBorder))
         bottomBorder = 0;
-    
+
     return topBorder + topPad + bottomPad + bottomBorder;
 }
+
+
+// Add a suffix-match method to String.
+String.prototype.endsWith = function(suffix) {
+    var lastIndex = this.lastIndexOf(suffix);
+    return (-1 != lastIndex) && (this.length == lastIndex + suffix.length);
+}
+

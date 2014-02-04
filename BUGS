@@ -46,9 +46,11 @@
 2014-01-17  Rennie deGraaf  <rennie.degraaf@gmail.com>
     The first photo doesn't load and debug mode doesn't work on Android 4.3
     and and earlier (4.4.2 works).  Apparently, they don't support the load 
-    event for link elements.  The workarounds that I can find online are all 
-    horrible kludges that depend on browser version checks and either don't 
-    always work reliably or involve polling. 
+    event for link elements.  
+
+    WORKAROUND: I can't find any way to feature-detect browsers with this bug, 
+    so I check for a version of Android earlier than 4.4 and start a poll loop
+    with an exponential backoff until the stylesheet is present. 
 
 2014-01-17  Rennie deGraaf  <rennie.degraaf@gmail.com>
     Photos take up too little of the screen area on smartphone browsers.

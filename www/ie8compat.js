@@ -3,11 +3,11 @@
  * Written by Shawn Allen, Eli Grey, and others?
  *
  * From aight.js:
- * Aight is a collection of JavaScript shims that make IE8 behave like a modern
- * browser (sans SVG).
+ *   Aight is a collection of JavaScript shims that make IE8 behave like a 
+ *   modern browser (sans SVG).
  * 
  * From LICENSE:
- * aight is public domain
+ *   aight is public domain
  */
 
 !window.addEventListener && (function (WindowPrototype, DocumentPrototype, ElementPrototype, addEventListener, removeEventListener, dispatchEvent, registry) {

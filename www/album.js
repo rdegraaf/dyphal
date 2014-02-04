@@ -78,7 +78,7 @@ function suppressWarning()
 function start()
 {
     log("start enter");
-    
+
     try
     {
         // DomContentLoaded doesn't get signalled when only the hash changes, but this does.
@@ -87,7 +87,7 @@ function start()
 
         hidePhotoOverlay();
         hideHelp();
-        
+
         document.getElementById("helpLink").addEventListener("click", showHelp, false);
 
         // Parse the page arguments
@@ -114,19 +114,7 @@ function start()
                 throw new Error("Incorrect page arguments");
         }
 
-        if (debug != debugNew)
-        {
-            debug = debugNew;
-            if (debugNew)
-                loadDebug();
-            else
-                unloadDebug();
-            
-            // These methods register load callbacks that change the DOM, so we need to wait until 
-            // they complete before we can finish loading
-            return;
-        }
-
+        // We need to set albumName before we set debug so that loadDebugError() can work.
         if (albumName != albumNameNew)
         {
             albumName = albumNameNew;
@@ -134,7 +122,20 @@ function start()
             album = null;
             page = null;
         }
-    
+
+        if (debug != debugNew)
+        {
+            debug = debugNew;
+            if (debugNew)
+                loadDebug();
+            else
+                unloadDebug();
+
+            // These methods register load callbacks that change the DOM, so we need to wait until 
+            // they complete before we can finish loading
+            return;
+        }
+
         if (page != pageNew)
         {
             page = pageNew;
@@ -160,6 +161,19 @@ function start()
 }
 
 
+// Check if the browser is known to not fire load events on link elements.
+function brokenLoadEventOnLink()
+{
+    // Load events on link elements are broken on Android versions prior to 4.4
+    regex = /Android ([0-9]+)\.([0-9]+)(?:[^0-9]|$)/i
+    match = regex.exec(navigator.userAgent);
+    if (null != match && 3 == match.length)
+        return (match[1] < 4 || match[2] < 4)
+
+    return false;
+}
+
+
 // Load the debug stylesheet and update links
 function loadDebug()
 {
@@ -174,6 +188,15 @@ function loadDebug()
     cssElement.setAttribute("href", "debug.css");
     cssElement.setAttribute("id", "debugStylesheet");
     document.getElementsByTagName("head")[0].appendChild(cssElement);
+
+    // Some browsers don't call load events on link objects.  So we need to poll 
+    // until the stylesheet is present.
+    if (brokenLoadEventOnLink())
+    {
+        pollUntil(50, 6, function() {
+                return document.styleSheets[document.styleSheets.length-1].href.endsWith("/debug.css");
+            }, loadDebugAfterStylesheet, loadDebugError);
+    }
 
     log("loadDebug exit");
 }
@@ -222,7 +245,7 @@ function loadDebugError()
     try
     {
         debug = false;
-    
+
         // Unload the debug stylesheet
         var cssElement = document.getElementById("debugStylesheet");
         cssElement.parentNode.removeChild(cssElement);
@@ -426,6 +449,15 @@ function loadPhotoContent()
         cssElementNew.addEventListener("load", loadPhotoAfterStylesheet, false);
         cssElementNew.setAttribute("href", "photo.css");
         cssElement.parentNode.replaceChild(cssElementNew, cssElement);
+
+        // Some browsers don't call load events on link objects.  So we need to 
+        // poll until the stylesheet is present.
+        if (brokenLoadEventOnLink())
+        {
+            pollUntil(50, 6, function() {
+                    return document.styleSheets.length >= 2 && document.styleSheets[1].href.endsWith("/photo.css");
+                }, loadPhotoAfterStylesheet, function() { error("Error loading stylesheet"); });
+        }
     }
     else
         loadPhotoAfterStylesheet();
@@ -495,7 +527,7 @@ function loadPhotoContent()
         prevLinkElement.setAttribute("data-target", page-1);
         document.getElementById("prevImage").style["visibility"] = "visible";
     }
-            
+
     if (page == album.photos.length)
     {
         // No next photo
@@ -522,7 +554,7 @@ function loadPhotoContent()
         nextLinkElement.setAttribute("data-target", page+1);
         document.getElementById("nextImage").style["visibility"] = "visible";
     }
-    
+
     document.getElementById("indexLink").setAttribute("href", generatePhotoURL(0));
     if (debug)
         document.getElementById("debugLink").setAttribute("href", generatePhotoURL(page, true));
@@ -554,7 +586,7 @@ function loadPhotoAfterStylesheet()
             // Make sure that the event listener is in place before we set the photo
             photoElement.setAttribute("src", albumPath + photoData.photo);
             window.addEventListener("resize", fitPhoto, false);
-            
+
             document.getElementById("photoOverlay").style["backgroundImage"] = "url(" + albumPath + photoData.photo + ")";
         }
     }
@@ -601,7 +633,7 @@ function fitPhoto()
             panelWidth = getObjWidth(photoPanel) - getHBorder(photo);
             panelHeight = getObjHeight(photoPanel) - getVBorder(photo);
             panelAspect = panelWidth/panelHeight;
-            
+
             windowWidth = (window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth) - 6;
             windowHeight = (window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight) - 6;
 
@@ -650,7 +682,7 @@ function fitPhoto()
 function generatePhotoURL(index, suppressDebug)
 {
     var link = "#" + albumName;
-    if (0 != index)
+    if (null != index && 0 != index)
         link += "," + index;
     if (debug && (true != suppressDebug))
         link += ",debug";
@@ -798,7 +830,7 @@ function showHelp()
         var help = document.getElementById("helpTextPanel");
         help.style["display"] = "block";
         help.addEventListener("click", hideHelp, false);
-        
+
         // Displaying the help text may resize the window.  Delay setting helpVisible to ensure 
         // that the call to fitPhoto() on the initial resize doesn't immediately suppress help.
         setTimeout( function() { helpVisible = true; }, 50);
