@@ -4,11 +4,10 @@
 */
 
 // TODO: generation tool for JSON files, scaled photos
-// TODO: test Android
 // TODO: index of albums?
 // TODO: mobile stylesheet?
-// TODO: gestures for navigation on mobile?
-// TODO: minifier?  Build system? Put the svn revision in something somewhere?
+// TODO: gestures for navigation on mobile? Compare positions of touchend and touchstart?
+// TODO: minifier?  Build system? Put the svn revision in the help text or README?
 // TODO: move the todo list out of this file.
 // TODO: test a short description string.
 // TODO: verify markdown in README
@@ -580,6 +579,8 @@ function loadPhotoAfterStylesheet()
             // Remove the event listeners before we change anything so that we don't get fitPhoto storms in IE8
             photoElement.removeEventListener("load", fitPhoto, false);
             window.removeEventListener("resize", fitPhoto, false);
+            // Webkit doesn't fire a load event if the src doesn't change.  So let's make sure it changes.
+            photoElement.setAttribute("src", "");
             photoElement.style["width"] = photoData.width + "px";
             photoElement.style["height"] = photoData.height + "px"
             photoElement.addEventListener("load", fitPhoto, false);

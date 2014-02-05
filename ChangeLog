@@ -1,3 +1,14 @@
+2013-02-04  Rennie deGraaf  <rennie.degraaf@gmail.com>
+
+    * album.html: set the viewport width to device-width to limit the resizing 
+      of things when mobile browsers are rotated.
+
+    * album.js (loadPhotoAfterStylesheet): Set the photo's src to "" before 
+      setting it to the correct value to ensure that it changes.  Without this 
+      fix, loading a photo, returning to album view, then opening the same 
+      photo again will not show the photo because the load event doesn't fire 
+      due to the src not changing.
+
 2014-02-04  Rennie deGraaf  <rennie.degraaf@gmail.com>
 
     * album.js, lib.js: In browsers that are known to not fire load events on 

@@ -53,10 +53,9 @@
     with an exponential backoff until the stylesheet is present. 
 
 2014-01-17  Rennie deGraaf  <rennie.degraaf@gmail.com>
-    Photos take up too little of the screen area on smartphone browsers.
-
-2014-01-17  Rennie deGraaf  <rennie.degraaf@gmail.com>
-    Text shrinks when an Android browser is rotated to vertical.
+    The photo view layout breaks down on very small windows, such as 
+    smartphones.  It might be best to give the photo as much space as it wants 
+    and put all of the text together beside or below it.  
 
 2014-01-18  Rennie deGraaf  <rennie.degraaf@gmail.com>
     Despite photos being cached, browsers still check the server for new 
@@ -67,3 +66,10 @@
     POSTPONED: The overhead of checking with the server for new versions should 
     not be a big deal, and I need to stop adding unnecessary features if I'm 
     ever going to get this to a useful state.
+
+2014-02-04  Rennie deGraaf  <rennie.degraaf@gmail.com>
+    Everything gets really spread-out on large wide windows.  It would look 
+    better if the description, properties, and navigation stuff were pushed 
+    over beside the photo.  Perhaps put a maximum width on both side columns 
+    and somehow force them to the middle if the percentage width is wider than 
+    the maximum?
