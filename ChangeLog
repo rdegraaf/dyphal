@@ -1,7 +1,11 @@
 2013-02-05  Rennie deGraaf  <rennie.degraaf@gmail.com>
 
+    * album.js: Added navigation by left- and right- touch swipe in album view.
+
+2013-02-05  Rennie deGraaf  <rennie.degraaf@gmail.com>
+
     * album.html, photo.css: removed an unnecessary class.
-    
+
     * common.css, photo.css, debug.css: Capped the width of elements that are 
       displayed in side columns and moved them towards the middle if the caps 
       are reached, so that the layout is less spread out on wide windows.

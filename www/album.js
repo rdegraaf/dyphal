@@ -6,7 +6,6 @@
 // TODO: generation tool for JSON files, scaled photos
 // TODO: index of albums?
 // TODO: mobile stylesheet?
-// TODO: gestures for navigation on mobile? Compare positions of touchend and touchstart?
 // TODO: minifier?  Build system? Put the svn revision in the help text or README?
 // TODO: move the todo list out of this file.
 // TODO: test a short description string.
@@ -29,6 +28,8 @@ window.addEventListener("load", start, false);
 window.addEventListener("hashchange", start, false);
 // Since JavaScript is clearly enabled, hide the warning as early as possible
 document.addEventListener("DOMContentLoaded", suppressWarning, false);
+window.addEventListener("touchstart", touchStart);
+window.addEventListener("touchend", touchEnd);
 
 log(navigator.appName);
 log(navigator.userAgent);
@@ -756,13 +757,13 @@ function keyHandler(e)
             }
             else if ((34 /*page down*/ == e.keyCode) || (32 /*space*/ == e.keyCode))
             {
-                if (page != album.photos.length)
+                if (album.photos.length != page)
                     document.location.href = generatePhotoURL(page+1);
                 return false;
             }
             else if ((33 /*page up*/ == e.keyCode) || (8 /*backspace*/ == e.keyCode))
             {
-                if (page != 1)
+                if (1 != page)
                     document.location.href = generatePhotoURL(page-1);
                 return false;
             }
@@ -788,6 +789,41 @@ function keyHandler(e)
     }
 }
 
+
+// Record the start of a touch
+var currentX = null;
+var currentY = null;
+function touchStart(evt)
+{
+    currentX = parseInt(evt.touches[0].clientX);
+    currentY = parseInt(evt.touches[0].clientY);
+}
+
+
+// Determine if the touch that just ended was a left or right swipe, and if so, 
+// change the photo being displayed.
+function touchEnd(evt)
+{
+    var thresholdY = 40;
+    var thresholdX = 100;
+    
+    var motionX = parseInt(evt.changedTouches[0].clientX) - currentX;
+    var motionY = parseInt(evt.changedTouches[0].clientY) - currentY;
+    
+    if ((thresholdY > Math.abs(motionY)) && (thresholdX < Math.abs(motionX)))
+    {
+        if (0 > motionX)
+        {
+            if (0 < page && album.photos.length != page)
+                document.location.href = generatePhotoURL(page+1);
+        }
+        else
+        {
+            if (1 <= page)
+                document.location.href = generatePhotoURL(page-1);
+        }
+    }
+}
 
 // Show the full-screen photo overlay
 function showPhotoOverlay()
