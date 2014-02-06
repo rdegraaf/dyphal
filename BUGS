@@ -70,6 +70,15 @@
 2014-02-04  Rennie deGraaf  <rennie.degraaf@gmail.com>
     Everything gets really spread-out on large wide windows.  It would look 
     better if the description, properties, and navigation stuff were pushed 
-    over beside the photo.  Perhaps put a maximum width on both side columns 
-    and somehow force them to the middle if the percentage width is wider than 
-    the maximum?
+    over beside the photo.  
+
+    POSTPONED: There's no clear way for things to the left and right of the 
+    contentPanel to move into unused space on its edges without putting layout 
+    information in the JavaScript or bounding the width of the photo.  Using a 
+    'middle-out' layout where the photo is positioned in the center and pushes 
+    things out to its sides won't work because assigning a maximum width to the 
+    contentPanel requires knowledge of layout.  Repositioning the stuff on the 
+    sides after photo scaling also requires knowledge of layout.  Bounding the 
+    width of contentPanel and forcing stuff to the sides to stick to its edges 
+    would limit the width photos that can be shown and may cause the side 
+    panels to move around as we switch between photos.

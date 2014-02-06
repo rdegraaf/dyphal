@@ -73,7 +73,8 @@ div.centerBlock>*:first-child {
   width: 20%;
   top: 25px; /* 0.5*(titlePanel.height - height) */
   height: 30px; /* img.back.height */
-  left: 0;
+  right: 80%;
+  max-width: 300px;
 }
 
 #indexPanel>h2 {

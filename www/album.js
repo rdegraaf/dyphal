@@ -11,6 +11,7 @@
 // TODO: move the todo list out of this file.
 // TODO: test a short description string.
 // TODO: verify markdown in README
+// TODO: re-arrange CSS to reduce duplication
 
 var debug=false;
 var albumName=null; // name of the current album
