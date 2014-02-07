@@ -1,3 +1,25 @@
+2013-02-06  Rennie deGraaf  <rennie.degraaf@gmail.com>
+
+    * img000.jpeg.json: Changed caption to include a really long line that will 
+      wrap around a couple times.
+
+    * album.css: Moved display overrides to the top and removed some 
+      unnecessary styles.
+
+    * album.html: Added a paragraph to the help text about touch navigation.
+
+    * album.js: Added try-catch blocks to the handlers for touch events.
+
+    * photo.css: Re-arranged some styles to reduce duplication and moved core 
+      layout to the top.
+
+    * photo.css: Set the styling on captionItems to preserve newlines from 
+      their text.
+
+    * README: fixed some markup problems
+
+    * deploy.sh: build an HTML version of the README and install it to WWWROOT
+
 2013-02-05  Rennie deGraaf  <rennie.degraaf@gmail.com>
 
     * album.js: Added navigation by left- and right- touch swipe in album view.

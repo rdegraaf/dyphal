@@ -3,6 +3,10 @@
   Copyright (c) Rennie deGraaf, 2005-2014.  All rights reserved.
 */
 
+#navigationPanel,#prevThumbPanel,#nextThumbPanel,#captionPanel,#propertyPanel,#photo,#overlay {
+  display: none;
+}
+
 img.hthumbnail, img.vthumbnail {
   vertical-align: middle;
   border: 9px solid #AAAAAA;
@@ -41,12 +45,6 @@ li.thumbnail {
   margin-bottom: 80px;
   text-align: center;
   line-height: 0px;
-}
-
-#navigationPanel,#prevThumbPanel,#nextThumbPanel,#captionPanel,#propertyPanel,#photo,#overlay {
-  display: none;
-  width: 0;
-  height: 0;
 }
 
 #description {

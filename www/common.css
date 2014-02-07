@@ -91,7 +91,7 @@ div.centerBlock>*:first-child {
   height: 100%;
   font-size: 0pt;
   color: #4b4b4b; /* same as background; hide text in Opera */
-  vertical-align: text-top
+  vertical-align: text-top;
 }
 
 #footerContent {

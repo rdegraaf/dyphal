@@ -8,9 +8,6 @@
 // TODO: mobile stylesheet?
 // TODO: minifier?  Build system? Put the svn revision in the help text or README?
 // TODO: move the todo list out of this file.
-// TODO: test a short description string.
-// TODO: verify markdown in README
-// TODO: re-arrange CSS to reduce duplication
 
 var debug=false;
 var albumName=null; // name of the current album
@@ -795,8 +792,15 @@ var currentX = null;
 var currentY = null;
 function touchStart(evt)
 {
-    currentX = parseInt(evt.touches[0].clientX);
-    currentY = parseInt(evt.touches[0].clientY);
+    try
+    {
+        currentX = parseInt(evt.touches[0].clientX);
+        currentY = parseInt(evt.touches[0].clientY);
+    }
+    catch (e)
+    {
+        error(e.name + ": " + e.message);
+    }
 }
 
 
@@ -804,24 +808,31 @@ function touchStart(evt)
 // change the photo being displayed.
 function touchEnd(evt)
 {
-    var thresholdY = 40;
-    var thresholdX = 100;
-    
-    var motionX = parseInt(evt.changedTouches[0].clientX) - currentX;
-    var motionY = parseInt(evt.changedTouches[0].clientY) - currentY;
-    
-    if ((thresholdY > Math.abs(motionY)) && (thresholdX < Math.abs(motionX)))
+    try
     {
-        if (0 > motionX)
+        var thresholdY = 40;
+        var thresholdX = 100;
+
+        var motionX = parseInt(evt.changedTouches[0].clientX) - currentX;
+        var motionY = parseInt(evt.changedTouches[0].clientY) - currentY;
+
+        if ((thresholdY > Math.abs(motionY)) && (thresholdX < Math.abs(motionX)))
         {
-            if (0 < page && album.photos.length != page)
-                document.location.href = generatePhotoURL(page+1);
+            if (0 > motionX)
+            {
+                if (0 < page && album.photos.length != page)
+                    document.location.href = generatePhotoURL(page+1);
+            }
+            else
+            {
+                if (1 <= page)
+                    document.location.href = generatePhotoURL(page-1);
+            }
         }
-        else
-        {
-            if (1 <= page)
-                document.location.href = generatePhotoURL(page-1);
-        }
+    }
+    catch (e)
+    {
+        error(e.name + ": " + e.message);
     }
 }
 

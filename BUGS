@@ -77,8 +77,15 @@
     information in the JavaScript or bounding the width of the photo.  Using a 
     'middle-out' layout where the photo is positioned in the center and pushes 
     things out to its sides won't work because assigning a maximum width to the 
-    contentPanel requires knowledge of layout.  Repositioning the stuff on the 
-    sides after photo scaling also requires knowledge of layout.  Bounding the 
-    width of contentPanel and forcing stuff to the sides to stick to its edges 
-    would limit the width photos that can be shown and may cause the side 
-    panels to move around as we switch between photos.
+    contentPanel requires knowledge of layout.  We can calculate the maximum 
+    width while generating albums and store it in the album JSON, but 
+    repositioning the stuff on the sides after photo scaling also requires 
+    knowledge of layout.  Bounding the width of contentPanel and forcing stuff 
+    to the sides to stick to its edges would limit the width photos that can be 
+    shown and may cause the side panels to move around as we switch between 
+    photos.  Maybe there's a way to set a max-width on the contentPanel when 
+    the album is loaded, set up CSS so that it the browser makes it as wide as 
+    possible without exceeding that so that we can measure its actual size to 
+    scale the photo, and force the sidebars to stick to its edges?  I can live 
+    without the layout automatically adjusting when the window is resized if 
+    necessary.

@@ -3,6 +3,68 @@
   Copyright (c) Rennie deGraaf, 2005-2014.  All rights reserved.
 */
 
+#thumbnailList, #description {
+  display: none;
+}
+
+#navigationPanel, #prevThumbPanel, #nextThumbPanel, #captionPanel, #propertyPanel, #contentPanel {
+  position: absolute;
+}
+
+#navigationPanel, #prevThumbPanel, #nextThumbPanel, #captionPanel, #propertyPanel {
+  width: 20%;
+  max-width: 300px;
+}
+
+#navigationPanel {
+  top: 25px; /* 0.5*(titlePanel.height - height) */
+  height: 30px; /* img.prev.height */
+  left: 80%;
+}
+
+#prevThumbPanel, #nextThumbPanel {
+  top: 80px; /* titlePanel.height */
+  height: 106px; /* img.vnavigation.height + 2*img.vnavigation.border */
+  line-height: 0px;
+}
+
+#contentPanel {
+  top: 80px; /* titlePanel.height */
+  left: 20%;
+  right: 20%;
+  bottom: 80px; /* footerPanel.height */
+  line-height: 0px;
+}
+
+#captionPanel, #propertyPanel {
+  top: 186px; /* titlePanel.height + prevThumbPanel.height */
+  bottom: 0;
+}
+
+#prevThumbPanel, #captionPanel {
+  right: 80%;
+}
+
+#nextThumbPanel, #propertyPanel {
+  left: 80%;
+}
+
+img.hnavigation, img.vnavigation {
+  border: 3px solid #AAAAAA;
+  border-radius: 5px;
+  box-shadow: 2px 2px 4px #000000;
+}
+
+img.hnavigation {
+  width: 100px;
+  height: 75px;
+}
+
+img.vnavigation {
+  width: 75px;
+  height: 100px;
+}
+
 #propertyTable {
   border-style: none;
 }
@@ -21,27 +83,17 @@
   width: 100%;
 }
 
-img.hnavigation, img.vnavigation {
-  border: 3px solid #AAAAAA;
-  border-radius: 5px;
-  box-shadow: 2px 2px 4px #000000;
-}
-img.hnavigation {
-  width: 100px;
-  height: 75px;
-}
-img.vnavigation {
-  width: 75px;
-  height: 100px;
-}
-
 #photo {
   border: 3px solid black;
   visibility: hidden;
 }
 
-#captionPanel {
+#index, #captionPanel {
   font-size: 12pt;
+}
+
+#index {
+  font-weight: bold;
 }
 
 p.captionItem, #propertyTable {
@@ -49,60 +101,12 @@ p.captionItem, #propertyTable {
   margin: 0;
 }
 
-#index {
-  font-weight: bold;
-  font-size: 12pt;
+p.captionItem {
+  white-space: pre-line;
 }
 
-#navigationPanel, #prevThumbPanel, #nextThumbPanel {
+#navigationPanel, #prevThumbPanel, #nextThumbPanel, #contentPanel {
   text-align: center;
-  position: absolute;
-  width: 20%;
-  max-width: 300px;
-}
-
-#navigationPanel {
-  top: 25px; /* 0.5*(titlePanel.height - height) */
-  height: 30px; /* img.prev.height */
-  left: 80%;
-}
-
-#prevThumbPanel, #nextThumbPanel {
-  top: 80px; /* titlePanel.height */
-  height: 106px; /* img.vnavigation.height + 2*img.vnavigation.border */
-  line-height: 0px;
-}
-
-#captionPanel, #propertyPanel, #contentPanel {
-  position: absolute;
-}
-
-#captionPanel, #propertyPanel {
-  top: 186px; /* titlePanel.height + prevThumbPanel.height */
-  width: 20%;
-  max-width: 300px;
-  bottom: 0;
-}
-
-#prevThumbPanel, #captionPanel {
-  right: 80%;
-}
-
-#nextThumbPanel, #propertyPanel {
-  left: 80%;
-}
-
-#contentPanel {
-  top: 80px; /* titlePanel.height */
-  left: 20%;
-  right: 20%;
-  bottom: 80px; /* footerPanel.height */
-  text-align: center;
-  line-height: 0px;
-}
-
-#thumbnailList, #description {
-  display: none;
 }
 
 #prevImage,#nextImage {
