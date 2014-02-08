@@ -1,0 +1,35 @@
+For version 3:
+
+    * Create a tool to generate appropriately-scaled photos and JSON files.
+
+    * Create an alternate CSS layout suitable for smartphone browsers.  See 
+      BUGS (2014-01-17) for more details.
+
+    * Extend or replace deploy.sh to generate release builds that don't include 
+      the test data.  An option for minified release builds would also be nice. 
+      So would an option to build a tarball of everything.  And a way to get 
+      get rid of README.html and any other generated files.
+
+For future versions:
+
+    * Create an auto-generated index page.  Include a reference to a thumbnail 
+      of a photo to represent the album in each album JSON, then create an 
+      index JSON that lists all albums.  Have an index page load the index JSON 
+      and all of the album JSONs, and display the title and thumbnail for each 
+      album.
+
+    * Revisit whether IE8 support is still needed.  If not, get rid of the 
+      compat crap.
+
+    * Revisit whether Android <4.4 support is still needed.  If not, get rid of 
+      the poll loop.  See BUGS (2014-01-17) for more details.
+
+    * Reference CSS properties in a consistent and standards-compatible way.  
+      See BUGS (2014-01-12) for more details.
+
+    * Cache all photos and thumbnails that have been downloaded so that the 
+      browser doesn't need to keep polling the server to see if they've 
+      changed.  See BUGS (2014-01-18) for more details.
+
+    * Design a more compact layout for large windows.  See BUGS (2014-02-04) 
+      for more details.

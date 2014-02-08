@@ -3,12 +3,6 @@
   Copyright (c) Rennie deGraaf, 2005-2014.  All rights reserved.
 */
 
-// TODO: generation tool for JSON files, scaled photos
-// TODO: index of albums?
-// TODO: mobile stylesheet?
-// TODO: minifier?  Build system? Put the svn revision in the help text or README?
-// TODO: move the todo list out of this file.
-
 var debug=false;
 var albumName=null; // name of the current album
 var albumPath=null; // relative path to the album JSON file.  Begins with "." and ends with '/'.

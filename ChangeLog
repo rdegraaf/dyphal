@@ -1,7 +1,15 @@
+2013-02-08  Rennie deGraaf  <rennie.degraaf@gmail.com>
+
+    * TODO: new file
+    
+    * album.js: Moved "todo" information to TODO
+    
+    * README, album.html: Added the version number and SVN $Id$
+
 2013-02-06  Rennie deGraaf  <rennie.degraaf@gmail.com>
 
-    * img000.jpeg.json: Changed caption to include a really long line that will 
-      wrap around a couple times.
+    * test/img000.jpeg.json: Changed the caption to include a really long line 
+      that will wrap around a couple times.
 
     * album.css: Moved display overrides to the top and removed some 
       unnecessary styles.
@@ -11,14 +19,14 @@
     * album.js: Added try-catch blocks to the handlers for touch events.
 
     * photo.css: Re-arranged some styles to reduce duplication and moved core 
-      layout to the top.
+      layout stuff to the top.
 
     * photo.css: Set the styling on captionItems to preserve newlines from 
       their text.
 
     * README: fixed some markup problems
 
-    * deploy.sh: build an HTML version of the README and install it to WWWROOT
+    * deploy.sh: build an HTML version of README and install it to WWWROOT
 
 2013-02-05  Rennie deGraaf  <rennie.degraaf@gmail.com>
 
