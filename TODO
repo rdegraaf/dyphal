@@ -10,6 +10,10 @@ For version 3:
       So would an option to build a tarball of everything.  And a way to get 
       get rid of README.html and any other generated files.
 
+    * Find a way to push the version date into README and album.html.  A git 
+      filter might be able to do the job, if I used git.  Maybe add something 
+      to deploy.sh?
+
 For future versions:
 
     * Create an auto-generated index page.  Include a reference to a thumbnail 

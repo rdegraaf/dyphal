@@ -1,5 +1,13 @@
 2013-02-08  Rennie deGraaf  <rennie.degraaf@gmail.com>
 
+    * README, album.html: Removed SVN keywords since they don't do quite what I 
+      want: they give revision and date information for the file, not for the 
+      repository. 
+
+    * Disabled function call logging by default.
+
+2013-02-08  Rennie deGraaf  <rennie.degraaf@gmail.com>
+
     * TODO: new file
     
     * album.js: Moved "todo" information to TODO

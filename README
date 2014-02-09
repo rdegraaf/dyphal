@@ -1,5 +1,5 @@
-DHTML Photo Album                                               Version 3.0
-=================                                               $Date$
+DHTML Photo Album
+=================
 
 This package is a web photo album template designed to allow photographers to 
 show off their work without needing to turn to commercial providers that inject 
@@ -144,4 +144,5 @@ own tool.  gThumb still has the best support for photo metadata of any Linux
 photo manager that I could find, so my tool pulls metadata from the places 
 where gThumb stores it and pulls lists of photos from gThumb collections.
 
-$Id$
+
+Version 3.0  $Date$

@@ -11,7 +11,7 @@ var page=null; // number of the current page, 0 for the album thumbnail view
 var pages=[]; // objects describing all pages that have been retrieved.  Corresponds to album.photos.
 var overlayVisible=false;
 var helpVisible = false;
-var logall = true;
+var logall = false;
 
 
 // Set up event listeners
