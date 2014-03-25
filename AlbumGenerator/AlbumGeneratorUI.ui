@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>800</width>
-    <height>750</height>
+    <height>875</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -39,11 +39,14 @@
         <property name="alignment">
          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
         </property>
-        <layout class="QVBoxLayout" name="verticalLayout_6">
+        <layout class="QVBoxLayout" name="verticalLayout_6" stretch="6,0,1">
          <item>
           <widget class="QListWidget" name="photosList">
            <property name="toolTip">
             <string>Photos to include in the album.</string>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QListWidget::item {padding: 2px}</string>
            </property>
            <property name="dragEnabled">
             <bool>true</bool>
@@ -54,44 +57,20 @@
            <property name="selectionMode">
             <enum>QAbstractItemView::ExtendedSelection</enum>
            </property>
-           <property name="spacing">
-            <number>2</number>
-           </property>
           </widget>
          </item>
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout_4">
            <item>
-            <widget class="QComboBox" name="addPhotosButton">
-             <property name="toolTip">
-              <string>Add photos to the album.</string>
+            <widget class="QPushButton" name="addPhotosButton">
+             <property name="text">
+              <string>Add Photos...</string>
              </property>
-             <property name="autoFillBackground">
-              <bool>false</bool>
+             <property name="icon">
+              <iconset theme="list-add">
+               <normaloff/>
+              </iconset>
              </property>
-             <property name="sizeAdjustPolicy">
-              <enum>QComboBox::AdjustToContents</enum>
-             </property>
-             <item>
-              <property name="text">
-               <string>Add Photos...</string>
-              </property>
-              <property name="icon">
-               <iconset theme="list-add">
-                <normaloff/>
-               </iconset>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>Add Files...</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>Add a gThumb 3 Catalog...</string>
-              </property>
-             </item>
             </widget>
            </item>
            <item>
@@ -124,11 +103,61 @@
            </item>
           </layout>
          </item>
+         <item>
+          <widget class="QTextEdit" name="photoProperties">
+           <property name="palette">
+            <palette>
+             <active>
+              <colorrole role="Base">
+               <brush brushstyle="SolidPattern">
+                <color alpha="255">
+                 <red>230</red>
+                 <green>230</green>
+                 <blue>230</blue>
+                </color>
+               </brush>
+              </colorrole>
+             </active>
+             <inactive>
+              <colorrole role="Base">
+               <brush brushstyle="SolidPattern">
+                <color alpha="255">
+                 <red>230</red>
+                 <green>230</green>
+                 <blue>230</blue>
+                </color>
+               </brush>
+              </colorrole>
+             </inactive>
+             <disabled>
+              <colorrole role="Base">
+               <brush brushstyle="SolidPattern">
+                <color alpha="255">
+                 <red>244</red>
+                 <green>244</green>
+                 <blue>244</blue>
+                </color>
+               </brush>
+              </colorrole>
+             </disabled>
+            </palette>
+           </property>
+           <property name="tabChangesFocus">
+            <bool>true</bool>
+           </property>
+           <property name="undoRedoEnabled">
+            <bool>false</bool>
+           </property>
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
         </layout>
        </widget>
       </item>
       <item>
-       <layout class="QVBoxLayout" name="verticalLayout_8" stretch="2,2,1,1">
+       <layout class="QVBoxLayout" name="verticalLayout_8" stretch="2,2,1,1,1">
         <item>
          <widget class="QGroupBox" name="groupBox_2">
           <property name="title">
@@ -136,20 +165,21 @@
           </property>
           <layout class="QVBoxLayout" name="verticalLayout">
            <item>
-            <widget class="QComboBox" name="addDescriptionButton">
+            <widget class="QPushButton" name="addCaptionButton">
              <property name="toolTip">
               <string>Add a field to the photos' captions.</string>
              </property>
-             <item>
-              <property name="text">
-               <string>Add Caption...</string>
-              </property>
-              <property name="icon">
-               <iconset theme="list-add">
-                <normaloff/>
-               </iconset>
-              </property>
-             </item>
+             <property name="styleSheet">
+              <string notr="true">QPushButton{text-align: left;} QPushButton::menu-indicator{subcontrol-position: right center; left: -10px;}</string>
+             </property>
+             <property name="text">
+              <string>Add Caption...</string>
+             </property>
+             <property name="icon">
+              <iconset theme="list-add">
+               <normaloff/>
+              </iconset>
+             </property>
             </widget>
            </item>
            <item>
@@ -220,20 +250,21 @@
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_3">
            <item>
-            <widget class="QComboBox" name="addPropertyButton">
+            <widget class="QPushButton" name="addPropertyButton">
              <property name="toolTip">
               <string>Add a field to the photos' properties.</string>
              </property>
-             <item>
-              <property name="text">
-               <string>Add Property...</string>
-              </property>
-              <property name="icon">
-               <iconset theme="list-add">
-                <normaloff/>
-               </iconset>
-              </property>
-             </item>
+             <property name="styleSheet">
+              <string notr="true">QPushButton{text-align: left;} QPushButton::menu-indicator{subcontrol-position: right center; left: -10px;} QMenu {menu-scrollable: 1;}</string>
+             </property>
+             <property name="text">
+              <string>Add Property...</string>
+             </property>
+             <property name="icon">
+              <iconset theme="list-add">
+               <normaloff/>
+              </iconset>
+             </property>
             </widget>
            </item>
            <item>
@@ -317,6 +348,22 @@
          </widget>
         </item>
         <item>
+         <widget class="QGroupBox" name="groupBox_6">
+          <property name="title">
+           <string>Album Description</string>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_2">
+           <item>
+            <widget class="QPlainTextEdit" name="descriptionText">
+             <property name="tabChangesFocus">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
          <widget class="QGroupBox" name="groupBox_5">
           <property name="title">
            <string>Album  Footer</string>
@@ -372,7 +419,7 @@
       <item>
        <widget class="QLabel" name="label">
         <property name="text">
-         <string>Photo Size:</string>
+         <string>Scale photos to:</string>
         </property>
        </widget>
       </item>
@@ -425,6 +472,16 @@
        </spacer>
       </item>
       <item>
+       <widget class="QPushButton" name="installTemplateButton">
+        <property name="text">
+         <string>Install Album Template...</string>
+        </property>
+        <property name="icon">
+         <iconset theme="insert-image"/>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QProgressBar" name="progressBar">
         <property name="enabled">
          <bool>true</bool>
@@ -443,7 +500,7 @@
          <string>Cancel</string>
         </property>
         <property name="icon">
-         <iconset theme="dialog-cancel">
+         <iconset theme="process-stop">
           <normaloff/>
          </iconset>
         </property>

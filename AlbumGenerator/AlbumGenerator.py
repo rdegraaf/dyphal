@@ -4,8 +4,9 @@
 # TODO: display properties for a selected photo somewhere
 # TODO: window icon
 # TODO: comments
-# TODO: investigate replacing the combo boxes with buttons with menus
-# TODO: UI to install the template
+# TODO: reduce the spacing on items in the Add Caption and Add Property menus.
+#     I tried to change the padding with a QMenu::item stylesheet, but this 
+#     removed the hover effect.  I can't figure out how to get both.
 
 import sys
 import os
@@ -316,6 +317,21 @@ class Config(object):
         self.close()
 
 
+class ListKeyFilter(QtCore.QObject):
+    delKeyPressed = QtCore.pyqtSignal()
+    escKeyPressed = QtCore.pyqtSignal()
+    
+    def eventFilter(self, obj, event):
+        if QtCore.QEvent.KeyPress == event.type():
+            if QtCore.Qt.Key_Delete == event.key():
+                self.delKeyPressed.emit()
+                return True
+            elif QtCore.Qt.Key_Escape == event.key():
+                self.escKeyPressed.emit()
+                return True
+        return False
+
+
 class PhotoAlbumUI(QtGui.QMainWindow, AlbumGeneratorUI.Ui_MainWindow):
     """Photo Album Generator UI"""
     _addPhotoSignal = QtCore.pyqtSignal(PhotoFile)
@@ -335,14 +351,35 @@ class PhotoAlbumUI(QtGui.QMainWindow, AlbumGeneratorUI.Ui_MainWindow):
         self.progressBar.setVisible(False)
         self.cancelButton.setVisible(False)
 
-        # Make re-style the various combo-boxes
-        self._setButtonBoxStyle(self.addPhotosButton)
-        self._setButtonBoxStyle(self.addDescriptionButton)
-        self._setButtonBoxStyle(self.addPropertyButton)
+        # Set up the menu for the "Add Photos" button
+        self._addPhotosButtonMenu = QtGui.QMenu(self.addPhotosButton)
+        self._addPhotosFiles = QtGui.QAction("Add Files...", self._addPhotosButtonMenu)
+        self._addPhotosGthumb3 = QtGui.QAction("Add a gThumb 3 Catalog...", self._addPhotosButtonMenu)
+        self._addPhotosButtonMenu.addAction(self._addPhotosFiles)
+        self._addPhotosButtonMenu.addAction(self._addPhotosGthumb3)
+        self.addPhotosButton.setMenu(self._addPhotosButtonMenu)
+
+        # Set up the menu for the "Add Caption" button
+        self._addCaptionButtonMenu = QtGui.QMenu(self.addCaptionButton)
+        self.addCaptionButton.setMenu(self._addCaptionButtonMenu)
+
+        # Set up the menu for the "Add Property" button
+        self._addPropertyButtonMenu = QtGui.QMenu(self.addPropertyButton)
+        self.addPropertyButton.setMenu(self._addPropertyButtonMenu)
+
+        # Listen for keyboard events in photosList, descriptionsList, and propertiesList
+        self._photosListFilter = ListKeyFilter()
+        self.photosList.installEventFilter(self._photosListFilter)
+        self._descriptionsListFilter = ListKeyFilter()
+        self.descriptionsList.installEventFilter(self._descriptionsListFilter)
+        self._propertiesListFilter = ListKeyFilter()
+        self.propertiesList.installEventFilter(self._propertiesListFilter)
 
         # Event handlers
-        self.addPhotosButton.activated.connect(self._addPhotosHandler)
+        self._addPhotosFiles.triggered.connect(self._addPhotosHandler)
+        self._addPhotosGthumb3.triggered.connect(self._addPhotosHandler)
         self.removePhotosButton.clicked.connect(self._removePhotosHandler)
+        self.photosList.itemSelectionChanged.connect(self._showProperties)
         self.photosList.itemActivated.connect(self._showPhoto)
         self._addPhotoSignal.connect(self._addPhoto)
         self._showErrorSignal.connect(self._showError)
@@ -350,38 +387,51 @@ class PhotoAlbumUI(QtGui.QMainWindow, AlbumGeneratorUI.Ui_MainWindow):
         self._backgroundCompleteSignal.connect(self._backgroundComplete)
         self.showAllDescriptionsFlag.stateChanged.connect(self._updatePhotoDescriptions)
         self.showAllPropertiesFlag.stateChanged.connect(self._updatePhotoProperties)
-        self.addDescriptionButton.activated.connect(self._addDescriptionHandler)
         self.removeDescriptionsButton.clicked.connect(self._removeDescriptionsHandler)
-        self.addPropertyButton.activated.connect(self._addPropertyHandler)
         self.removePropertiesButton.clicked.connect(self._removePropertiesHandler)
         self.generateAlbumButton.clicked.connect(self._generateAlbum)
         self.openAlbumButton.clicked.connect(self._openAlbum)
+        self.installTemplateButton.clicked.connect(self._installTemplate)
         self.cancelButton.clicked.connect(self._cancelBackgroundTasks)
+        self._photosListFilter.delKeyPressed.connect(self._removePhotosHandler)
+        self._photosListFilter.escKeyPressed.connect(self.photosList.clearSelection)
+        self._descriptionsListFilter.delKeyPressed.connect(self._removeDescriptionsHandler)
+        self._descriptionsListFilter.escKeyPressed.connect(self.descriptionsList.clearSelection)
+        self._propertiesListFilter.delKeyPressed.connect(self._removePropertiesHandler)
+        self._propertiesListFilter.escKeyPressed.connect(self.propertiesList.clearSelection)
+        
+        # To make the first item of a QComboBox unselectable:
+        #model = combobox.model()
+        #firstIndex = model.index(0, combobox.modelColumn(), combobox.rootModelIndex())
+        #firstItem = model.itemFromIndex(firstIndex)
+        #firstItem.setSelectable(False)
 
-
-    def _setButtonBoxStyle(self, combobox):
-        """Make a QComboBox items behave more like buttons"""
-        # Make the first item unselectable
-        model = combobox.model()
-        firstIndex = model.index(0, combobox.modelColumn(), combobox.rootModelIndex())
-        firstItem = model.itemFromIndex(firstIndex)
-        firstItem.setSelectable(False)
-
-        # Change the background color of items to match normal buttons.  They still lack the 3D 
-        # effects.
-        p = combobox.palette()
-        p.setColor(QtGui.QPalette.Base, p.color(QtGui.QPalette.Button))
-        p.setBrush(QtGui.QPalette.Base, p.brush(QtGui.QPalette.Button))
-        combobox.setPalette(p)
+        # To make the background color of QComboBox items to match normal buttons:
+        #p = combobox.palette()
+        #p.setColor(QtGui.QPalette.Base, p.color(QtGui.QPalette.Button))
+        #p.setBrush(QtGui.QPalette.Base, p.brush(QtGui.QPalette.Button))
+        #combobox.setPalette(p)
 
         # To force a QGroupBox's title to the top left, add something like this to the QBroupBox's 
         # stylesheet: QGroupBox::title {subcontrol-position: top left;}
 
+        #self.photosList.currentItemChanged.connect(lambda a,b : print("currentItemChanged"))
+        #self.photosList.currentRowChanged.connect(self._b)
+        #self.photosList.currentTextChanged.connect(self._c)
+        #self.photosList.itemActivated.connect(self._d)
+        #self.photosList.itemChanged.connect(self._e)
+        #self.photosList.itemClicked.connect(self._f)
+        #self.photosList.itemDoubleClicked.connect(self._g)
+        #self.photosList.itemEntered.connect(self._h)
+        #self.photosList.itemPressed.connect(self._i)
+        #self.photosList.itemSelectionChanged.connect(lambda : print("itemSelectionChanged"))
+        
+
 
     def _addPhotosHandler(self, index):
         """Event handler for the addPhotos button"""
-        self.addPhotosButton.setCurrentIndex(0)
-        if 1 == index: 
+        sender = self.sender()
+        if self._addPhotosFiles is sender:
             # Browse for photos
             filenames = QtGui.QFileDialog.getOpenFileNames(self, "Select photos", 
                                                        self._config.photoDir, 
@@ -389,7 +439,7 @@ class PhotoAlbumUI(QtGui.QMainWindow, AlbumGeneratorUI.Ui_MainWindow):
             self._addPhotoFiles(filenames)
             if 0 < len(filenames):
                 self._config.photoDir = os.path.dirname(filenames[len(filenames)-1])
-        elif 2 == index:
+        elif self._addPhotosGthumb3 is sender:
             # Add a gThumb 3 catalog
             catalogFileName = QtGui.QFileDialog.getOpenFileName(self, "Select catalog", 
                                                         self._config.gthumb3Dir, "*.catalog")
@@ -404,7 +454,7 @@ class PhotoAlbumUI(QtGui.QMainWindow, AlbumGeneratorUI.Ui_MainWindow):
                 self._addPhotoFiles(filenames)
                 self._config.gthumb3Dir = os.path.dirname(catalogFileName)
         else:
-            print("ERROR: unknown index selected in 'Add Photos' control")
+            print("ERROR: unknown item selected in 'Add Photos' control")
 
 
     def _addPhotoFiles(self, filenames):
@@ -435,8 +485,23 @@ class PhotoAlbumUI(QtGui.QMainWindow, AlbumGeneratorUI.Ui_MainWindow):
         self.photosList.addItem(photo)
 
 
+    def _showProperties(self):
+        """Displays a photo's properties."""
+        self.photoProperties.clear()
+        # When the user deselects everything, currentRow and currentItem remain the last selected 
+        # item.  But selectedItems() is empty.
+        if 0 != len(self.photosList.selectedItems()):
+            photo = self.photosList.currentItem()
+            lineBreak = ""
+            for obj in [photo.descriptions, photo.properties]:
+                for prop in sorted(obj.keys()):
+                    self.photoProperties.insertHtml("%s<strong>%s</strong>: %s" % (lineBreak, prop, obj[prop]))
+                    if "" == lineBreak:
+                        lineBreak = "<br>"
+
+
     def _showPhoto(self, photo):
-        """Event handler for activating entries in photosList"""
+        """Displays a photo using the system's image viewer."""
         QtGui.QDesktopServices.openUrl(QtCore.QUrl.fromLocalFile(photo.getPath()))
 
 
@@ -529,19 +594,16 @@ class PhotoAlbumUI(QtGui.QMainWindow, AlbumGeneratorUI.Ui_MainWindow):
                 else:
                     properties[prop] = 1
 
-        # Remove everything except the list title
-        listCount = self.addPropertyButton.count()
-        for i in range(listCount-1, 0, -1):
-            self.addPropertyButton.removeItem(i)
-
-        # Add the new property fields to the list
+        # Rebuild the list
+        self._addPropertyButtonMenu.clear()
         showAll = self.showAllPropertiesFlag.isChecked()
         for prop in sorted(properties.keys()):
             if showAll or count == properties[prop]:
-                self.addPropertyButton.addItem(prop)
+                self._addPropertyButtonMenu.addAction(prop, self._addPropertyHandler)
 
 
     def _updatePhotoDescriptions(self):
+        # Figure out what caption fields we have.
         descriptions = {}
         count = self.photosList.count()
         for i in range(count):
@@ -552,22 +614,16 @@ class PhotoAlbumUI(QtGui.QMainWindow, AlbumGeneratorUI.Ui_MainWindow):
                 else:
                     descriptions[prop] = 1
 
-        # Remove everything except the list title
-        listCount = self.addDescriptionButton.count()
-        for i in range(listCount-1, 0, -1):
-            self.addDescriptionButton.removeItem(i)
-
-        # Add the new description fields to the list
+        # Rebuild the list
+        self._addCaptionButtonMenu.clear()
         showAll = self.showAllDescriptionsFlag.isChecked()
         for prop in sorted(descriptions.keys()):
             if showAll or count == descriptions[prop]:
-                self.addDescriptionButton.addItem(prop)
+                self._addCaptionButtonMenu.addAction(prop, self._addCaptionHandler)
 
 
-    def _addDescriptionHandler(self, index):
-        self.addDescriptionButton.setCurrentIndex(0)
-        prop = self.addDescriptionButton.itemText(index)
-        self.descriptionsList.addItem(prop)
+    def _addCaptionHandler(self):
+        self.descriptionsList.addItem(self.sender().text())
 
 
     def _removeDescriptionsHandler(self):
@@ -577,10 +633,8 @@ class PhotoAlbumUI(QtGui.QMainWindow, AlbumGeneratorUI.Ui_MainWindow):
             self.descriptionsList.takeItem(self.descriptionsList.indexFromItem(item).row())
 
 
-    def _addPropertyHandler(self, index):
-        self.addPropertyButton.setCurrentIndex(0)
-        prop = self.addPropertyButton.itemText(index)
-        self.propertiesList.addItem(prop)
+    def _addPropertyHandler(self):
+        self.propertiesList.addItem(self.sender().text())
 
 
     def _removePropertiesHandler(self):
@@ -595,12 +649,15 @@ class PhotoAlbumUI(QtGui.QMainWindow, AlbumGeneratorUI.Ui_MainWindow):
         album["version"] = FILE_FORMAT_VERSION
         album["title"] = self.titleText.toPlainText()
         album["footer"] = self.footerText.toPlainText()
-        album["description"] = ""
+        album["description"] = self.descriptionText.toPlainText()
         album["photoResolution"] = tuple(int(s) for s in self.photoSizeButton.currentText().split("x"))
         album["descriptionFields"] = [self.descriptionsList.item(i).text() for i in range(0, self.descriptionsList.count())]
         album["propertyFields"] = [self.propertiesList.item(i).text() for i in range(0, self.propertiesList.count())]
         album["photos"] = [self.photosList.item(i).getAlbumJSON() for i in range(0, self.photosList.count())]
         #print(json.dumps(album, indent=2, sort_keys=True))
+
+        # TODO: instead of prompting for a directory, then looking for "album.json" in it, prompt 
+        # to save a .json file.
 
         # Get the output directory.
         # The KDE directory chooser dialog is all kinds of buggy: it doesn't expand the current 
@@ -630,6 +687,9 @@ class PhotoAlbumUI(QtGui.QMainWindow, AlbumGeneratorUI.Ui_MainWindow):
             tasks = []
             for i in range(0, count):
                 photo = self.photosList.item(i)
+                # In Python 3.4, I might be able to use functools.partialmethod to create a generic 
+                # wrapper that calls self._incProgressSignal.emit() after an arbitrary method call, 
+                # rather than needing to write wrappers for every method call.
                 tasks.append(self._threads.submit(self._bgGeneratePhotoJSON, photo, dirFD, pixels, descriptions, properties))
                 tasks.append(self._threads.submit(self._bgGeneratePhoto, photo, dirFD, pixels))
                 tasks.append(self._threads.submit(self._bgGenerateThumbnail, photo, dirFD, THUMB_WIDTH,  THUMB_HEIGHT))
@@ -658,15 +718,13 @@ class PhotoAlbumUI(QtGui.QMainWindow, AlbumGeneratorUI.Ui_MainWindow):
         if 0 != len(errors):
             self._showErrorSignal.emit(str(len(errors)) + " errors were encountered generating the album:\n" + "\n".join(errors))
 
-        # Re-enable any disabled buttons
+        # Dismiss the cancellation UI
         self._backgroundCompleteSignal.emit()
 
         # Close the directory
         os.close(dirFD)
 
 
-    # In Python 3.4, I might be able to use functools.partialmethod to create a generic wrapper 
-    # that calls self._incProgressSignal.emit() after an arbitrary method call.
     def _bgGeneratePhotoJSON(self, photo, dirFD, pixels, descriptions, properties):
         photo.generateJSON(dirFD, pixels, descriptions, properties)
         self._incProgressSignal.emit()
@@ -681,6 +739,12 @@ class PhotoAlbumUI(QtGui.QMainWindow, AlbumGeneratorUI.Ui_MainWindow):
     def _openAlbum(self):
         # TODO
         pass
+
+
+    def _installTemplate(self):
+        #TODO
+        pass
+
 
 
     def _cancelBackgroundTasks(self):

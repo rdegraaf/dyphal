@@ -1,5 +1,41 @@
 2014-03-24  Rennie deGraaf  <rennie.degraaf@gmail.com>
 
+    * AlbumGenerator/AlbumGeneratorUI.ui: Replaced the QComboBoxes for 
+      addPhotosButton, addDescriptionButton, and addPropertyButton with 
+      QPushButtons.
+
+    * AlbumGenerator/AlbumGeneratorUI.ui: Changed the icon for cancelButton.
+
+    * AlbumGenerator/AlbumGeneratorUI.ui: Added a new button to install the 
+      album template.
+
+    * AlbumGenerator/AlbumGeneratorUI.ui: Added a new QPlainTextEdit for the 
+      album description.
+
+    * AlbumGenerator/AlbumGeneratorUI.ui: Added a new QTextEdit to display the 
+      properties of the selected photo.
+
+    * AlbumGenerator/AlbumGeneratorUI.ui: Replaced the item spacing in 
+      photosList with a padding style on list items to remove the gaps in 
+      selectability.
+
+    * AlbumGenerator/AlbumGenerator.py: Replaced the QComboBoxes for 
+      addPhotosButton, addDescriptionButton, and addPropertyButton with 
+      QPushButtons with attached menus.  I may need to revert that for 
+      addCaptionButton and addPropertyButton if they can get too long.
+
+    * AlbumGenerator/AlbumGenerator.py: Hooked up albumDescription to the JSON 
+      generator.
+
+    * AlbumGenerator/AlbumGenerator.py: Displayed the properties of the current 
+      photo in photoProperties.
+
+    * AlbumGenerator/AlbumGenerator.py: Added event filters to photosList, 
+      descriptionsList, and propertiesList so that Escape can be used to 
+      deselect everything and Delete removes the selected objects.
+
+2014-03-23  Rennie deGraaf  <rennie.degraaf@gmail.com>
+
     * AlbumGenerator/AlbumGenerator.py, AlbumGenerator/AlbumGeneratorUI.ui, 
       AlbumGenerator/build.sh: Initial checkin of a tool to generate the JSON 
       files, thumbnails, and scaled photos for albums.  About 60% complete.
