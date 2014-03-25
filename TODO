@@ -14,6 +14,10 @@ For version 3:
       filter might be able to do the job, if I used git.  Maybe add something 
       to deploy.sh?
 
+    * Replace getElementsByClass() with document.getElementsByClassName() and a 
+      MSIE8-compat shim (https://stackoverflow.com/questions/13261506/getelement
+      sbyclassname-in-ie8) or with document.querySelectorAll()
+
 For future versions:
 
     * Create an auto-generated index page.  Include a reference to a thumbnail 
@@ -37,3 +41,6 @@ For future versions:
 
     * Design a more compact layout for large windows.  See BUGS (2014-02-04) 
       for more details.
+
+    * Handle thumbnails with aspect ratios other than 4:3 (eg, for panorama 
+      photos).

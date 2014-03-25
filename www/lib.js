@@ -43,7 +43,7 @@ function getJSON(object, callback, fatalErrors, args)
 }
 
 
-// Poll 'test' with an exponential backoff starting with 'interval'  milliseconds between attempts. 
+// Poll 'test' with an exponential backoff starting with 'interval' milliseconds between attempts. 
 // When it returns true, call 'action'.  If it fails 'maxtries' times, call 'error'.
 function pollUntil(interval, maxtries, test, action, error)
 {

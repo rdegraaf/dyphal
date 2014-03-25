@@ -89,9 +89,9 @@ The full-screen photo overlay and help overlay do not have independent URLs.
 Since only one HTML document is used for all views, its differences in 
 appearance are implemented by switching stylesheets and, to a lesser extent, by 
 adding and removing document elements.  Photos, thumbnails, and photo metadata 
-are not contained in the HTML; they are loaded from JSON files and their 
-contents are inserted or removed from the document when appropriate.  The album 
-JSON file (`vacation.json` in the above example) contains a title, footer, and 
+are not stored in the HTML; they are loaded from JSON files and their contents 
+are inserted or removed from the document when appropriate.  The album JSON 
+file (`vacation.json` in the above example) contains a title, footer, and 
 description of the album, plus a list of the photos in the album.  Each photo 
 has its own JSON file (the photo's name from the album JSON with "`.json`" 
 appended), containing the name of the photo file, its dimensions, and its 
@@ -140,9 +140,10 @@ ended up with this.
 The main disadvantage of the new album over the old gThumb-generated one is 
 that I can no longer rely on gThumb to select the photos to include, create 
 down-sized versions of them, and extract their metadata.  Instead, I wrote my 
-own tool.  gThumb still has the best support for photo metadata of any Linux 
-photo manager that I could find, so my tool pulls metadata from the places 
-where gThumb stores it and pulls lists of photos from gThumb collections.
+own tool.  gThumb, despite a couple annoying mis-features, still has the best 
+support for photo metadata of any Linux photo manager that I could find, so my 
+tool pulls metadata from the places where gThumb stores it and pulls lists of 
+photos from gThumb collections.
 
 
 Version 3.0  $Date$

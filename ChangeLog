@@ -1,59 +1,74 @@
-2013-02-08  Rennie deGraaf  <rennie.degraaf@gmail.com>
+2014-03-24  Rennie deGraaf  <rennie.degraaf@gmail.com>
 
-    * README, album.html: Removed SVN keywords since they don't do quite what I 
-      want: they give revision and date information for the file, not for the 
-      repository. 
+    * AlbumGenerator/AlbumGenerator.py, AlbumGenerator/AlbumGeneratorUI.ui, 
+      AlbumGenerator/build.sh: Initial checkin of a tool to generate the JSON 
+      files, thumbnails, and scaled photos for albums.  About 60% complete.
 
-    * Disabled function call logging by default.
+    * Changelog: Added correct relative paths to file names.
 
-2013-02-08  Rennie deGraaf  <rennie.degraaf@gmail.com>
+    * www/lib.js: Fixed a typo in a comment.
 
-    * TODO: new file
-    
-    * album.js: Moved "todo" information to TODO
-    
-    * README, album.html: Added the version number and SVN $Id$
+    * README: A couple minor changes.
 
-2013-02-06  Rennie deGraaf  <rennie.degraaf@gmail.com>
+2014-02-08  Rennie deGraaf  <rennie.degraaf@gmail.com>
+
+    * README, www/album.html: Removed SVN keywords since they don't do quite 
+      what I want: they give revision and date information for the file, not 
+      for the repository. 
+
+    * www/album.js: Disabled function call logging by default.
+
+2014-02-08  Rennie deGraaf  <rennie.degraaf@gmail.com>
+
+    * TODO: New file.
+
+    * www/album.js: Moved "todo" information to TODO.
+
+    * README, www/album.html: Added the version number and SVN $Id$.
+
+2014-02-06  Rennie deGraaf  <rennie.degraaf@gmail.com>
 
     * test/img000.jpeg.json: Changed the caption to include a really long line 
       that will wrap around a couple times.
 
-    * album.css: Moved display overrides to the top and removed some 
+    * www/album.css: Moved display overrides to the top and removed some 
       unnecessary styles.
 
-    * album.html: Added a paragraph to the help text about touch navigation.
+    * www/album.html: Added a paragraph to the help text about touch 
+      navigation.
 
-    * album.js: Added try-catch blocks to the handlers for touch events.
+    * www/album.js: Added try-catch blocks to the handlers for touch events.
 
-    * photo.css: Re-arranged some styles to reduce duplication and moved core 
-      layout stuff to the top.
+    * www/photo.css: Re-arranged some styles to reduce duplication and moved 
+      core layout stuff to the top.
 
-    * photo.css: Set the styling on captionItems to preserve newlines from 
+    * www/photo.css: Set the styling on captionItems to preserve newlines from 
       their text.
 
-    * README: fixed some markup problems
+    * README: Fixed some markup problems.
 
-    * deploy.sh: build an HTML version of README and install it to WWWROOT
+    * deploy.sh: Build an HTML version of README and install it to WWWROOT.
 
-2013-02-05  Rennie deGraaf  <rennie.degraaf@gmail.com>
+2014-02-05  Rennie deGraaf  <rennie.degraaf@gmail.com>
 
-    * album.js: Added navigation by left- and right- touch swipe in album view.
+    * www/album.js: Added navigation by left- and right- touch swipe in album 
+      view.
 
-2013-02-05  Rennie deGraaf  <rennie.degraaf@gmail.com>
+2014-02-05  Rennie deGraaf  <rennie.degraaf@gmail.com>
 
-    * album.html, photo.css: removed an unnecessary class.
+    * www/album.html, www/photo.css: Removed an unnecessary class.
 
-    * common.css, photo.css, debug.css: Capped the width of elements that are 
-      displayed in side columns and moved them towards the middle if the caps 
-      are reached, so that the layout is less spread out on wide windows.
+    * www/common.css, www/photo.css, www/debug.css: Capped the width of 
+      elements that are displayed in side columns and moved them towards the 
+      middle if the caps are reached, so that the layout is less spread out on 
+      wide windows.
 
-2013-02-04  Rennie deGraaf  <rennie.degraaf@gmail.com>
+2014-02-04  Rennie deGraaf  <rennie.degraaf@gmail.com>
 
-    * album.html: set the viewport width to device-width to limit the resizing 
-      of things when mobile browsers are rotated.
+    * www/album.html: Set the viewport width to device-width to limit the 
+      resizing of things when mobile browsers are rotated.
 
-    * album.js (loadPhotoAfterStylesheet): Set the photo's src to "" before 
+    * www/album.js (loadPhotoAfterStylesheet): Set the photo's src to "" before 
       setting it to the correct value to ensure that it changes.  Without this 
       fix, loading a photo, returning to album view, then opening the same 
       photo again will not show the photo because the load event doesn't fire 
@@ -61,51 +76,53 @@
 
 2014-02-04  Rennie deGraaf  <rennie.degraaf@gmail.com>
 
-    * album.js, lib.js: In browsers that are known to not fire load events on 
-      link elements (ie, Android <4.4), poll for stylesheet readiness then call 
-      the load event handlers whenever a load event on a stylesheet is needed.
+    * www/album.js, www/lib.js: In browsers that are known to not fire load 
+      events on link elements (ie, Android <4.4), poll for stylesheet readiness 
+      then call the load event handlers whenever a load event on a stylesheet 
+      is needed.
 
 2014-01-23  Rennie deGraaf  <rennie.degraaf@gmail.com>
 
-    * README: added some more content.
+    * README: Added some more content.
 
-    * album.js, common.css: tweaked some comments
+    * www/album.js, www/common.css: Tweaked some comments.
 
 2014-01-23  Rennie deGraaf  <rennie.degraaf@gmail.com>
 
-    * album.css, common.css: Fixed the footer in album view.  Tested in 
+    * www/album.css, www/common.css: Fixed the footer in album view.  Tested in 
       Chromium, Firefox, Konqueror, Opera, IE8, IE11, Android.
 
 2014-01-18  Rennie deGraaf  <rennie.degraaf@gmail.com>
 
-    * album.js: Added a bunch more debug logging
+    * www/album.js: Added a bunch more debug logging.
 
-    * album.js: Set event listeners before setting the target when loading the 
-      debug and photo stylesheets.
+    * www/album.js: Set event listeners before setting the target when loading 
+      the debug and photo stylesheets.
 
 2014-01-17  Rennie deGraaf  <rennie.degraaf@gmail.com>
 
-    * album.js (loadPhotoAfterStylesheet): Fixed the intermittent failure for 
-      the first photo to load.  It seems to have been due to a race between the 
-      photo loading and the callback being registered.
+    * www/album.js (loadPhotoAfterStylesheet): Fixed the intermittent failure 
+      for the first photo to load.  It seems to have been due to a race between 
+      the photo loading and the callback being registered.
 
-    * album.js: Added some debug logging statements.
+    * www/album.js: Added some debug logging statements.
 
-    * album.js (fitphoto): removed some unreachable logic.
+    * www/album.js (fitphoto): Removed some unreachable logic.
 
-    * album.html: set the default src for the photo to placeholder.png.
+    * www/album.html: Set the default src for the photo to placeholder.png.
 
-    * ie8compat.js: switched to versions of the shims with a well-defined 
+    * www/ie8compat.js: Switched to versions of the shims with a well-defined 
       licence.
 
 2014-01-13  Rennie deGraaf  <rennie.degraaf@gmail.com>
 
-    * README: New file
+    * README: New file.
 
-    * album.js: moved the design goals to README.
+    * www/album.js: moved the design goals to README.
 
-    * album.css, album.html, album.js, common.css, debug.css, ie8compat.js, 
-      lib.js, photo.css: Changed the file header comment format.
+    * www/album.css, www/album.html, www/album.js, www/common.css, 
+      www/debug.css, www/ie8compat.js, www/lib.js, www/photo.css: Changed the 
+      file header comment format.
 
 2014-01-12  Rennie deGraaf  <rennie.degraaf@gmail.com>
 
@@ -116,203 +133,206 @@
 
 2014-01-12  Rennie deGraaf  <rennie.degraaf@gmail.com>
 
-    * ie8compat.js: New file containing third-party work-arounds for IE 8's 
+    * www/ie8compat.js: New file containing third-party work-arounds for IE 8's 
       lack of support for textContent, addEventListener, and 
       removeEventListener.
 
-    * album.html: Conditionally include ie8compat.js in IE to work around some 
-      of its limitations.
+    * www/album.html: Conditionally include ie8compat.js in IE to work around 
+      some of its limitations.
 
-    * album.html: Added an X-UA-Compatible meta header to make IE stop 
+    * www/album.html: Added an X-UA-Compatible meta header to make IE stop 
       prompting for compatibility view.
 
-    * album.html: Made some changes to the help text to reflect the fact that 
-      there is now third-party code in the album.
+    * www/album.html: Made some changes to the help text to reflect the fact 
+      that there is now third-party code in the album.
 
-    * album.js: When entering or exiting debug mode, return out of start() 
+    * www/album.js: When entering or exiting debug mode, return out of start() 
       immediately and enter it again from a callback after the debug-specific 
       elements have been added to or removed from the DOM in order to avoid 
       issues related to the order in which callbacks are serviced.
 
-    * album.js: Removed an unnecessary variable assignment.
+    * www/album.js: Removed an unnecessary variable assignment.
 
-    * album.js: Delay setting helpVisible when showing the help screen, since 
-      making the help screen visible can change the page dimensions and we 
-      don't want the resulting call to fitPhoto() to immediately hide the help 
-      screen again.
+    * www/album.js: Delay setting helpVisible when showing the help screen, 
+      since making the help screen visible can change the page dimensions and 
+      we don't want the resulting call to fitPhoto() to immediately hide the 
+      help screen again.
 
-    * lib.js: Fall back to req.responseText if req.response doesn't exist on 
+    * www/lib.js: Fall back to req.responseText if req.response doesn't exist on 
       JSON response objects.
 
-    * lib.js: Convert property names from dashed-lowercase to camelCase in 
+    * www/lib.js: Convert property names from dashed-lowercase to camelCase in 
       getProperty() when using one of the eval fallbacks, because dashes aren't 
       valid characters in JavaScript identifiers.
 
-    * lib.js: Removed the unused function getChildren().
+    * www/lib.js: Removed the unused function getChildren().
 
 2014-01-11  Rennie deGraaf  <rennie.degraaf@gmail.com>
 
-    * index.html: renamed to album.html
+    * www/index.html: Renamed to album.html.
 
 2014-01-11  Rennie deGraaf  <rennie.degraaf@gmail.com>
 
     * deploy.sh: Moved the test album into a subdirectory, rather than the same 
       directory as the album source.
 
-    * album.json: Made the description string longer.
+    * test/album.json: Made the description string longer.
 
-    * album.js: Added support for albums in subdirectories.  The relative path 
-      to the album JSON file is given in the argument, and we parse out the 
-      directory and prefix it to other album objects as they are loaded.
+    * www/album.js: Added support for albums in subdirectories.  The relative 
+      path to the album JSON file is given in the argument, and we parse out 
+      the directory and prefix it to other album objects as they are loaded.
     
-    * album.css: Made colours more consistent between different parts of the 
-      album.
+    * www/album.css: Made colours more consistent between different parts of 
+      the album.
 
-    * album.js, common.css, debug.css, index.html, photo.css: Removed some 
-      unnecessary classes and ids from the HTML, replacing them with more 
-      advanced CSS selectors where necessary.
+    * www/album.js, www/common.css, www/debug.css, www/index.html, 
+      www/photo.css: Removed some unnecessary classes and ids from the HTML, 
+      replacing them with more advanced CSS selectors where necessary.
 
-    * album.js: Set the height and width of the photo as CSS properties rather 
-      than HTML properties.  I'm not sure why the HTML versions are still 
-      allowed in HTML 5.
+    * www/album.js: Set the height and width of the photo as CSS properties 
+      rather than HTML properties.  I'm not sure why the HTML versions are 
+      still allowed in HTML 5.
 
-    * album.js: Apparently Firefox doesn't allow the "background-image" 
+    * www/album.js: Apparently Firefox doesn't allow the "background-image" 
       property to be set using JavaScript.  "backgroundImage" works, though.
 
-    * common.css, debug.css: Removed some unnecessary styles.
+    * www/common.css, www/debug.css: Removed some unnecessary styles.
 
-    * common.css, photo.css: Fixed a display bug in opera where text in the 
-      navigation links would show up as little squiggles, despite using a 0-pt 
-      font.
+    * www/common.css, www/photo.css: Fixed a display bug in opera where text in 
+      the navigation links would show up as little squiggles, despite using a 
+      0-pt font.
 
-    * debug.css: Added override styles for the help screen and description.
+    * www/debug.css: Added override styles for the help screen and description.
 
-    * placeholder.png: new file, a 1x1 transparent PNG.
+    * www/placeholder.png: New file, a 1x1 transparent PNG.
 
-    * index.html: Set the initial targets of all links and images to 
+    * www/index.html: Set the initial targets of all links and images to 
       placeholder.png.
 
-    * index.html, photo.css: Moved table column widths to CSS.
+    * www/index.html, www/photo.css: Moved table column widths to CSS.
 
-    * index.html: Made some changes to the help text.
+    * www/index.html: Made some changes to the help text.
 
 2014-01-11  Rennie deGraaf  <rennie.degraaf@gmail.com>
 
-    * arrows.svg: Added a question-mark icon.
+    * misc/arrows.svg: Added a question-mark icon.
 
-    * help.png: New file.
+    * www/help.png: New file.
 
-    * album.js, index.html, common.css: Added a help view, which can be toggled 
-      on or off from either the album or photo view.
+    * www/album.js, www/index.html, www/common.css: Added a help view, which 
+      can be toggled on or off from either the album or photo view.
 
-    * album.css: Centered the description in the album view and capped its 
+    * www/album.css: Centered the description in the album view and capped its 
       width.
 
-    * album.js: Handled the case where the debug parameter is present but the 
-      debug stylesheet cannot be loaded; we'll just drop the debug parameter 
-      and continue.
+    * www/album.js: Handled the case where the debug parameter is present but 
+      the debug stylesheet cannot be loaded; we'll just drop the debug 
+      parameter and continue.
 
-    * album.js: Fixed the stylesheet load order issue.
+    * www/album.js: Fixed the stylesheet load order issue.
 
-    * album.js: Put exception handlers on JavaScript callbacks that were 
+    * www/album.js: Put exception handlers on JavaScript callbacks that were 
       missing them.
 
-    * common.css, photo.css: Navigation icons use the background-image property 
-      rather than background.
+    * www/common.css, www/photo.css: Navigation icons use the background-image 
+      property rather than background.
 
 2014-01-10  Rennie deGraaf  <rennie.degraaf@gmail.com>
 
-    * album.json: Removed all HTML from the footer.
+    * test/album.json: Removed all HTML from the footer.
 
-    * common.css: Set the styling on footerContent to preserve newlines from 
-      its text.
+    * www/common.css: Set the styling on footerContent to preserve newlines 
+      from its text.
 
-    * album.js: Removed all uses of innerHTML, replacing them with textContent. 
+    * www/album.js: Removed all uses of innerHTML, replacing them with 
+      textContent. 
 
-    * album.js: Removed unnecessary span elements from property table cells, 
-      instead assigning their styles to the cells themselves.
+    * www/album.js: Removed unnecessary span elements from property table 
+      cells, instead assigning their styles to the cells themselves.
 
-      album.js, photo.css: Fixed some styling on the full-screen photo overlay.
+    * www/album.js, www/photo.css: Fixed some styling on the full-screen photo 
+      overlay.
 
-    * album.css, common.cs, debug.css, index.html, photo.css: Removed old 
-      MSIE6-compat cruft, simplified styles, and removed unnecessary styles.
+    * www/album.css, www/common.cs, www/debug.css, www/index.html, 
+      www/photo.css: Removed old MSIE6-compat cruft, simplified styles, and 
+      removed unnecessary styles.
 
     * It's been a while since I've made a change that resulted in less code.
 
 2014-01-08  Rennie deGraaf  <rennie.degraaf@gmail.com>
 
-    * album.json: Added actual content to the description field.  Removed the 
-      thumbnail field, as I don't needed it for now.
+    * test/album.json: Added actual content to the description field.  Removed 
+      the thumbnail field, as I don't needed it for now.
 
-    * album.css, album.js, index.html: Added an album description to album 
-      view, displayed above the thumbnail list.
+    * www/album.css, www/album.js, www/index.html: Added an album description 
+      to album view, displayed above the thumbnail list.
 
-    * album.js, index.html: Added a full-screen photo overlay to the photo 
-      view, which can be toggled on and off when the photo is displayed at less 
-      than its full size.
+    * www/album.js, www/index.html: Added a full-screen photo overlay to the 
+      photo view, which can be toggled on and off when the photo is displayed 
+      at less than its full size.
 
-    * album.css, album.js, common.css, photo.css: Added an index link to the 
-      album view, intended to refer to an index of albums.
+    * www/album.css, www/album.js, www/common.css, www/photo.css: Added an 
+      index link to the album view, intended to refer to an index of albums.
 
-    * index.json: New file to support an index of albums.  Nothing uses this 
-      file at the moment.
+    * test/index.json: New file to support an index of albums.  Nothing uses 
+      this file at the moment.
 
-    * index.html: Added mouse-over tooltips to the navigation arrows.
+    * www/index.html: Added mouse-over tooltips to the navigation arrows.
 
 2014-01-07  Rennie deGraaf  <rennie.degraaf@gmail.com>
 
-    * arrows.svg: New file containing sources for arrow icons.
+    * misc/arrows.svg: New file containing sources for arrow icons.
 
-    * back.png, next.png, prev.png: Replaced the arrow button images with new 
-      onse with transparent backgrounds. 
+    * www/back.png, www/next.png, www/prev.png: Replaced the arrow button 
+      images with new ones with transparent backgrounds. 
 
-    * album.js, index.html, photo.css: Replaced the img tags for the arrow 
-      buttons with CSS background images.
+    * www/album.js, www/index.html, www/photo.css: Replaced the img tags for 
+      the arrow buttons with CSS background images.
 
-    * index.html: Got rid of the "contents" div, since it didn't seem to do 
+    * www/index.html: Got rid of the "contents" div, since it didn't seem to do 
       anything.
 
-    * album.css, common.css: Deleted and commented out some old MSIE6-compat 
-      cruft.
+    * www/album.css, www/common.css: Deleted and commented out some old MSIE6-
+      compat cruft.
 
 2014-01-06  Rennie deGraaf  <rennie.degraaf@gmail.com>
 
-    * album.js: Re-wrote the argument-parsing logic.  The name of the album 
+    * www/album.js: Re-wrote the argument-parsing logic.  The name of the album 
       JSON file is now an argument.
 
-    * album.js: Fixed a bug where the warning panel wouldn't be suppressed when
-      only the hash changes.
+    * www/album.js: Fixed a bug where the warning panel wouldn't be suppressed 
+      when only the hash changes.
 
-    * album.js: generatePhotoURL() is now used for all links.
+    * www/album.js: generatePhotoURL() is now used for all links.
     
-    * index.html: Set the class of indexLink to navigationLink so that adding  
-      and removing the debug argument to/from it doesn't need to be handled 
-      separately from other links.
+    * www/index.html: Set the class of indexLink to navigationLink so that 
+      adding and removing the debug argument to/from it doesn't need to be 
+      handled separately from other links.
 
-    * album.js: Removed special-case logic for adding/removing the debug 
+    * www/album.js: Removed special-case logic for adding/removing the debug 
       argument to/from indexLink.
 
-    * album.js (keyHandler): Added new alternate navigation keys.
+    * www/album.js (keyHandler): Added new alternate navigation keys.
 
 2014-01-05  Rennie deGraaf  <rennie.degraaf@gmail.com>
 
-    * index.html: Added a Content Security Policy meta header.  AFAIK, only 
+    * www/index.html: Added a Content Security Policy meta header.  AFAIK, only 
       Chrome-based browsers support CSP from meta headers at the moment.
 
-    * index.html: Removed inline styles that violate CSP.
+    * www/index.html: Removed inline styles that violate CSP.
 
-    * lib.js (getHBorder, getVBorder): Fixed property names so that 
+    * www/lib.js (getHBorder, getVBorder): Fixed property names so that 
       getProperty() doesn't fall back to eval()-based paths in standards-
       compliant browsers.
 
-    * album.json: Added description and thumbnail fields.  Nothing uses them at 
-      this time.
+    * test/album.json: Added description and thumbnail fields.  Nothing uses 
+      them at this time.
 
 2014-01-05  Rennie deGraaf  <rennie.degraaf@gmail.com>
 
     * Imported missed files from the previous commit.
 
-    * index.js: renamed to album.js
+    * www/index.js: renamed to album.js
 
 2014-01-05  Rennie deGraaf  <rennie.degraaf@gmail.com>
 
