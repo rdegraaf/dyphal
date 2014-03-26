@@ -1,12 +1,12 @@
 #!/usr/bin/python3
-# requires Python 3.3 or newer
+# requires Python 3.3 or newer on Linux
 
-# TODO: display properties for a selected photo somewhere
 # TODO: window icon
 # TODO: comments
 # TODO: reduce the spacing on items in the Add Caption and Add Property menus.
 #     I tried to change the padding with a QMenu::item stylesheet, but this 
 #     removed the hover effect.  I can't figure out how to get both.
+
 
 import sys
 import os
@@ -14,7 +14,7 @@ import os.path
 import xml.etree.ElementTree
 import re
 import threading
-import concurrent.futures
+#import concurrent.futures # Imported later so that the program will load under Python 2.7
 import subprocess
 import json
 import tempfile
@@ -30,10 +30,12 @@ from PyQt4 import QtGui
 import AlbumGeneratorUI
 
 
+PROGRAM_NAME = "Album Generator"
 FILE_FORMAT_VERSION = 1
 ALBUM_FILE = "album.json"
 THUMB_WIDTH = 160
 THUMB_HEIGHT = 120
+CONFIG_FILE = os.path.expanduser("~/.config/AlbumGenerator.conf")
 
 # f = functools.partial(handleExceptions, some_callback)
 # f(...)
@@ -146,9 +148,9 @@ class PhotoFile(QtGui.QListWidgetItem):
 
 
     def __init__(self, filepath, config):
-        super().__init__("%s (%s)" % (os.path.basename(filepath), re.sub("^"+os.path.expanduser("~"), 
-                                      "~", filepath)))
         self._fileName = os.path.basename(filepath)
+        self._fileFullPath = re.sub("^"+os.path.expanduser("~"), "~", filepath)
+        super().__init__("%s (%s)" % (self._fileName, self._fileFullPath))
         (name, suffix) = os.path.splitext(self._fileName)
         self._thumbName = name + ".thumbnail" + suffix
         self._jsonName = name + ".json"
@@ -223,10 +225,7 @@ class PhotoFile(QtGui.QListWidgetItem):
 
     def getPath(self):
         return self._filePath
-    def getWidth(self):
-        return self._width
-    def getHeight(self):
-        return self._height
+
 
     def _rescale(self, pixels):
         aspect = self._width / self._height
@@ -234,7 +233,7 @@ class PhotoFile(QtGui.QListWidgetItem):
         if pixels >= self._width * self._height:
             return (self._width, self._height)
         else:
-            # Need to find the largest x,y such that x*y <= pixels and x/y == aspect.
+            # Need to find the largest w,h such that w*h <= pixels and w/h == aspect.
             # w/h == aspect, so w == h*aspect.  Substutiting that for w, h*h*aspect <= pixels.
             # Rearranging for h gives h <= sqrt(pixels/aspect)
             height = math.sqrt(pixels / aspect)
@@ -247,6 +246,7 @@ class PhotoFile(QtGui.QListWidgetItem):
         props["name"] = self._fileName
         props["thumbnail"] = self._thumbName
         props["orientation"] = "horizontal" if self._width >= self._height else "vertical"
+        props["path"] = self._fileFullPath
         return props
 
 
@@ -257,8 +257,8 @@ class PhotoFile(QtGui.QListWidgetItem):
         data["photo"] = self._fileName
         data["width"] = str(width)
         data["height"] = str(height)
-        data["caption"] = [self.descriptions[tag] for tag in descriptions]
-        data["properties"] = dict((tag, self.properties[tag]) for tag in properties)
+        data["caption"] = [self.descriptions[tag] for tag in descriptions if tar in self.descriptions]
+        data["properties"] = dict((tag, self.properties[tag]) for tag in properties if tag in self.properties)
         #print(json.dumps(data, indent=2, sort_keys=True))
 
         def openFunc(path, flags):
@@ -297,18 +297,62 @@ class PhotoFile(QtGui.QListWidgetItem):
 class Config(object):
     """Run-time configuration"""
     def __init__(self):
-        # TODO: load configuration from a file
-        self.photoDir = os.path.expanduser("~")
-        self.gthumb3Dir = os.path.join(os.path.expanduser("~"), ".local/share/gthumb/catalogs")
-        #self.gthumb2Dir = os.path.join(os.path.expanduser("~", ".gnome2/gthumb/collections")
-        self.outputDir = os.path.expanduser("~")
+        """Load the configuration file.  Populate any run-time properties not found in the file 
+        with sane defaults."""
+        # Load the configuration file.  Keep the handle so that we can save to the same file.
+        self._file = None
+        data = {}
+        try:
+            # Python's 'r+' mode doesn't create files if they don't already exist.
+            self._file = open(CONFIG_FILE, "r+", opener=lambda path, flags: os.open(path, flags|os.O_CREAT, 0o666))
+            data = json.load(self._file)
+        except (FileNotFoundError, ValueError):
+            # open() can fail with FileNotFoundError if a directory in the path doesn't exist.
+            # json.load() can fail with ValueError if the file is empty or otherwise invalid.
+            pass
+        except:
+            # We'll just ignore any other failures and continue without a configuration file.
+            (exc_type, exc_value, exc_traceback) = sys.exc_info()
+            traceback.print_exception(exc_type, exc_value, exc_traceback)
+
+        # Used during operation and stored in the configuration file
+        self.photoDir = data["photoDir"] if "photoDir" in data else os.path.expanduser("~")
+        self.gthumb3Dir = data["gthumb3Dir"] if "gthumb3Dir" in data else os.path.join(os.path.expanduser("~"), ".local/share/gthumb/catalogs")
+        #self.gthumb2Dir = data["gthumb2Dir"] if "gthumb2Dir" in data else os.path.join(os.path.expanduser("~"), ".gnome2/gthumb/collections")
+        self.outputDir = data["outputDir"] if "outputDir" in data else os.path.expanduser("~")
+        
+        # Used only at startup and stored in the configuration file
+        self.dimensions = data["dimensions"] if "dimensions" in data else None
+        self.uiData = data["uiData"] if "uiData" in data else None
+        
+        # Not stored in the configuration file
         self.maxWorkers = 4 # TODO: how to get a good number for this?
         self.tempDir = tempfile.TemporaryDirectory()
-        # TODO: store the window size, selected description and property fields, footer, and resolution
+
+
+    def save(self):
+        """Save the current state to the configuration file"""
+        # If we couldn't open or create the config file, don't bother saving.
+        if None != self._file:
+            data = {}
+            data["photoDir"] = self.photoDir
+            data["gthumb3Dir"] = self.gthumb3Dir
+            data["outputDir"] = self.outputDir
+            data["dimensions"] = self.dimensions
+            data["uiData"] = self.uiData
+
+            self._file.seek(0)
+            self._file.truncate(0)
+            json.dump(data, self._file)
+            self._file.flush()
+
 
     def close(self):
+        """Close the configuration file and tear down any global runtime state."""
         self.tempDir.cleanup()
         self.tempDir = None
+        self._file.close()
+        self._file = None
         # TODO: save configuration back to a file
 
     def __enter__(self):
@@ -343,11 +387,14 @@ class PhotoAlbumUI(QtGui.QMainWindow, AlbumGeneratorUI.Ui_MainWindow):
         """Constructor"""
         super().__init__()
         self._config = config
-        # TODO: need to call self._threads.shutdown() somewhere?
         self._threads = concurrent.futures.ThreadPoolExecutor(self._config.maxWorkers)
         self._backgroundTasks = None
 
         self.setupUi(self)
+        if None != self._config.dimensions:
+            self.resize(*self._config.dimensions)
+        if None != self._config.uiData:
+            self._restoreUIData(self._config.uiData)
         self.progressBar.setVisible(False)
         self.cancelButton.setVisible(False)
 
@@ -425,7 +472,48 @@ class PhotoAlbumUI(QtGui.QMainWindow, AlbumGeneratorUI.Ui_MainWindow):
         #self.photosList.itemEntered.connect(self._h)
         #self.photosList.itemPressed.connect(self._i)
         #self.photosList.itemSelectionChanged.connect(lambda : print("itemSelectionChanged"))
-        
+
+
+    def closeEvent(self, event):
+        """Main window close event handler.  Shutdown the thread pool and save the run-time 
+        configuration."""
+        self._threads.shutdown()
+        self._config.dimensions = (self.size().width(), self.size().height())
+        self._config.uiData = self._saveUIData()
+        self._config.save()
+        event.accept()
+
+
+    def _saveUIData(self):
+        """Retrieve UI data fields that are likely to remain the same between albums."""
+        # TODO: generateAlbum should use this code
+        data = {}
+        # I deliberately don't save title, description or photos because they're likely to change 
+        # between albums.  These fields are much more likely to stay the same.
+        data["photoResolution"] = tuple(int (s) for s in self.photoSizeButton.currentText().split("x"))
+        data["footer"] = self.footerText.toPlainText()
+        data["captionFields"] = [self.descriptionsList.item(i).text() for i in range(0, self.descriptionsList.count())]
+        data["propertyFields"] = [self.propertiesList.item(i).text() for i in range(0, self.propertiesList.count())]
+        return data
+
+
+    def _restoreUIData(self, uiData):
+        """Restore UI data fields that are likely to remain the same between albums."""
+        # TODO: use this code when loading albums
+        if "photoResolution" in uiData:
+            resolution = "x".join(map(str, uiData["photoResolution"]))
+            for i in range(0, self.photoSizeButton.count()):
+                if resolution == self.photoSizeButton.itemText(i):
+                    self.photoSizeButton.setCurrentIndex(i)
+                    break
+        if "footer" in uiData:
+            self.footerText.setPlainText(uiData["footer"])
+        if "captionFields" in uiData:
+            for prop in uiData["captionFields"]:
+                self.descriptionsList.addItem(prop)
+        if "propertyFields" in uiData:
+            for prop in uiData["propertyFields"]:
+                self.propertiesList.addItem(prop)
 
 
     def _addPhotosHandler(self, index):
@@ -507,7 +595,7 @@ class PhotoAlbumUI(QtGui.QMainWindow, AlbumGeneratorUI.Ui_MainWindow):
 
     def _showError(self, err):
         """Show an error message."""
-        QtGui.QMessageBox.question(self, "Error", err, QtGui.QMessageBox.Ok, QtGui.QMessageBox.Ok)
+        QtGui.QMessageBox.question(self, PROGRAM_NAME, err, QtGui.QMessageBox.Ok, QtGui.QMessageBox.Ok)
 
 
     def _incProgress(self):
@@ -651,7 +739,7 @@ class PhotoAlbumUI(QtGui.QMainWindow, AlbumGeneratorUI.Ui_MainWindow):
         album["footer"] = self.footerText.toPlainText()
         album["description"] = self.descriptionText.toPlainText()
         album["photoResolution"] = tuple(int(s) for s in self.photoSizeButton.currentText().split("x"))
-        album["descriptionFields"] = [self.descriptionsList.item(i).text() for i in range(0, self.descriptionsList.count())]
+        album["captionFields"] = [self.descriptionsList.item(i).text() for i in range(0, self.descriptionsList.count())]
         album["propertyFields"] = [self.propertiesList.item(i).text() for i in range(0, self.propertiesList.count())]
         album["photos"] = [self.photosList.item(i).getAlbumJSON() for i in range(0, self.photosList.count())]
         #print(json.dumps(album, indent=2, sort_keys=True))
@@ -746,7 +834,6 @@ class PhotoAlbumUI(QtGui.QMainWindow, AlbumGeneratorUI.Ui_MainWindow):
         pass
 
 
-
     def _cancelBackgroundTasks(self):
         """Attempt to cancel any pending background tasks."""
         for task in self._backgroundTasks:
@@ -764,20 +851,35 @@ def _openFile(fileName, mode, dirFD, overwritePrompt=None, parentWindow=None):
     try:
         return open(fileName, "x", opener=openFunc)
     except FileExistsError:
-        if overwritePrompt and QtGui.QMessageBox.Yes == QtGui.QMessageBox.warning(parentWindow, "Warning", overwritePrompt, QtGui.QMessageBox.Yes|QtGui.QMessageBox.No, QtGui.QMessageBox.No):
+        if overwritePrompt and QtGui.QMessageBox.Yes == QtGui.QMessageBox.warning(parentWindow, PROGRMA_NAME, overwritePrompt, QtGui.QMessageBox.Yes|QtGui.QMessageBox.No, QtGui.QMessageBox.No):
             return open(fileName, "w", opener=openFunc)
         else:
             raise
 
 
 def main():
+    app = QtGui.QApplication(sys.argv)
+
+    # Check that the Python version is at least 3.3 and that we're on an OS with 
+    # /proc/<pid>/fd/<fd>.  Error out if not.
+    if sys.version_info.major < 3 or (sys.version_info.major == 3 and sys.version_info.minor < 3):
+        QtGui.QMessageBox.critical(None, PROGRAM_NAME, "This program requires Python 3.3 or newer.", QtGui.QMessageBox.Ok, QtGui.QMessageBox.Ok)
+        sys.exit(1)
+    try:
+        f = open("/proc/%d/fd/0" % (os.getpid()))
+        f.close()
+    except:
+        QtGui.QMessageBox.critical(None, PROGRAM_NAME, "This program currently only runs on Linux.", QtGui.QMessageBox.Ok, QtGui.QMessageBox.Ok)
+        sys.exit(1)
+
+    # Loaded here so that the program will load under Python 2.7 and then error out nicely rather 
+    # than crashing with a cryptic stack trace.
+    import concurrent.futures
+    global concurrent
+
     with Config() as config:
-
-        app = QtGui.QApplication(sys.argv)
         wnd = PhotoAlbumUI(config)
-
         wnd.show()
-
         sys.exit(app.exec_())
 
 if __name__ == '__main__':
