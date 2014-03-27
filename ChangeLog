@@ -1,3 +1,48 @@
+2014-03-27  Rennie deGraaf  <rennie.degraaf@gmail.com>
+
+    * AlbumGenerator/AlbumGeneratorUI.io: Set a window icon that actually loads.
+    
+    * AlbumGenerator/AlbumGenerator.py: Create the directory holding the config 
+      file if it does not exist.
+
+    * AlbumGenerator/AlbumGenerator.py: Check for the presence of exiftool and 
+      convert at startup.
+
+    * AlbumGenerator/AlbumGenerator.py: Implemented album re-loading.
+
+    * AlbumGenerator/AlbumGenerator.py: Switched to prompting for the album 
+      JSON file's name rather than for a directory when outputting albums.
+
+    * AlbumGenerator/AlbumGenerator.py: Moved the ouput of the album JSON file 
+      to a background thread.
+
+    * AlbumGenerator/AlbumGenerator.py: When loading photos, if there is 
+      already a photo in th album with the same name, prompt to rename or 
+      remove it.
+
+    * AlbumGenerator/AlbumGenerator.py: Only add caption or description fields 
+      if they're not already selected.
+
+2014-03-26  Rennie deGraaf  <rennie.degraaf@gmail.com>
+
+    * AlbumGenerator/AlbumGenerator.py (main): Added some logic to startup to 
+      detect incompatible Python versions or a lack of /proc/<pid>/fd/...
+
+    * AlbumGenerator/AlbumGenerator.py (PhotoFile): Fixed a bug where photo 
+      JSON generation would fail for photos that lacked a selected caption or 
+      property.
+
+    * AlbumGenerator/AlbumGenerator.py (PhotoFile.generateJSON): Added a 
+      representation of the original file path to the album JSON so that albums 
+      can be re-loaded.
+
+    * AlbumGenerator/AlbumGenerator.py: Save run-time configuration to a file 
+      at exit.  Load it at startup.  Added the window size and UI data that is 
+      likely to not change between albums to the configuration file.
+
+    * AlbumGenerator/AlbumGeneratorUI.ui: Added stretch factors to layouts that 
+      didn't have any.  Probably not necessary.
+
 2014-03-24  Rennie deGraaf  <rennie.degraaf@gmail.com>
 
     * AlbumGenerator/AlbumGeneratorUI.ui: Replaced the QComboBoxes for 

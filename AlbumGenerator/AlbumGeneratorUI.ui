@@ -14,7 +14,7 @@
    <string>Photo Album Generator</string>
   </property>
   <property name="windowIcon">
-   <iconset theme="emblem-photos">
+   <iconset theme="insert-image">
     <normaloff/>
    </iconset>
   </property>

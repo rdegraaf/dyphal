@@ -16,7 +16,9 @@ For version 3:
 
     * Replace getElementsByClass() with document.getElementsByClassName() and a 
       MSIE8-compat shim (https://stackoverflow.com/questions/13261506/getelement
-      sbyclassname-in-ie8) or with document.querySelectorAll()
+      sbyclassname-in-ie8) or with document.querySelectorAll().
+
+    * Installation procedure.
 
 For future versions:
 

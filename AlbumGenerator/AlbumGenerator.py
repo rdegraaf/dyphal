@@ -1,5 +1,7 @@
 #!/usr/bin/python3
-# requires Python 3.3 or newer on Linux
+# Server-side data generator for DHTML photo album.
+# Copyright (c) Rennie deGraaf, 2005-2014.  All rights reserved.
+# Requires Python 3.3 or newer on Linux.
 
 # TODO: window icon
 # TODO: comments
@@ -32,10 +34,14 @@ import AlbumGeneratorUI
 
 PROGRAM_NAME = "Album Generator"
 FILE_FORMAT_VERSION = 1
-ALBUM_FILE = "album.json"
 THUMB_WIDTH = 160
 THUMB_HEIGHT = 120
 CONFIG_FILE = os.path.expanduser("~/.config/AlbumGenerator.conf")
+
+FILTER_IMAGES = "Images (*.jpg *.jpeg *.png *.tif *.tiff)"
+FILTER_GTHUMB3_CATALOGS = "gThumb catalogs (*.catalog)"
+FILTER_ALBUMS = "Albums (*.json)"
+
 
 # f = functools.partial(handleExceptions, some_callback)
 # f(...)
@@ -147,8 +153,8 @@ class PhotoFile(QtGui.QListWidgetItem):
     ]
 
 
-    def __init__(self, filepath, config):
-        self._fileName = os.path.basename(filepath)
+    def __init__(self, filepath, fileName, config):
+        self._fileName = fileName
         self._fileFullPath = re.sub("^"+os.path.expanduser("~"), "~", filepath)
         super().__init__("%s (%s)" % (self._fileName, self._fileFullPath))
         (name, suffix) = os.path.splitext(self._fileName)
@@ -163,68 +169,76 @@ class PhotoFile(QtGui.QListWidgetItem):
         #     unique but predictable; that's ok because the directory is secure.
         #  5. Pass the symlink's path to other programs.
 
-        self._fileDescriptor = os.open(filepath, os.O_RDONLY)
-        linkPath = os.path.join(config.tempDir.name, str(self._fileDescriptor)) + os.path.splitext(filepath)[1]
-        # TODO: if the link already exists, prompt for a new name?
-        os.symlink("/proc/%d/fd/%s" % (os.getpid(), self._fileDescriptor), linkPath)
-        self._filePath = linkPath
-        propertiesText = subprocess.check_output(["exiftool", "-json", "-a", "-G", "-All", self._filePath], timeout=5, universal_newlines=True, stderr=subprocess.STDOUT)
-        propertiesObj = json.loads(propertiesText)[0]
+        self._linkPath = os.path.join(config.tempDir.name, str(self._fileName))
+        try:
+            self._fileDescriptor = os.open(filepath, os.O_RDONLY)
+            os.symlink("/proc/%d/fd/%d" % (os.getpid(), self._fileDescriptor), self._linkPath)
+            propertiesText = subprocess.check_output(["exiftool", "-json", "-a", "-G", "-All", self._linkPath], timeout=5, universal_newlines=True, stderr=subprocess.STDOUT)
+            propertiesObj = json.loads(propertiesText)[0]
 
-        # exiftool finds way too many properties to force the user to sift through, so we extract 
-        # only a hard-coded list of properties that are likely to be interesting.
-        self.properties = {}
-        for prop in self._recognizedProperties:
-            if prop.name in propertiesObj:
-                self.properties[prop.text] = prop.transform(propertiesObj[prop.name])
-            elif None != prop.default:
-                self.properties[prop.text] = prop.default
+            # exiftool finds way too many properties to force the user to sift through, so we extract 
+            # only a hard-coded list of properties that are likely to be interesting.
+            self.properties = {}
+            for prop in self._recognizedProperties:
+                if prop.name in propertiesObj:
+                    self.properties[prop.text] = prop.transform(propertiesObj[prop.name])
+                elif None != prop.default:
+                    self.properties[prop.text] = prop.default
 
-        # Override the file name property because exiftool saw the our generated file name
-        self.properties["File name"] = os.path.basename(filepath)
-        
-        # Get the photo dimensions
-        self._width = propertiesObj["File:ImageWidth"]
-        self._height = propertiesObj["File:ImageHeight"]
+            # Override the file name property because exiftool saw the our generated file name
+            self.properties["File name"] = os.path.basename(filepath)
+            
+            # Get the photo dimensions
+            self._width = propertiesObj["File:ImageWidth"]
+            self._height = propertiesObj["File:ImageHeight"]
 
-        self.descriptions = {}
+            self.descriptions = {}
 
-        # Get the display date, if one exists
-        for tag in ["XMP:DateTimeOriginal", "Composite:DateTimeCreated", "EXIF:DateTimeOriginal"]:
-            if tag in propertiesObj:
-                (displayTime, timeZone) = formatDisplayTime(propertiesObj[tag])
-                self.descriptions["Date"] = displayTime
-                self.properties["Time zone"] = timeZone
-                break
+            # Get the display date, if one exists
+            for tag in ["XMP:DateTimeOriginal", "Composite:DateTimeCreated", "EXIF:DateTimeOriginal"]:
+                if tag in propertiesObj:
+                    (displayTime, timeZone) = formatDisplayTime(propertiesObj[tag])
+                    self.descriptions["Date"] = displayTime
+                    self.properties["Time zone"] = timeZone
+                    break
 
-        # Get the location, if one exists
-        for tag in ["XMP:Location", "IPTC:ContentLocationName"]:
-            if tag in propertiesObj:
-                self.descriptions["Location"] = propertiesObj[tag]
-                break
+            # Get the location, if one exists
+            for tag in ["XMP:Location", "IPTC:ContentLocationName"]:
+                if tag in propertiesObj:
+                    self.descriptions["Location"] = propertiesObj[tag]
+                    break
 
-        # Get the description, if one exists
-        for tag in ["XMP:Description", "IPTC:Caption-Abstract", "EXIF:UserComment"]:
-            if tag in propertiesObj:
-                self.descriptions["Description"] = propertiesObj[tag]
-                break
+            # Get the description, if one exists
+            for tag in ["XMP:Description", "IPTC:Caption-Abstract", "EXIF:UserComment"]:
+                if tag in propertiesObj:
+                    self.descriptions["Description"] = propertiesObj[tag]
+                    break
 
-        #time.sleep(1)
-        #for prop in self.properties.keys():
-        #    print("%s: %s" % (prop, self.properties[prop]))
-        #for prop in self.descriptions.keys():
-        #    print("%s: %s" % (prop, self.descriptions[prop]))
+            #time.sleep(1)
+            #for prop in self.properties.keys():
+            #    print("%s: %s" % (prop, self.properties[prop]))
+            #for prop in self.descriptions.keys():
+            #    print("%s: %s" % (prop, self.descriptions[prop]))
+
+        except:
+            # If something failed, make sure to not leave any dangling resources.  Ignore any 
+            # failures that this causes.
+            try:
+                close()
+            except:
+                pass
+            raise
 
 
     def close(self):
-        os.remove(self._filePath)
-        self._filePath = None
+        os.unlink(self._linkPath)
+        self._linkPath = None
         os.close(self._fileDescriptor)
         self._fileDescriptor = None
 
 
     def getPath(self):
-        return self._filePath
+        return self._linkPath
 
 
     def _rescale(self, pixels):
@@ -250,14 +264,14 @@ class PhotoFile(QtGui.QListWidgetItem):
         return props
 
 
-    def generateJSON(self, dirFD, pixels, descriptions, properties):
-        (width, height) = self._rescale(pixels)
+    def generateJSON(self, dirFD, widthBase, heightBase, descriptions, properties):
+        (width, height) = self._rescale(widthBase*heightBase)
         
         data = {}
         data["photo"] = self._fileName
         data["width"] = str(width)
         data["height"] = str(height)
-        data["caption"] = [self.descriptions[tag] for tag in descriptions if tar in self.descriptions]
+        data["caption"] = [self.descriptions[tag] for tag in descriptions if tag in self.descriptions]
         data["properties"] = dict((tag, self.properties[tag]) for tag in properties if tag in self.properties)
         #print(json.dumps(data, indent=2, sort_keys=True))
 
@@ -266,7 +280,7 @@ class PhotoFile(QtGui.QListWidgetItem):
         with open(self._jsonName, "w", opener=openFunc) as jsonFile:
             json.dump(data, jsonFile)
 
-    def generatePhoto(self, dirFD, pixels):
+    def generatePhoto(self, dirFD, width, height):
         # TODO
         pass
 
@@ -303,6 +317,11 @@ class Config(object):
         self._file = None
         data = {}
         try:
+            try:
+                # This will throw FileExistsError if the permissions are different than expected.
+                os.makedirs(os.path.dirname(CONFIG_FILE), exist_ok=True)
+            except FileExistsError:
+                pass
             # Python's 'r+' mode doesn't create files if they don't already exist.
             self._file = open(CONFIG_FILE, "r+", opener=lambda path, flags: os.open(path, flags|os.O_CREAT, 0o666))
             data = json.load(self._file)
@@ -353,7 +372,7 @@ class Config(object):
         self.tempDir = None
         self._file.close()
         self._file = None
-        # TODO: save configuration back to a file
+
 
     def __enter__(self):
         return self
@@ -382,6 +401,7 @@ class PhotoAlbumUI(QtGui.QMainWindow, AlbumGeneratorUI.Ui_MainWindow):
     _showErrorSignal = QtCore.pyqtSignal(str)
     _incProgressSignal = QtCore.pyqtSignal()
     _backgroundCompleteSignal = QtCore.pyqtSignal()
+    _renamePhotosSignal = QtCore.pyqtSignal(list)
 
     def __init__(self, config):
         """Constructor"""
@@ -446,6 +466,7 @@ class PhotoAlbumUI(QtGui.QMainWindow, AlbumGeneratorUI.Ui_MainWindow):
         self._descriptionsListFilter.escKeyPressed.connect(self.descriptionsList.clearSelection)
         self._propertiesListFilter.delKeyPressed.connect(self._removePropertiesHandler)
         self._propertiesListFilter.escKeyPressed.connect(self.propertiesList.clearSelection)
+        self._renamePhotosSignal.connect(self._renamePhotos)
         
         # To make the first item of a QComboBox unselectable:
         #model = combobox.model()
@@ -486,7 +507,6 @@ class PhotoAlbumUI(QtGui.QMainWindow, AlbumGeneratorUI.Ui_MainWindow):
 
     def _saveUIData(self):
         """Retrieve UI data fields that are likely to remain the same between albums."""
-        # TODO: generateAlbum should use this code
         data = {}
         # I deliberately don't save title, description or photos because they're likely to change 
         # between albums.  These fields are much more likely to stay the same.
@@ -497,21 +517,22 @@ class PhotoAlbumUI(QtGui.QMainWindow, AlbumGeneratorUI.Ui_MainWindow):
         return data
 
 
-    def _restoreUIData(self, uiData):
+    def _restoreUIData(self, uiData, requireFields=False):
         """Restore UI data fields that are likely to remain the same between albums."""
-        # TODO: use this code when loading albums
-        if "photoResolution" in uiData:
+        if requireFields or "photoResolution" in uiData:
             resolution = "x".join(map(str, uiData["photoResolution"]))
             for i in range(0, self.photoSizeButton.count()):
                 if resolution == self.photoSizeButton.itemText(i):
                     self.photoSizeButton.setCurrentIndex(i)
                     break
-        if "footer" in uiData:
+        if requireFields or "footer" in uiData:
             self.footerText.setPlainText(uiData["footer"])
-        if "captionFields" in uiData:
+        if requireFields or "captionFields" in uiData:
+            self.descriptionsList.clear()
             for prop in uiData["captionFields"]:
                 self.descriptionsList.addItem(prop)
-        if "propertyFields" in uiData:
+        if requireFields or "propertyFields" in uiData:
+            self.propertiesList.clear()
             for prop in uiData["propertyFields"]:
                 self.propertiesList.addItem(prop)
 
@@ -522,15 +543,14 @@ class PhotoAlbumUI(QtGui.QMainWindow, AlbumGeneratorUI.Ui_MainWindow):
         if self._addPhotosFiles is sender:
             # Browse for photos
             filenames = QtGui.QFileDialog.getOpenFileNames(self, "Select photos", 
-                                                       self._config.photoDir, 
-                                                       "Images (*.jpg *.jpeg *.png *.tif *.tiff)")
-            self._addPhotoFiles(filenames)
+                                                           self._config.photoDir, FILTER_IMAGES)
+            self._addPhotoFiles([(name, os.path.basename(name)) for name in filenames])
             if 0 < len(filenames):
                 self._config.photoDir = os.path.dirname(filenames[len(filenames)-1])
         elif self._addPhotosGthumb3 is sender:
             # Add a gThumb 3 catalog
             catalogFileName = QtGui.QFileDialog.getOpenFileName(self, "Select catalog", 
-                                                        self._config.gthumb3Dir, "*.catalog")
+                                                        self._config.gthumb3Dir, FILTER_GTHUMB3_CATALOGS)
             # The QT documentation says that getOpenFileName returns a null string on cancel.  But 
             # it returns an empty string here.  Maybe that's a PyQt bug?
             if "" != catalogFileName:
@@ -539,22 +559,25 @@ class PhotoAlbumUI(QtGui.QMainWindow, AlbumGeneratorUI.Ui_MainWindow):
                 # I assume that the display order is the names sorted alphabetically.
                 filenames = sorted([QtCore.QUrl(elmt.attrib["uri"]).toLocalFile() 
                                     for elmt in tree.getroot().iter("file")])
-                self._addPhotoFiles(filenames)
+                self._addPhotoFiles([(name, os.path.basename(name)) for name in filenames])
                 self._config.gthumb3Dir = os.path.dirname(catalogFileName)
         else:
             print("ERROR: unknown item selected in 'Add Photos' control")
 
 
     def _addPhotoFiles(self, filenames):
+        """Start background tasks to load a list of photos."""
         if 0 < len(filenames):
             self._backgroundInit(len(filenames))
             tasks = []
             task = None
-            for name in filenames:
-                task = self._threads.submit(self._bgAddPhoto, name, task)
+            for (path, name) in filenames:
+                task = self._threads.submit(self._bgAddPhoto, path, name, task)
+                task.photoName = path
                 tasks.append(task)
             self._threads.submit(functools.partial(handleExceptions, self._bgAddPhotoComplete), tasks)
             self._backgroundStart(tasks)
+
 
     def _removePhotosHandler(self):
         """Event handler for the removePhotos button"""
@@ -626,9 +649,9 @@ class PhotoAlbumUI(QtGui.QMainWindow, AlbumGeneratorUI.Ui_MainWindow):
         self.generateAlbumButton.setVisible(True)
 
 
-    def _bgAddPhoto(self, name, prevTask):
+    def _bgAddPhoto(self, path, name, prevTask):
         """Background task to extract information from a photo and put it in the list when done"""
-        photo = PhotoFile(name, self._config)
+        photo = PhotoFile(path, name, self._config)
         # Wait for the previous photo to be loaded so that photos are added to the list in the 
         # correct order.
         if None != prevTask:
@@ -642,19 +665,26 @@ class PhotoAlbumUI(QtGui.QMainWindow, AlbumGeneratorUI.Ui_MainWindow):
         (done, notDone) = concurrent.futures.wait(tasks)
         assert(0 == len(notDone))
 
-        # Display any error messages
+        # Display any error messages and find any files that need to be renamed
         errors = []
+        renamePhotos = []
         for task in done:
             try:
                 task.result()
             except FileNotFoundError as e:
+                # Either exiftool or the photo was missing.
                 if "exiftool" == e.filename:
                     errors.append("Error executing 'exiftool'.  Is it installed?")
                 else:
                     errors.append("Error opening photo " + e.filename)
             except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as e:
+                # Exiftool failed or timed out.
                 errors.append("Error reading metadata from photo " + name)
+            except FileExistsError:
+                # The symlink target already exists, implying a duplicate file name.
+                renamePhotos.append(task.photoName)
             except concurrent.futures.CancelledError:
+                # The task was cancelled.
                 pass
             except:
                 (exc_type, exc_value, exc_traceback) = sys.exc_info()
@@ -667,9 +697,13 @@ class PhotoAlbumUI(QtGui.QMainWindow, AlbumGeneratorUI.Ui_MainWindow):
         self.showAllPropertiesFlag.stateChanged.emit(0)
         self.showAllDescriptionsFlag.stateChanged.emit(0)
         
+        # Get the user to handle any photos that need renaming
+        if 0 != len(renamePhotos):
+            self._renamePhotosSignal.emit(renamePhotos)
+
         # re-enable any disabled buttons
         self._backgroundCompleteSignal.emit()
-
+        
 
     def _updatePhotoProperties(self):
         properties = {}
@@ -711,80 +745,75 @@ class PhotoAlbumUI(QtGui.QMainWindow, AlbumGeneratorUI.Ui_MainWindow):
 
 
     def _addCaptionHandler(self):
-        self.descriptionsList.addItem(self.sender().text())
+        """Add the selected caption field to the album captions."""
+        if 0 == len(self.descriptionsList.findItems(self.sender().text(), QtCore.Qt.MatchFixedString)):
+            self.descriptionsList.addItem(self.sender().text())
 
 
     def _removeDescriptionsHandler(self):
-        """Event handler for the removeDescriptions button"""
+        """Remove the selected caption fields from the album captions."""
         for item in self.descriptionsList.selectedItems():
             # removeItemWidget() doesn't seem to work
             self.descriptionsList.takeItem(self.descriptionsList.indexFromItem(item).row())
 
 
     def _addPropertyHandler(self):
-        self.propertiesList.addItem(self.sender().text())
+        """Add the selected property field to the album properties."""
+        if 0 == len(self.propertiesList.findItems(self.sender().text(), QtCore.Qt.MatchFixedString)):
+            self.propertiesList.addItem(self.sender().text())
 
 
     def _removePropertiesHandler(self):
-        """Event handler for the removeProperties button"""
+        """Remove the selected properties fields from the album properties."""
         for item in self.propertiesList.selectedItems():
             # removeItemWidget() doesn't seem to work
             self.propertiesList.takeItem(self.propertiesList.indexFromItem(item).row())
 
 
     def _generateAlbum(self):
-        album = {}
-        album["version"] = FILE_FORMAT_VERSION
+        album = self._saveUIData()
+        album["albumVersion"] = FILE_FORMAT_VERSION
         album["title"] = self.titleText.toPlainText()
-        album["footer"] = self.footerText.toPlainText()
         album["description"] = self.descriptionText.toPlainText()
-        album["photoResolution"] = tuple(int(s) for s in self.photoSizeButton.currentText().split("x"))
-        album["captionFields"] = [self.descriptionsList.item(i).text() for i in range(0, self.descriptionsList.count())]
-        album["propertyFields"] = [self.propertiesList.item(i).text() for i in range(0, self.propertiesList.count())]
         album["photos"] = [self.photosList.item(i).getAlbumJSON() for i in range(0, self.photosList.count())]
         #print(json.dumps(album, indent=2, sort_keys=True))
 
-        # TODO: instead of prompting for a directory, then looking for "album.json" in it, prompt 
-        # to save a .json file.
-
-        # Get the output directory.
-        # The KDE directory chooser dialog is all kinds of buggy: it doesn't expand the current 
-        # directory on open, and double-clicking on a directory tries to rename it.  So I'm using 
-        # the QT directory chooser instead.
-        outDir = QtGui.QFileDialog.getExistingDirectory(self, "Album Directory", self._config.outputDir, QtGui.QFileDialog.ShowDirsOnly|QtGui.QFileDialog.DontUseNativeDialog)
-        # Make sure to close this when no longer needed
-        dirFD = os.open(outDir, os.O_RDONLY)
+        # Get the output file name
+        albumFileName = QtGui.QFileDialog.getSaveFileName(self, "Album File", self._config.outputDir, FILTER_ALBUMS)
+        
+        # Open the directory so that we can ensure that all files are created in the same directory.
+        albumDirName = os.path.dirname(albumFileName)
+        # Make sure to close this when no longer needed.
+        dirFD = os.open(albumDirName, os.O_RDONLY)
         
         # Create the album JSON file
-        # TODO: dump this on a background thread
-        # TODO: If this is done on a background thread, then we need to block all other background 
-        # tasks until this one is complete, and then cancel them if the user refuses to overwrite 
-        # a file.  But the tasks aren't even registered yet, so this task would need to register 
-        # all the other tasks.  Maybe it makes more sense to check up front if the file exists and 
-        # prompt to overwrite before launching background tasks, then fail if the file appeared.  
-        # But then we'd still need to prevent the other tasks from running.
-        with _openFile(ALBUM_FILE, 0o666, dirFD, overwritePrompt="'%s' already contains a photo album.  Overwrite it?" % (outDir), parentWindow=self, ) as jsonFile:
-            json.dump(album, jsonFile)
+        tasks = []
+        tasks.append(self._threads.submit(self._bgGenerateAlbum, album, os.path.basename(albumFileName), dirFD))
+
         # Don't prompt for anything else; just overwrite it.
         count = self.photosList.count()
         if 0 < count:
             self._backgroundInit(3 * count)
-            pixels = album["photoResolution"][0] * album["photoResolution"][1]
-            descriptions = album["descriptionFields"]
+            descriptions = album["captionFields"]
             properties = album["propertyFields"]
-            tasks = []
             for i in range(0, count):
                 photo = self.photosList.item(i)
                 # In Python 3.4, I might be able to use functools.partialmethod to create a generic 
                 # wrapper that calls self._incProgressSignal.emit() after an arbitrary method call, 
                 # rather than needing to write wrappers for every method call.
-                tasks.append(self._threads.submit(self._bgGeneratePhotoJSON, photo, dirFD, pixels, descriptions, properties))
-                tasks.append(self._threads.submit(self._bgGeneratePhoto, photo, dirFD, pixels))
+                tasks.append(self._threads.submit(self._bgGeneratePhotoJSON, photo, dirFD, album["photoResolution"][0], album["photoResolution"][1], descriptions, properties))
+                tasks.append(self._threads.submit(self._bgGeneratePhoto, photo, dirFD, album["photoResolution"][0], album["photoResolution"][1]))
                 tasks.append(self._threads.submit(self._bgGenerateThumbnail, photo, dirFD, THUMB_WIDTH,  THUMB_HEIGHT))
             self._threads.submit(functools.partial(handleExceptions, self._bgGenerateAlbumComplete), tasks, dirFD)
         self._backgroundStart(tasks)
 
-        self._config.outputDir = outDir
+        self._config.outputDir = albumDirName
+
+
+    def _bgGenerateAlbum(self, album, albumFileName, dirFD):
+        """Background task to generate an album JSON file"""
+        with open(os.path.basename(albumFileName), "w", opener=lambda path, flags: os.open(path, flags, 0o666, dir_fd=dirFD)) as albumFile:
+            json.dump(album, albumFile)
 
 
     def _bgGenerateAlbumComplete(self, tasks, dirFD):
@@ -813,11 +842,11 @@ class PhotoAlbumUI(QtGui.QMainWindow, AlbumGeneratorUI.Ui_MainWindow):
         os.close(dirFD)
 
 
-    def _bgGeneratePhotoJSON(self, photo, dirFD, pixels, descriptions, properties):
-        photo.generateJSON(dirFD, pixels, descriptions, properties)
+    def _bgGeneratePhotoJSON(self, photo, dirFD, width, height, descriptions, properties):
+        photo.generateJSON(dirFD, width, height, descriptions, properties)
         self._incProgressSignal.emit()
-    def _bgGeneratePhoto(self, photo, dirFD, pixels):
-        photo.generatePhoto(dirFD, pixels)
+    def _bgGeneratePhoto(self, photo, dirFD, width, height):
+        photo.generatePhoto(dirFD, width, height)
         self._incProgressSignal.emit()
     def _bgGenerateThumbnail(self, photo, dirFD, width, height):
         photo.generateThumbnail(dirFD, width, height)
@@ -825,8 +854,24 @@ class PhotoAlbumUI(QtGui.QMainWindow, AlbumGeneratorUI.Ui_MainWindow):
 
 
     def _openAlbum(self):
-        # TODO
-        pass
+        """Load an album JSON file and populate the UI with its contents."""
+        albumFileName = QtGui.QFileDialog.getOpenFileName(self, "Select album", self._config.outputDir, FILTER_ALBUMS)
+        # The QT documentation says that getOpenFileName returns a null string on cancel.  But it
+        # returns an empty string here.  Maybe that's a PyQt bug?
+        if "" != albumFileName:
+            try:
+                albumFile = open(albumFileName)
+                data = json.load(albumFile)
+                if "albumVersion" in data:
+                    if FILE_FORMAT_VERSION == data["albumVersion"]:
+                        self._restoreUIData(data, requireFields=True)
+                        self.titleText.setPlainText(data["title"])
+                        self.descriptionText.setPlainText(data["description"])
+                        self._addPhotoFiles([(os.path.expanduser(photo["path"]), os.path.basename(photo["path"])) for photo in data["photos"]])
+                        return
+                raise ValueError("Invalid album file")
+            except (KeyError, ValueError, OSError):
+                QtGui.QMessageBox.warning(None, PROGRAM_NAME, "Unable to load an album from '%s'." % (os.path.basename(albumFileName)), QtGui.QMessageBox.Ok, QtGui.QMessageBox.Ok)
 
 
     def _installTemplate(self):
@@ -843,25 +888,43 @@ class PhotoAlbumUI(QtGui.QMainWindow, AlbumGeneratorUI.Ui_MainWindow):
         pass
 
 
-def _openFile(fileName, mode, dirFD, overwritePrompt=None, parentWindow=None):
-    """Open an album JSON file relative to a directory.  If the file already exist, prompt the user 
-    for permission to overwrite it."""
-    def openFunc(path, flags):
-        return os.open(path, flags, mode, dir_fd=dirFD)
-    try:
-        return open(fileName, "x", opener=openFunc)
-    except FileExistsError:
-        if overwritePrompt and QtGui.QMessageBox.Yes == QtGui.QMessageBox.warning(parentWindow, PROGRMA_NAME, overwritePrompt, QtGui.QMessageBox.Yes|QtGui.QMessageBox.No, QtGui.QMessageBox.No):
-            return open(fileName, "w", opener=openFunc)
-        else:
-            raise
+    def _renamePhotos(self, photoNames):
+        promptDialog = QtGui.QMessageBox(self)
+        promptDialog.setIcon(QtGui.QMessageBox.Question)
+        renameButton = promptDialog.addButton("Rename...", QtGui.QMessageBox.YesRole)
+        removeButton = promptDialog.addButton("Remove", QtGui.QMessageBox.NoRole)
+
+        # Get new names for the files
+        newNames = []
+        print("called")
+        for photoName in photoNames:
+            promptDialog.setText("There is already a photo with the name %s in the album.  Would you like to rename or remove the new one?" % (photoName))
+            promptDialog.exec_()
+            if renameButton is promptDialog.clickedButton():
+                # It seems that if I try to re-use the QFileDialog, changing the selected file has 
+                # no effect
+                fileDialog = QtGui.QFileDialog(self, "New photo name", self._config.tempDir.name, FILTER_IMAGES)
+                fileDialog.setAcceptMode(QtGui.QFileDialog.AcceptSave)
+                fileDialog.setFileMode(QtGui.QFileDialog.AnyFile)
+                fileDialog.setOption(QtGui.QFileDialog.DontConfirmOverwrite)
+                fileDialog.selectFile(os.path.basename(photoName))
+                fileDialog.exec_()
+                if 0 < len(fileDialog.selectedFiles()):
+                    assert(1 == len(fileDialog.selectedFiles()))
+                    newFileName = fileDialog.selectedFiles()[0]
+                    newNames.append((photoName, os.path.basename(newFileName)))
+
+        # Spawn background tasks to load the files using the new names
+        # We can't do this in the loop above because we need to know how many background tasks to 
+        # expect ahead of time.
+        self._addPhotoFiles(newNames)
 
 
 def main():
     app = QtGui.QApplication(sys.argv)
 
-    # Check that the Python version is at least 3.3 and that we're on an OS with 
-    # /proc/<pid>/fd/<fd>.  Error out if not.
+    # Check that the Python version is at least 3.3, that we're on an OS with /proc/<pid>/fd/<fd>, 
+    # and that exiftool and convert are available.  Error out if not.
     if sys.version_info.major < 3 or (sys.version_info.major == 3 and sys.version_info.minor < 3):
         QtGui.QMessageBox.critical(None, PROGRAM_NAME, "This program requires Python 3.3 or newer.", QtGui.QMessageBox.Ok, QtGui.QMessageBox.Ok)
         sys.exit(1)
@@ -870,6 +933,16 @@ def main():
         f.close()
     except:
         QtGui.QMessageBox.critical(None, PROGRAM_NAME, "This program currently only runs on Linux.", QtGui.QMessageBox.Ok, QtGui.QMessageBox.Ok)
+        sys.exit(1)
+    try:
+        subprocess.check_call(["exiftool", "-ver"], stdout=subprocess.DEVNULL, timeout=1)
+    except (subprocess.CalledProcessError, subprocess.TimeoutExpired):
+        QtGui.QMessageBox.critical(None, PROGRAM_NAME, "This program requires that 'exiftool' be available in your PATH.", QtGui.QMessageBox.Ok, QtGui.QMessageBox.Ok)
+        sys.exit(1)
+    try:
+        subprocess.check_call(["convert", "--version"], stdout=subprocess.DEVNULL, timeout=1)
+    except (subprocess.CalledProcessError, subprocess.TimeoutExpired):
+        QtGui.QMessageBox.critical(None, PROGRAM_NAME, "This program requires that 'convert' from the 'ImageMagick' package be available in your PATH.", QtGui.QMessageBox.Ok, QtGui.QMessageBox.Ok)
         sys.exit(1)
 
     # Loaded here so that the program will load under Python 2.7 and then error out nicely rather 
@@ -881,6 +954,7 @@ def main():
         wnd = PhotoAlbumUI(config)
         wnd.show()
         sys.exit(app.exec_())
+
 
 if __name__ == '__main__':
     main()
