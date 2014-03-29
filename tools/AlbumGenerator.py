@@ -1,21 +1,24 @@
 #!/usr/bin/python3
-# Server-side data generator for DHTML photo album.
-# Copyright (c) Rennie deGraaf, 2005-2014.  All rights reserved.
 # Requires Python 3.3 or newer on Linux.
 
-# TODO: window icon
+"""Server-side data generator for DHTML photo album."""
+__author__ = "Rennie deGraaf"
+__email__ = "rennie.degraaf@gmail.com"
+__license__ = "Copyright (c) Rennie deGraaf, 2005-2014.  All rights reserved."
+
 # TODO: comments
 # TODO: reduce the spacing on items in the Add Caption and Add Property menus.
 #     I tried to change the padding with a QMenu::item stylesheet, but this 
 #     removed the hover effect.  I can't figure out how to get both.
-
+# TODO: move default paths to variables at the top of the file
+# TODO: get rid of the dirFD crap.  The shell commands can't use it.
+# TODO: merge _bgGenerateAlbumComplete and _bgInstallTemplateComplete?
 
 import sys
 import os
 import os.path
 import xml.etree.ElementTree
 import re
-import threading
 #import concurrent.futures # Imported later so that the program will load under Python 2.7
 import subprocess
 import json
@@ -23,24 +26,36 @@ import tempfile
 import traceback
 import time
 import functools
-import contextlib
 import math
+import shutil
 
 from PyQt4 import QtCore
 from PyQt4 import QtGui
 
-import AlbumGeneratorUI
-
+# These variables may be re-written by the installation script
+PKG_PATH = os.path.expanduser("~/.lib/python3/")
+DATA_PATH = os.path.expanduser("~/.share/AlbumGenerator/")
+CONFIG_FILE = os.path.expanduser("~/.config/AlbumGenerator.conf")
 
 PROGRAM_NAME = "Album Generator"
 FILE_FORMAT_VERSION = 1
 THUMB_WIDTH = 160
 THUMB_HEIGHT = 120
-CONFIG_FILE = os.path.expanduser("~/.config/AlbumGenerator.conf")
+TEMPLATE_FILE_NAMES = ["album.css", "album.html", "album.js", "back.png", "common.css", 
+                       "debug.css", "help.png", "ie8compat.js", "lib.js", "next.png",
+                       "photo.css", "placeholder.png", "prev.png"]
 
-FILTER_IMAGES = "Images (*.jpg *.jpeg *.png *.tif *.tiff)"
+DEFAULT_PHOTO_DIR = os.path.expanduser("~")
+DEFAULT_GTHUMB3_DIR = os.path.expanduser("~/.local/share/gthumb/catalogs")
+DEFAULT_GTHUMB2_DIR = os.path.expanduser("~/.gnome2/gthumb/collections")
+DEFAULT_OUTPUT_DIR = os.path.expanduser("~")
+
+FILTER_IMAGES = "Images (*.jpeg *.jpg *.png *.tiff *.tif)"
 FILTER_GTHUMB3_CATALOGS = "gThumb catalogs (*.catalog)"
 FILTER_ALBUMS = "Albums (*.json)"
+
+sys.path.append(PKG_PATH)
+import AlbumGenerator.ui
 
 
 # f = functools.partial(handleExceptions, some_callback)
@@ -53,6 +68,7 @@ def handleExceptions(func, *args, **kwargs):
         traceback.print_exception(exc_type, exc_value, exc_traceback)
         raise
 
+#import contextlib
 #with pushDir(self._config.outputDir):
 #@contextlib.contextmanager
 #def pushDir(path):
@@ -335,17 +351,17 @@ class Config(object):
             traceback.print_exception(exc_type, exc_value, exc_traceback)
 
         # Used during operation and stored in the configuration file
-        self.photoDir = data["photoDir"] if "photoDir" in data else os.path.expanduser("~")
-        self.gthumb3Dir = data["gthumb3Dir"] if "gthumb3Dir" in data else os.path.join(os.path.expanduser("~"), ".local/share/gthumb/catalogs")
-        #self.gthumb2Dir = data["gthumb2Dir"] if "gthumb2Dir" in data else os.path.join(os.path.expanduser("~"), ".gnome2/gthumb/collections")
-        self.outputDir = data["outputDir"] if "outputDir" in data else os.path.expanduser("~")
+        self.photoDir = data["photoDir"] if "photoDir" in data else DEFAULT_PHOTO_DIR
+        self.gthumb3Dir = data["gthumb3Dir"] if "gthumb3Dir" in data else DEFAULT_GTHUMB3_DIR
+        #self.gthumb2Dir = data["gthumb2Dir"] if "gthumb2Dir" in data else DEFAULT_GTHUMB2_DIR
+        self.outputDir = data["outputDir"] if "outputDir" in data else DEFAULT_OUTPUT_DIR
         
         # Used only at startup and stored in the configuration file
         self.dimensions = data["dimensions"] if "dimensions" in data else None
         self.uiData = data["uiData"] if "uiData" in data else None
         
         # Not stored in the configuration file
-        self.maxWorkers = 4 # TODO: how to get a good number for this?
+        self.maxWorkers = 8 # TODO: how to get a good number for this?
         self.tempDir = tempfile.TemporaryDirectory()
 
 
@@ -395,7 +411,7 @@ class ListKeyFilter(QtCore.QObject):
         return False
 
 
-class PhotoAlbumUI(QtGui.QMainWindow, AlbumGeneratorUI.Ui_MainWindow):
+class PhotoAlbumUI(QtGui.QMainWindow, AlbumGenerator.ui.Ui_MainWindow):
     """Photo Album Generator UI"""
     _addPhotoSignal = QtCore.pyqtSignal(PhotoFile)
     _showErrorSignal = QtCore.pyqtSignal(str)
@@ -875,8 +891,42 @@ class PhotoAlbumUI(QtGui.QMainWindow, AlbumGeneratorUI.Ui_MainWindow):
 
 
     def _installTemplate(self):
-        #TODO
-        pass
+        # Get the destination directory
+        # The KDE directory chooser dialog is all kinds of buggy: it doesn't expand the current 
+        # directory on open, and double-clicking on a directory prompts the user to rename it. So 
+        # I'm using the QT directory chooser instead.
+        outDir = QtGui.QFileDialog.getExistingDirectory(self, "Album directory", self._config.outputDir, QtGui.QFileDialog.ShowDirsOnly|QtGui.QFileDialog.DontUseNativeDialog)
+
+        # Spawn background tasks to do the copying.
+        self._backgroundInit(len(TEMPLATE_FILE_NAMES))
+        tasks = []
+        for f in TEMPLATE_FILE_NAMES:
+            tasks.append(self._threads.submit(shutil.copyfile, os.path.join(DATA_PATH, f), os.path.join(outDir, f)))
+        self._threads.submit(functools.partial(handleExceptions, self._bgInstallTemplateComplete, tasks))
+        self._backgroundStart(tasks)
+
+
+    def _bgInstallTemplateComplete(self, tasks):
+        # Wait for the template installation tasks to complete.
+        (done, notDone) = concurrent.futures.wait(tasks)
+        assert(0 == len(notDone))
+        
+        # Display any error messages
+        errors = []
+        for task in done:
+            try:
+                task.result()
+            except concurrent.futures.CancelledError:
+                pass
+            except:
+                (exc_type, exc_value, exc_traceback) = sys.exc_info()
+                traceback.print_exception(exc_type, exc_value, exc_traceback)
+                errors.append(sys.exc_info())
+        if 0 != len(errors):
+            self._showErrorSignal.emit(str(len(errors)) + " errors were encountered while installing the template:\n" + "\n".join(errors))
+
+        # Dismiss the cancellation UI
+        self._backgroundCompleteSignal.emit()
 
 
     def _cancelBackgroundTasks(self):
@@ -902,10 +952,13 @@ class PhotoAlbumUI(QtGui.QMainWindow, AlbumGeneratorUI.Ui_MainWindow):
             promptDialog.exec_()
             if renameButton is promptDialog.clickedButton():
                 # It seems that if I try to re-use the QFileDialog, changing the selected file has 
-                # no effect
+                # no effect.
                 fileDialog = QtGui.QFileDialog(self, "New photo name", self._config.tempDir.name, FILTER_IMAGES)
                 fileDialog.setAcceptMode(QtGui.QFileDialog.AcceptSave)
                 fileDialog.setFileMode(QtGui.QFileDialog.AnyFile)
+                # The PhotoFile class won't let the user overwrite anything, but with overwrite 
+                # confirmations on, QFileDialog prompts to overwrite the directory if a user hits 
+                # "Save" with nothing selected.  Disabling confirmation avoids this.
                 fileDialog.setOption(QtGui.QFileDialog.DontConfirmOverwrite)
                 fileDialog.selectFile(os.path.basename(photoName))
                 fileDialog.exec_()
@@ -914,9 +967,7 @@ class PhotoAlbumUI(QtGui.QMainWindow, AlbumGeneratorUI.Ui_MainWindow):
                     newFileName = fileDialog.selectedFiles()[0]
                     newNames.append((photoName, os.path.basename(newFileName)))
 
-        # Spawn background tasks to load the files using the new names
-        # We can't do this in the loop above because we need to know how many background tasks to 
-        # expect ahead of time.
+        # Spawn background tasks to load the files using the new names.
         self._addPhotoFiles(newNames)
 
 

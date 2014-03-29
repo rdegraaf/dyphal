@@ -1,7 +1,22 @@
+2014-03-28  Rennie deGraaf  <rennie.degraaf@gmail.com>
+
+    * AlbumGenerator/AlbumGenerator.py: Renamed to tools/AlbumGenerator.py.
+
+    * AlbumGenerator/AlbumGeneratorUI.ui: Renamed to tools/AlbumGeneratorUI.ui.
+
+    * AlbumGenerator/build.sh: Renamed to install.sh.
+
+    * tools/AlbumGenerator.py: Implemented template installation.
+
+    * install.sh: Wrote a decent installation procedure.
+
+    * I made some other changes, but all the renaming is making it difficult to 
+      get a useful diff.
+
 2014-03-27  Rennie deGraaf  <rennie.degraaf@gmail.com>
 
     * AlbumGenerator/AlbumGeneratorUI.io: Set a window icon that actually loads.
-    
+
     * AlbumGenerator/AlbumGenerator.py: Create the directory holding the config 
       file if it does not exist.
 
