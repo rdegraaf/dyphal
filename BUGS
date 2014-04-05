@@ -57,6 +57,8 @@
     smartphones.  It might be best to give the photo as much space as it wants 
     and put all of the text together beside or below it.  
 
+    OPEN:
+
 2014-01-18  Rennie deGraaf  <rennie.degraaf@gmail.com>
     Despite photos being cached, browsers still check the server for new 
     versions of photos and thumbnails when displaying photo pages.  This could 

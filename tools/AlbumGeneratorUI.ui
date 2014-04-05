@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
+    <width>900</width>
     <height>875</height>
    </rect>
   </property>
@@ -14,9 +14,7 @@
    <string>Photo Album Generator</string>
   </property>
   <property name="windowIcon">
-   <iconset theme="insert-image">
-    <normaloff/>
-   </iconset>
+   <iconset theme="insert-image"/>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout_9" stretch="1,0">
@@ -36,121 +34,127 @@
         <property name="title">
          <string>Photos</string>
         </property>
-        <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-        </property>
-        <layout class="QVBoxLayout" name="verticalLayout_6" stretch="6,0,1">
+        <layout class="QVBoxLayout" name="verticalLayout_6">
          <item>
-          <widget class="QListWidget" name="photosList">
-           <property name="toolTip">
-            <string>Photos to include in the album.</string>
+          <widget class="QSplitter" name="splitter">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
            </property>
-           <property name="styleSheet">
-            <string notr="true">QListWidget::item {padding: 2px}</string>
-           </property>
-           <property name="dragEnabled">
-            <bool>true</bool>
-           </property>
-           <property name="dragDropMode">
-            <enum>QAbstractItemView::InternalMove</enum>
-           </property>
-           <property name="selectionMode">
-            <enum>QAbstractItemView::ExtendedSelection</enum>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="0,1,0">
-           <item>
-            <widget class="QPushButton" name="addPhotosButton">
-             <property name="text">
-              <string>Add Photos...</string>
-             </property>
-             <property name="icon">
-              <iconset theme="list-add">
-               <normaloff/>
-              </iconset>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <spacer name="horizontalSpacer_7">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item>
-            <widget class="QPushButton" name="removePhotosButton">
-             <property name="toolTip">
-              <string>Remove the selected photos from the album.</string>
-             </property>
-             <property name="text">
-              <string>Remove Photos</string>
-             </property>
-             <property name="icon">
-              <iconset theme="list-remove">
-               <normaloff/>
-              </iconset>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
-         <item>
-          <widget class="QTextEdit" name="photoProperties">
-           <property name="palette">
-            <palette>
-             <active>
-              <colorrole role="Base">
-               <brush brushstyle="SolidPattern">
-                <color alpha="255">
-                 <red>230</red>
-                 <green>230</green>
-                 <blue>230</blue>
-                </color>
-               </brush>
-              </colorrole>
-             </active>
-             <inactive>
-              <colorrole role="Base">
-               <brush brushstyle="SolidPattern">
-                <color alpha="255">
-                 <red>230</red>
-                 <green>230</green>
-                 <blue>230</blue>
-                </color>
-               </brush>
-              </colorrole>
-             </inactive>
-             <disabled>
-              <colorrole role="Base">
-               <brush brushstyle="SolidPattern">
-                <color alpha="255">
-                 <red>244</red>
-                 <green>244</green>
-                 <blue>244</blue>
-                </color>
-               </brush>
-              </colorrole>
-             </disabled>
-            </palette>
-           </property>
-           <property name="tabChangesFocus">
-            <bool>true</bool>
-           </property>
-           <property name="undoRedoEnabled">
-            <bool>false</bool>
-           </property>
-           <property name="readOnly">
-            <bool>true</bool>
-           </property>
+           <widget class="QWidget" name="widget_2" native="true">
+            <layout class="QVBoxLayout" name="verticalLayout_7" stretch="1,0">
+             <item>
+              <widget class="QListWidget" name="photosList">
+               <property name="toolTip">
+                <string>Photos to include in the album.</string>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">QListWidget::item {padding: 2px}</string>
+               </property>
+               <property name="dragEnabled">
+                <bool>true</bool>
+               </property>
+               <property name="dragDropMode">
+                <enum>QAbstractItemView::InternalMove</enum>
+               </property>
+               <property name="selectionMode">
+                <enum>QAbstractItemView::ExtendedSelection</enum>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="0,1,0">
+               <item>
+                <widget class="QPushButton" name="addPhotosButton">
+                 <property name="text">
+                  <string>Add Photos...</string>
+                 </property>
+                 <property name="icon">
+                  <iconset theme="list-add">
+                   <normaloff/>
+                  </iconset>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <spacer name="horizontalSpacer_7">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>40</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item>
+                <widget class="QPushButton" name="removePhotosButton">
+                 <property name="toolTip">
+                  <string>Remove the selected photos from the album.</string>
+                 </property>
+                 <property name="text">
+                  <string>Remove Photos</string>
+                 </property>
+                 <property name="icon">
+                  <iconset theme="list-remove">
+                   <normaloff/>
+                  </iconset>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+            </layout>
+           </widget>
+           <widget class="QTextEdit" name="photoProperties">
+            <property name="palette">
+             <palette>
+              <active>
+               <colorrole role="Base">
+                <brush brushstyle="SolidPattern">
+                 <color alpha="255">
+                  <red>230</red>
+                  <green>230</green>
+                  <blue>230</blue>
+                 </color>
+                </brush>
+               </colorrole>
+              </active>
+              <inactive>
+               <colorrole role="Base">
+                <brush brushstyle="SolidPattern">
+                 <color alpha="255">
+                  <red>230</red>
+                  <green>230</green>
+                  <blue>230</blue>
+                 </color>
+                </brush>
+               </colorrole>
+              </inactive>
+              <disabled>
+               <colorrole role="Base">
+                <brush brushstyle="SolidPattern">
+                 <color alpha="255">
+                  <red>244</red>
+                  <green>244</green>
+                  <blue>244</blue>
+                 </color>
+                </brush>
+               </colorrole>
+              </disabled>
+             </palette>
+            </property>
+            <property name="tabChangesFocus">
+             <bool>true</bool>
+            </property>
+            <property name="undoRedoEnabled">
+             <bool>false</bool>
+            </property>
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+           </widget>
           </widget>
          </item>
         </layout>
@@ -477,7 +481,9 @@
          <string>Install Album Template...</string>
         </property>
         <property name="icon">
-         <iconset theme="insert-image"/>
+         <iconset theme="insert-image">
+          <normaloff/>
+         </iconset>
         </property>
        </widget>
       </item>
@@ -528,7 +534,4 @@
  </widget>
  <resources/>
  <connections/>
- <slots>
-  <slot>_removePhotos2()</slot>
- </slots>
 </ui>

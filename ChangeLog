@@ -1,3 +1,31 @@
+2014-04-05  Rennie deGraaf  <rennie.degraaf@gmail.com>
+
+    * tools/AlbumGenerator.py: Merged _bgGenerateAlbumComplete() and 
+      _bgInstallTemplateComplete(), as they were essentially the same.
+
+    * tools/AlbumGenerator.py, www/album.js: Move photo JSON, photo, and 
+      thumbnail files into separate subdirectories.  Added background tasks to 
+      ensure that these directories exist before we try to write to them.
+
+    * tools/AlbumGenerator.py: Changed the name of photo JSON files to include 
+      the full photo file name, as is expected by the JavaScript.
+
+    * tools/AlbumGeneratorUI.ui, tools/AlbumGenerator.py: Added a splitter 
+      between the photo list and the photo properties.
+
+    * tools/AlbumGenerator.py: Removed the code that passed around a directory 
+      file descriptor because the shell commands that I need to call to 
+      generate photos and thumbnails can't work with a file descriptor.  
+      Replaced it with code that opens the output directory (in a background 
+      thread), symlinks to its /proc entry, and writes files through the 
+      symlink.  
+
+    * tools/AlbumGenerator.py: Ignore any errors while closing a file 
+      descriptor or removing a symlink.
+
+    * tools/AlbumGenerator.py: fixed a bug that prevented unknown exceptions 
+      during background tasks from being displayed in the UI.
+
 2014-03-28  Rennie deGraaf  <rennie.degraaf@gmail.com>
 
     * AlbumGenerator/AlbumGenerator.py: Renamed to tools/AlbumGenerator.py.

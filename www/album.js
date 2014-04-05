@@ -138,7 +138,7 @@ function start()
             else if (page > album.photos.length)
                 error("Photo number out of range");
             else if (null == pages[page-1])
-                getJSON(albumPath + album.photos[page-1].name + ".json", loadPhoto, true, {"page":page});
+                getJSON(albumPath + album.metadataDir + album.photos[page-1].name + ".json", loadPhoto, true, {"page":page});
             else
                 loadPhotoContent();
         }
@@ -298,7 +298,7 @@ function loadAlbum(status, albumData, args)
         else if (page > album.photos.length)
             throw new Error("Photo number out of range");
         else if (null == pages[page-1])
-            getJSON(albumPath + album.photos[page-1].name + ".json", loadPhoto, true, {"page":page});
+            getJSON(albumPath + album.metadataDir + album.photos[page-1].name + ".json", loadPhoto, true, {"page":page});
         else
             loadPhotoContent();
     }
@@ -314,6 +314,7 @@ function verifyAlbum(albumData)
         || (null == albumData.title)
         || (null == albumData.footer)
         || (null == albumData.description)
+        || (null == albumData.metadataDir)
         || (null == albumData.photos))
     {
         throw new Error("Album data is invalid");
@@ -691,7 +692,7 @@ function cacheNext()
 
     if (null != page && page < album.photos.length && null == pages[page])
     {
-        getJSON(albumPath + album.photos[page].name + ".json", cachePhoto, false, {"page" : page});
+        getJSON(albumPath + album.metadataDir + album.photos[page].name + ".json", cachePhoto, false, {"page" : page});
     }
 
     log("cacheNext exit");

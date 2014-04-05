@@ -7,12 +7,8 @@ __email__ = "rennie.degraaf@gmail.com"
 __license__ = "Copyright (c) Rennie deGraaf, 2005-2014.  All rights reserved."
 
 # TODO: comments
-# TODO: reduce the spacing on items in the Add Caption and Add Property menus.
-#     I tried to change the padding with a QMenu::item stylesheet, but this 
-#     removed the hover effect.  I can't figure out how to get both.
-# TODO: move default paths to variables at the top of the file
-# TODO: get rid of the dirFD crap.  The shell commands can't use it.
-# TODO: merge _bgGenerateAlbumComplete and _bgInstallTemplateComplete?
+# TODO: build a better test set, including a photo with an odd aspect ratio and 
+#     photos with different sets of comments.
 
 import sys
 import os
@@ -54,6 +50,10 @@ FILTER_IMAGES = "Images (*.jpeg *.jpg *.png *.tiff *.tif)"
 FILTER_GTHUMB3_CATALOGS = "gThumb catalogs (*.catalog)"
 FILTER_ALBUMS = "Albums (*.json)"
 
+METADATA_DIR = "metadata"
+PHOTO_DIR = "photos"
+THUMBNAIL_DIR = "thumbnails"
+
 sys.path.append(PKG_PATH)
 import AlbumGenerator.ui
 
@@ -67,6 +67,13 @@ def handleExceptions(func, *args, **kwargs):
         (exc_type, exc_value, exc_traceback) = sys.exc_info()
         traceback.print_exception(exc_type, exc_value, exc_traceback)
         raise
+
+def ensureDirectory(name):
+    try:
+        # This will throw FileExistsError if the permissions are different than expected.
+        os.makedirs(name, exist_ok=True)
+    except FileExistsError:
+        pass
 
 #import contextlib
 #with pushDir(self._config.outputDir):
@@ -173,19 +180,19 @@ class PhotoFile(QtGui.QListWidgetItem):
         self._fileName = fileName
         self._fileFullPath = re.sub("^"+os.path.expanduser("~"), "~", filepath)
         super().__init__("%s (%s)" % (self._fileName, self._fileFullPath))
+        self._jsonName = self._fileName + ".json"
         (name, suffix) = os.path.splitext(self._fileName)
         self._thumbName = name + ".thumbnail" + suffix
-        self._jsonName = name + ".json"
 
         # To avoid TOCTOU when passing file names to other programs, we do the following:
-        #  1. Create a temporary directory.
+        #  1. Create a secure temporary directory.
         #  2. Open the file.  Get its file descriptor.
         #  3. Construct the /proc/<pid>/fd/<fd> path to the file using the file descriptor.
         #  4. Create a symlink from the temporary directory to the /proc path.  The link's name is 
         #     unique but predictable; that's ok because the directory is secure.
         #  5. Pass the symlink's path to other programs.
 
-        self._linkPath = os.path.join(config.tempDir.name, str(self._fileName))
+        self._linkPath = os.path.join(config.tempDir.name, self._fileName)
         try:
             self._fileDescriptor = os.open(filepath, os.O_RDONLY)
             os.symlink("/proc/%d/fd/%d" % (os.getpid(), self._fileDescriptor), self._linkPath)
@@ -247,9 +254,15 @@ class PhotoFile(QtGui.QListWidgetItem):
 
 
     def close(self):
-        os.unlink(self._linkPath)
+        try:
+            os.unlink(self._linkPath)
+        except OSError:
+            pass
         self._linkPath = None
-        os.close(self._fileDescriptor)
+        try:
+            os.close(self._fileDescriptor)
+        except OSError:
+            pass
         self._fileDescriptor = None
 
 
@@ -259,7 +272,7 @@ class PhotoFile(QtGui.QListWidgetItem):
 
     def _rescale(self, pixels):
         aspect = self._width / self._height
-        
+
         if pixels >= self._width * self._height:
             return (self._width, self._height)
         else:
@@ -274,33 +287,31 @@ class PhotoFile(QtGui.QListWidgetItem):
     def getAlbumJSON(self):
         props = {}
         props["name"] = self._fileName
-        props["thumbnail"] = self._thumbName
+        props["thumbnail"] = os.path.join(THUMBNAIL_DIR, self._thumbName)
         props["orientation"] = "horizontal" if self._width >= self._height else "vertical"
         props["path"] = self._fileFullPath
         return props
 
 
-    def generateJSON(self, dirFD, widthBase, heightBase, descriptions, properties):
+    def generateJSON(self, outDirName, widthBase, heightBase, descriptions, properties):
         (width, height) = self._rescale(widthBase*heightBase)
         
         data = {}
-        data["photo"] = self._fileName
+        data["photo"] = os.path.join(PHOTO_DIR, self._fileName)
         data["width"] = str(width)
         data["height"] = str(height)
         data["caption"] = [self.descriptions[tag] for tag in descriptions if tag in self.descriptions]
         data["properties"] = dict((tag, self.properties[tag]) for tag in properties if tag in self.properties)
         #print(json.dumps(data, indent=2, sort_keys=True))
 
-        def openFunc(path, flags):
-            return os.open(path, flags, 0o666, dir_fd=dirFD)
-        with open(self._jsonName, "w", opener=openFunc) as jsonFile:
+        with open(os.path.join(outDirName, self._jsonName), "w") as jsonFile:
             json.dump(data, jsonFile)
 
-    def generatePhoto(self, dirFD, width, height):
+    def generatePhoto(self, outDirName, width, height):
         # TODO
         pass
 
-    def generateThumbnail(self, dirFD, width, height):
+    def generateThumbnail(self, outDirName, width, height):
         # TODO
         # See http://www.imagemagick.org/Usage/resize/
         pass
@@ -333,11 +344,7 @@ class Config(object):
         self._file = None
         data = {}
         try:
-            try:
-                # This will throw FileExistsError if the permissions are different than expected.
-                os.makedirs(os.path.dirname(CONFIG_FILE), exist_ok=True)
-            except FileExistsError:
-                pass
+            ensureDirectory(os.path.dirname(CONFIG_FILE))
             # Python's 'r+' mode doesn't create files if they don't already exist.
             self._file = open(CONFIG_FILE, "r+", opener=lambda path, flags: os.open(path, flags|os.O_CREAT, 0o666))
             data = json.load(self._file)
@@ -425,6 +432,7 @@ class PhotoAlbumUI(QtGui.QMainWindow, AlbumGenerator.ui.Ui_MainWindow):
         self._config = config
         self._threads = concurrent.futures.ThreadPoolExecutor(self._config.maxWorkers)
         self._backgroundTasks = None
+        self._directories = []
 
         self.setupUi(self)
         if None != self._config.dimensions:
@@ -433,6 +441,11 @@ class PhotoAlbumUI(QtGui.QMainWindow, AlbumGenerator.ui.Ui_MainWindow):
             self._restoreUIData(self._config.uiData)
         self.progressBar.setVisible(False)
         self.cancelButton.setVisible(False)
+        
+        # Set the sizes of the photo list and properties within the splitter.
+        self.splitter.setStretchFactor(0, 5)
+        self.splitter.setStretchFactor(1, 1)
+        self.splitter.setCollapsible(0, False)
 
         # Set up the menu for the "Add Photos" button
         self._addPhotosButtonMenu = QtGui.QMenu(self.addPhotosButton)
@@ -705,7 +718,7 @@ class PhotoAlbumUI(QtGui.QMainWindow, AlbumGenerator.ui.Ui_MainWindow):
             except:
                 (exc_type, exc_value, exc_traceback) = sys.exc_info()
                 traceback.print_exception(exc_type, exc_value, exc_traceback)
-                errors.append(sys.exc_info())
+                errors.append(str(exc_type) + ": " + str(exc_value))
         if 0 != len(errors):
             self._showErrorSignal.emit(str(len(errors)) + " errors were encountered loading files:\n" + "\n".join(errors))
 
@@ -789,6 +802,7 @@ class PhotoAlbumUI(QtGui.QMainWindow, AlbumGenerator.ui.Ui_MainWindow):
     def _generateAlbum(self):
         album = self._saveUIData()
         album["albumVersion"] = FILE_FORMAT_VERSION
+        album["metadataDir"] = METADATA_DIR + "/"
         album["title"] = self.titleText.toPlainText()
         album["description"] = self.descriptionText.toPlainText()
         album["photos"] = [self.photosList.item(i).getAlbumJSON() for i in range(0, self.photosList.count())]
@@ -796,20 +810,56 @@ class PhotoAlbumUI(QtGui.QMainWindow, AlbumGenerator.ui.Ui_MainWindow):
 
         # Get the output file name
         albumFileName = QtGui.QFileDialog.getSaveFileName(self, "Album File", self._config.outputDir, FILTER_ALBUMS)
-        
-        # Open the directory so that we can ensure that all files are created in the same directory.
         albumDirName = os.path.dirname(albumFileName)
-        # Make sure to close this when no longer needed.
-        dirFD = os.open(albumDirName, os.O_RDONLY)
-        
-        # Create the album JSON file
-        tasks = []
-        tasks.append(self._threads.submit(self._bgGenerateAlbum, album, os.path.basename(albumFileName), dirFD))
 
-        # Don't prompt for anything else; just overwrite it.
+        # To prevent the output directory from being changed while generating files, we do the 
+        # following:
+        #  1. Create a secure temporary directory.
+        #  2. Open the output directory.  Get its file descriptor.
+        #  3. Construct the /proc/<pid>/fd/<fd> path to the directory using the file descriptor.
+        #  4. Create a symlink from the temporary directory to the /proc path.  The link's name is 
+        #     unique but predictable; that's ok because the directory is secure.
+        #  5. Use the symlink as the path when creating files.
+
+        # TODO: verify that no other background tasks are pending
+        self._backgroundInit(3 * self.photosList.count() + 5)
+        tasks = []
+
+        # Create the output directories.
+        # We read and write self._directories from different threads, but there's no race because 
+        # the read task is blocked until after the write tasks complete.
+        assert(0 == len(self._directories))
+        albumDirPath = os.path.join(self._config.tempDir.name, "album")
+        albumDirTask = self._threads.submit(self._bgCreateOutputDirectory, albumDirName, albumDirPath)
+        tasks.append(albumDirTask)
+        metadataDirPath = os.path.join(self._config.tempDir.name, METADATA_DIR)
+        metadataDirTask = None
+        if 0 != len(METADATA_DIR):
+            metadataDirTask = self._threads.submit(self._bgCreateOutputDirectory, 
+                                                   os.path.join(albumDirName, METADATA_DIR),
+                                                   metadataDirPath)
+            tasks.append(metadataDirTask)
+        photoDirPath = os.path.join(self._config.tempDir.name, PHOTO_DIR)
+        photoDirTask = None
+        if 0 != len(PHOTO_DIR):
+            photoDirTask = self._threads.submit(self._bgCreateOutputDirectory, 
+                                                os.path.join(albumDirName, PHOTO_DIR),
+                                                photoDirPath)
+            tasks.append(photoDirTask)
+        thumbnailDirPath = os.path.join(self._config.tempDir.name, THUMBNAIL_DIR)
+        thumbnailDirTask = None
+        if 0 != len(THUMBNAIL_DIR):
+            thumbnailDirTask = self._threads.submit(self._bgCreateOutputDirectory, 
+                                                    os.path.join(albumDirName, THUMBNAIL_DIR),
+                                                    thumbnailDirPath)
+            tasks.append(thumbnailDirTask)
+
+        # Create the album JSON file
+        tasks.append(self._threads.submit(self._bgGenerateAlbum, album, os.path.join(albumDirPath, os.path.basename(albumFileName)), albumDirTask))
+
+        # Create the metadata, thumbnail, and image for each photo.
         count = self.photosList.count()
         if 0 < count:
-            self._backgroundInit(3 * count)
             descriptions = album["captionFields"]
             properties = album["propertyFields"]
             for i in range(0, count):
@@ -817,26 +867,50 @@ class PhotoAlbumUI(QtGui.QMainWindow, AlbumGenerator.ui.Ui_MainWindow):
                 # In Python 3.4, I might be able to use functools.partialmethod to create a generic 
                 # wrapper that calls self._incProgressSignal.emit() after an arbitrary method call, 
                 # rather than needing to write wrappers for every method call.
-                tasks.append(self._threads.submit(self._bgGeneratePhotoJSON, photo, dirFD, album["photoResolution"][0], album["photoResolution"][1], descriptions, properties))
-                tasks.append(self._threads.submit(self._bgGeneratePhoto, photo, dirFD, album["photoResolution"][0], album["photoResolution"][1]))
-                tasks.append(self._threads.submit(self._bgGenerateThumbnail, photo, dirFD, THUMB_WIDTH,  THUMB_HEIGHT))
-            self._threads.submit(functools.partial(handleExceptions, self._bgGenerateAlbumComplete), tasks, dirFD)
+                tasks.append(self._threads.submit(self._bgGeneratePhotoJSON, photo, metadataDirPath, album["photoResolution"][0], album["photoResolution"][1], descriptions, properties, metadataDirTask))
+                tasks.append(self._threads.submit(self._bgGeneratePhoto, photo, photoDirPath, album["photoResolution"][0], album["photoResolution"][1], photoDirTask))
+                tasks.append(self._threads.submit(self._bgGenerateThumbnail, photo, thumbnailDirPath, THUMB_WIDTH, THUMB_HEIGHT, thumbnailDirTask))
+
+        self._threads.submit(functools.partial(handleExceptions, self._bgTasksComplete), tasks, "generating the album")
         self._backgroundStart(tasks)
 
         self._config.outputDir = albumDirName
 
 
-    def _bgGenerateAlbum(self, album, albumFileName, dirFD):
+    def _bgCreateOutputDirectory(self, dirPath, linkPath):
+        ensureDirectory(dirPath)
+        dirFD = os.open(dirPath, os.O_RDONLY)
+        self._directories.append((dirFD, linkPath))
+        os.symlink("/proc/%d/fd/%d" % (os.getpid(), dirFD), linkPath)
+        self._incProgressSignal.emit()
+
+
+    def _bgGenerateAlbum(self, album, albumFileName, dirCreationTask):
         """Background task to generate an album JSON file"""
-        with open(os.path.basename(albumFileName), "w", opener=lambda path, flags: os.open(path, flags, 0o666, dir_fd=dirFD)) as albumFile:
+        if None != dirCreationTask:
+            concurrent.futures.wait([dirCreationTask])
+        with open(albumFileName, "w") as albumFile:
             json.dump(album, albumFile)
+        self._incProgressSignal.emit()
 
 
-    def _bgGenerateAlbumComplete(self, tasks, dirFD):
-        # Wait for the album generation tasks to complete.
+    def _bgTasksComplete(self, tasks, message):
+        # Wait for the tasks to complete.
         (done, notDone) = concurrent.futures.wait(tasks)
         assert(0 == len(notDone))
         
+        # Close any file descriptors and remove any symlinks.  Ignore errors.
+        for (fd, link) in self._directories:
+            try:
+                os.unlink(link)
+            except OSError:
+                pass
+            try:
+                os.close(fd)
+            except OSError:
+                pass
+        self._directories = []
+
         # Display any error messages
         errors = []
         for task in done:
@@ -847,25 +921,33 @@ class PhotoAlbumUI(QtGui.QMainWindow, AlbumGenerator.ui.Ui_MainWindow):
             except:
                 (exc_type, exc_value, exc_traceback) = sys.exc_info()
                 traceback.print_exception(exc_type, exc_value, exc_traceback)
-                errors.append(sys.exc_info())
+                errors.append(str(exc_type) + ": " + str(exc_value))
         if 0 != len(errors):
-            self._showErrorSignal.emit(str(len(errors)) + " errors were encountered generating the album:\n" + "\n".join(errors))
+            self._showErrorSignal.emit("%d errors were encountered while %s:\n" % (len(errors), message) + "\n".join(errors))
 
         # Dismiss the cancellation UI
         self._backgroundCompleteSignal.emit()
 
-        # Close the directory
-        os.close(dirFD)
 
+    def _bgGeneratePhotoJSON(self, photo, outDirName, width, height, descriptions, properties, dirCreationTask):
+        # Wait for the directory to be created, then generate the photo JSON
+        if None != dirCreationTask:
+            concurrent.futures.wait([dirCreationTask])
+        photo.generateJSON(outDirName, width, height, descriptions, properties)
+        self._incProgressSignal.emit()
 
-    def _bgGeneratePhotoJSON(self, photo, dirFD, width, height, descriptions, properties):
-        photo.generateJSON(dirFD, width, height, descriptions, properties)
+    def _bgGeneratePhoto(self, photo, outDirName, width, height, dirCreationTask):
+        # Wait for the directory to be created, then generate the photo
+        if None != dirCreationTask:
+            concurrent.futures.wait([dirCreationTask])
+        photo.generatePhoto(outDirName, width, height)
         self._incProgressSignal.emit()
-    def _bgGeneratePhoto(self, photo, dirFD, width, height):
-        photo.generatePhoto(dirFD, width, height)
-        self._incProgressSignal.emit()
-    def _bgGenerateThumbnail(self, photo, dirFD, width, height):
-        photo.generateThumbnail(dirFD, width, height)
+
+    def _bgGenerateThumbnail(self, photo, outDirName, width, height, dirCreationTask):
+        # Wait for the directory to be created, then generate the thumbnail
+        if None != dirCreationTask:
+            concurrent.futures.wait([dirCreationTask])
+        photo.generateThumbnail(outDirName, width, height)
         self._incProgressSignal.emit()
 
 
@@ -897,36 +979,29 @@ class PhotoAlbumUI(QtGui.QMainWindow, AlbumGenerator.ui.Ui_MainWindow):
         # I'm using the QT directory chooser instead.
         outDir = QtGui.QFileDialog.getExistingDirectory(self, "Album directory", self._config.outputDir, QtGui.QFileDialog.ShowDirsOnly|QtGui.QFileDialog.DontUseNativeDialog)
 
-        # Spawn background tasks to do the copying.
-        self._backgroundInit(len(TEMPLATE_FILE_NAMES))
+        self._backgroundInit(len(TEMPLATE_FILE_NAMES) + 1)
         tasks = []
+
+        # Open the output directory so that it can't change under us.
+        assert(0 == len(self._directories))
+        albumDirPath = os.path.join(self._config.tempDir.name, "album")
+        albumDirTask = self._threads.submit(self._bgCreateOutputDirectory, outDir, albumDirPath)
+        tasks.append(albumDirTask)
+
+        # Spawn background tasks to do the copying.
         for f in TEMPLATE_FILE_NAMES:
-            tasks.append(self._threads.submit(shutil.copyfile, os.path.join(DATA_PATH, f), os.path.join(outDir, f)))
-        self._threads.submit(functools.partial(handleExceptions, self._bgInstallTemplateComplete, tasks))
+            tasks.append(self._threads.submit(self._bgCopyFile, os.path.join(DATA_PATH, f), os.path.join(albumDirPath, f), albumDirTask))
+
+        self._threads.submit(functools.partial(handleExceptions, self._bgTasksComplete, tasks, "installing the template"))
         self._backgroundStart(tasks)
 
 
-    def _bgInstallTemplateComplete(self, tasks):
-        # Wait for the template installation tasks to complete.
-        (done, notDone) = concurrent.futures.wait(tasks)
-        assert(0 == len(notDone))
-        
-        # Display any error messages
-        errors = []
-        for task in done:
-            try:
-                task.result()
-            except concurrent.futures.CancelledError:
-                pass
-            except:
-                (exc_type, exc_value, exc_traceback) = sys.exc_info()
-                traceback.print_exception(exc_type, exc_value, exc_traceback)
-                errors.append(sys.exc_info())
-        if 0 != len(errors):
-            self._showErrorSignal.emit(str(len(errors)) + " errors were encountered while installing the template:\n" + "\n".join(errors))
-
-        # Dismiss the cancellation UI
-        self._backgroundCompleteSignal.emit()
+    def _bgCopyFile(self, source, destination, dirCreationTask):
+        # Wait for the directory to be created, then copy the file
+        if None != dirCreationTask:
+            concurrent.futures.wait([dirCreationTask])
+        shutil.copyfile(source, destination)
+        self._incProgressSignal.emit()
 
 
     def _cancelBackgroundTasks(self):

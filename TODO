@@ -23,6 +23,10 @@ For version 3:
       html5, but with an inline stylesheet and a IE-conditionally included 
       third-party script.
 
+    * Reduce the spacing on items in the Add Caption and Add Property menus.
+      I tried to change the padding with a QMenu::item stylesheet, but this 
+      removed the hover effect.  I can't figure out how to get both.
+
 For future versions:
 
     * Create an auto-generated index page.  Include a reference to a thumbnail 
