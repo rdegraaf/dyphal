@@ -1,3 +1,21 @@
+    * tools/AlbumGenerator.py: Re-formatted the code to approximately follow 
+      Python standards (http://legacy.python.org/dev/peps/pep-0008/) and added 
+      better docstrings.  Ran pylint and fixed some of the things that it 
+      warned about.
+
+    * Removed various commented-out code.
+
+    * install.sh, tools/AlbumGenerator.py: Moved the UI package to the standard 
+      user packages directory and removed the sys.path hack.
+
+    * install.sh, tools/AlbumGenerator.py: Renamed the "AlbumGenerator" package 
+      to "album_generator" because Python's import system doesn't seem to work 
+      properly when a package has the same name as the main file.  In 
+      particular, pydoc3 didn't work.
+
+    * tools/AlbumGenerator.py, tools/AlbumGeneratorUI.ui: Renamed 
+      "descriptions" to "captions".
+
 2014-04-05  Rennie deGraaf  <rennie.degraaf@gmail.com>
 
     * tools/AlbumGenerator.py: Merged _bgGenerateAlbumComplete() and 

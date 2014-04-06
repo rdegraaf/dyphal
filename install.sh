@@ -3,17 +3,17 @@
 PATH=/bin:/usr/bin
 
 BIN_PATH="$HOME/bin"
-PKG_PATH="$HOME/.lib/python3/"
+PKG_PATH="$HOME/.local/lib/python3.3/site-packages"
 DATA_PATH="$HOME/.share/AlbumGenerator"
 
-PKG_NAME="AlbumGenerator"
+PKG_NAME="album_generator"
 
 mkdir -p "$PKG_PATH"/"$PKG_NAME"
-touch "$PKG_PATH"/"$PKG_NAME"/__init__.py
+echo "__all__ = []" > "$PKG_PATH"/"$PKG_NAME"/__init__.py
 pyuic4 tools/AlbumGeneratorUI.ui > "$PKG_PATH"/"$PKG_NAME"/ui.py
 
 mkdir -p "$BIN_PATH"
-cat tools/AlbumGenerator.py | sed -e "s@^PKG_PATH[ ]*=.*\$@PKG_PATH = \"${PKG_PATH}\"@" -e "s@^DATA_PATH[ ]*=.*\$@DATA_PATH = \"${DATA_PATH}\"@" > "$BIN_PATH"/AlbumGenerator
+cat tools/AlbumGenerator.py | sed -e "s@^DATA_PATH[ ]*=.*\$@DATA_PATH = \"${DATA_PATH}\"@" > "$BIN_PATH"/AlbumGenerator
 chmod +x "$BIN_PATH"/AlbumGenerator
 
 mkdir -p "$DATA_PATH"

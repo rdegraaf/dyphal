@@ -10,9 +10,9 @@ For version 3:
       So would an option to build a tarball of everything.  And a way to get 
       get rid of README.html and any other generated files.
 
-    * Find a way to push the version date into README and album.html.  A git 
-      filter might be able to do the job, if I used git.  Maybe add something 
-      to deploy.sh?
+    * Find a way to push the version date into README, album.html, and 
+      AlbumGenerator.py.  A git filter might be able to do the job, if I used 
+      git.  Maybe add something to install.sh?
 
     * Replace getElementsByClass() with document.getElementsByClassName() and a 
       MSIE8-compat shim (https://stackoverflow.com/questions/13261506/getelement
@@ -26,6 +26,14 @@ For version 3:
     * Reduce the spacing on items in the Add Caption and Add Property menus.
       I tried to change the padding with a QMenu::item stylesheet, but this 
       removed the hover effect.  I can't figure out how to get both.
+
+    * Build a better test set, including a photo with an odd aspect ratio and 
+      photos with different sets of comments.
+
+    * Need a better name than "DHTML Photo Album".
+
+    * jslint or something similar?
+
 
 For future versions:
 
