@@ -39,6 +39,7 @@ import time
 import functools
 import math
 import shutil
+import urllib.parse
 
 from PyQt4 import QtCore
 from PyQt4 import QtGui
@@ -53,6 +54,8 @@ PROGRAM_NAME = "Album Generator"
 FILE_FORMAT_VERSION = 1
 THUMB_WIDTH = 160
 THUMB_HEIGHT = 120
+THUMB_QUALITY = 50
+BG_TIMEOUT = 5
 TEMPLATE_FILE_NAMES = ["album.css", "album.html", "album.js", "back.png", "common.css", 
                        "debug.css", "help.png", "ie8compat.js", "lib.js", "next.png", 
                        "photo.css", "placeholder.png", "prev.png"]
@@ -61,6 +64,8 @@ DEFAULT_PHOTO_DIR = os.path.expanduser("~")
 DEFAULT_GTHUMB3_DIR = os.path.expanduser("~/.local/share/gthumb/catalogs")
 DEFAULT_GTHUMB2_DIR = os.path.expanduser("~/.gnome2/gthumb/collections")
 DEFAULT_OUTPUT_DIR = os.path.expanduser("~")
+DEFAULT_PHOTO_QUALITY = 75
+DEFAULT_THREADS = 8
 
 FILTER_IMAGES = "Images (*.jpeg *.jpg *.png *.tiff *.tif)"
 FILTER_GTHUMB3_CATALOGS = "gThumb catalogs (*.catalog)"
@@ -175,8 +180,8 @@ class PhotoFile(QtGui.QListWidgetItem):
                 Must be unique.  eg, "img_3201a.jpg"
         _jsonName (str): The name of the JSON file for this photo in 
                 the album.
-        _thumbnailName (str): The name of the thumbnail file for this 
-                photo in the album.
+        _thumbName (str): The name of the thumbnail file for this photo 
+                in the album.
         _linkPath (str): The full path to the link to this photo in the 
                 album's temporary directory.
         _fileDescriptor (int): A file descriptor for the photo file.
@@ -225,6 +230,11 @@ class PhotoFile(QtGui.QListWidgetItem):
         self._jsonName = self._fileName + ".json"
         (name, suffix) = os.path.splitext(self._fileName)
         self._thumbName = name + ".thumbnail" + suffix
+        # Don't set linkPath until after the link has been created.  Otherwise, a FileExistsError 
+        # due to us already having the file open somewhere else will result in us deleting the link 
+        # when we try to clean up.
+        self._linkPath = None
+        self._fileDescriptor = None
 
         # To avoid TOCTOU when passing file names to other programs, we do the following:
         #  1. Create a secure temporary directory.
@@ -234,13 +244,14 @@ class PhotoFile(QtGui.QListWidgetItem):
         #     unique but predictable; that's ok because the directory is secure.
         #  5. Pass the symlink's path to other programs.
 
-        self._linkPath = os.path.join(config.tempDir.name, self._fileName)
         try:
             self._fileDescriptor = os.open(filepath, os.O_RDONLY)
-            os.symlink("/proc/%d/fd/%d" % (os.getpid(), self._fileDescriptor), self._linkPath)
+            linkPath = os.path.join(config.tempDir.name, self._fileName)
+            os.symlink("/proc/%d/fd/%d" % (os.getpid(), self._fileDescriptor), linkPath)
+            self._linkPath = linkPath
             properties_text = subprocess.check_output(
-                                ["exiftool", "-json", "-a", "-G", "-All", self._linkPath], 
-                                timeout=5, universal_newlines=True, stderr=subprocess.STDOUT)
+                            ["exiftool", "-json", "-a", "-G", "-All", self._linkPath], 
+                            timeout=BG_TIMEOUT, universal_newlines=True, stderr=subprocess.STDOUT)
             properties_obj = json.loads(properties_text)[0]
 
             # exiftool finds way too many properties to force the user to sift through, so we 
@@ -294,12 +305,14 @@ class PhotoFile(QtGui.QListWidgetItem):
     def close(self):
         """Close a photo file and unlink it from the temporary directory."""
         try:
-            os.unlink(self._linkPath)
+            if None is not self._linkPath:
+                os.unlink(self._linkPath)
         except OSError:
             pass
         self._linkPath = None
         try:
-            os.close(self._fileDescriptor)
+            if None is not self._fileDescriptor:
+                os.close(self._fileDescriptor)
         except OSError:
             pass
         self._fileDescriptor = None
@@ -327,10 +340,10 @@ class PhotoFile(QtGui.QListWidgetItem):
         """Return the information about the photo that's necessary for 
         the album JSON file."""
         props = {}
-        props["name"] = self._fileName
-        props["thumbnail"] = os.path.join(THUMBNAIL_DIR, self._thumbName)
+        props["name"] = urllib.parse.quote(self._fileName)
+        props["thumbnail"] = urllib.parse.quote(os.path.join(THUMBNAIL_DIR, self._thumbName))
         props["orientation"] = "horizontal" if self._width >= self._height else "vertical"
-        props["path"] = self._fileFullPath
+        props["path"] = urllib.parse.quote(self._fileFullPath)
         return props
 
     def generateJSON(self, out_dir_name, width_base, height_base, captions, properties):
@@ -338,28 +351,37 @@ class PhotoFile(QtGui.QListWidgetItem):
         (width, height) = self._rescale(width_base * height_base)
 
         data = {}
-        data["photo"] = os.path.join(PHOTO_DIR, self._fileName)
+        data["photo"] = urllib.parse.quote(os.path.join(PHOTO_DIR, self._fileName))
         data["width"] = str(width)
         data["height"] = str(height)
         data["caption"] = \
             [self.captions[tag] for tag in captions if tag in self.captions]
         data["properties"] = \
-            dict((tag, self.properties[tag]) for tag in properties if tag in self.properties)
+            [(tag, self.properties[tag]) for tag in properties if tag in self.properties]
         #print(json.dumps(data, indent=2, sort_keys=True))
 
         with open(os.path.join(out_dir_name, self._jsonName), "w") as json_file:
             json.dump(data, json_file)
 
-    def generatePhoto(self, out_dir_name, width, height):
+    def generatePhoto(self, out_dir_name, width_base, height_base, quality):
         """Generate a scaled-down photo."""
-        # TODO
-        pass
-
-    def generateThumbnail(self, out_dir_name, width, height):
-        """Generate a thumbnail for the photo."""
-        # TODO
+        (width, height) = self._rescale(width_base * height_base)
         # See http://www.imagemagick.org/Usage/resize/
-        pass
+        subprocess.check_call(["convert", self._linkPath, "-resize", "%dx%d>" % (width, height), 
+                               "-strip", "-quality", str(quality), 
+                               os.path.join(out_dir_name, self._fileName)], timeout=BG_TIMEOUT)
+
+    def generateThumbnail(self, out_dir_name, width_base, height_base, quality):
+        """Generate a thumbnail for the photo."""
+        # width_base and height_base assume a horizontal photo.  Swap them for a vertical.
+        width, height = (width_base, height_base)
+        if self._width < self._height:
+            width, height = (height_base, width_base)
+        # See http://www.imagemagick.org/Usage/thumbnails/
+        subprocess.check_call(["convert", self._linkPath, "-thumbnail", "%dx%d^" % (width, height), 
+                               "-gravity", "center", "-extent", "%dx%d" % (width, height), 
+                               "-quality", str(quality), 
+                               os.path.join(out_dir_name, self._thumbName)], timeout=BG_TIMEOUT)
 
 
 class Config(object):
@@ -372,11 +394,12 @@ class Config(object):
                 3 catalog was last imported.
         outputDir (str): The name of the directory where an album was 
                 last created.
+        photoQuality (int): The quality percentage for resized photos.
+        maxWorkers (int): The maximum number of background threads to 
+                use.
         dimensions ((int, int)): The current window dimensions.
         uiData (dict): Contents of certain UI fields that were saved 
                 from the last session.
-        maxWorkers (int): The maximum number of background threads to 
-                use.
         tempDir (tempfile.TemporaryDirectory): A secure temporary 
                 directory to hold links to photos and generated files.
         _file (file): A handle to the configuration file.
@@ -408,13 +431,18 @@ class Config(object):
         self.gthumb3Dir = data["gthumb3Dir"] if "gthumb3Dir" in data else DEFAULT_GTHUMB3_DIR
         #self.gthumb2Dir = data["gthumb2Dir"] if "gthumb2Dir" in data else DEFAULT_GTHUMB2_DIR
         self.outputDir = data["outputDir"] if "outputDir" in data else DEFAULT_OUTPUT_DIR
+        self.photoQuality = DEFAULT_PHOTO_QUALITY
+        if "photoQuality" in data and 0 < data["photoQuality"] and 100 >= data["photoQuality"]:
+            self.photoQuality = data["photoQuality"]
 
         # Used only at startup and stored in the configuration file
+        self.maxWorkers = DEFAULT_THREADS
+        if "threads" in data and 0 < data["threads"] and 50 >= data["threads"]:
+            self.maxWorkers = data["threads"]
         self.dimensions = data["dimensions"] if "dimensions" in data else None
         self.uiData = data["uiData"] if "uiData" in data else None
 
         # Not stored in the configuration file
-        self.maxWorkers = 8 # TODO: how to get a good number for this?
         self.tempDir = tempfile.TemporaryDirectory()
 
     def save(self):
@@ -425,6 +453,8 @@ class Config(object):
             data["photoDir"] = self.photoDir
             data["gthumb3Dir"] = self.gthumb3Dir
             data["outputDir"] = self.outputDir
+            data["photoQuality"] = self.photoQuality
+            data["threads"] = self.maxWorkers
             data["dimensions"] = self.dimensions
             data["uiData"] = self.uiData
 
@@ -668,7 +698,7 @@ class PhotoAlbumUI(QtGui.QMainWindow, album_generator.ui.Ui_MainWindow):
         self.photoProperties.clear()
         # When the user deselects everything, currentRow and currentItem remain the last selected 
         # item.  But selectedItems() is empty.
-        if 0 != len(self.photosList.selectedItems()):
+        if 0 != len(self.photosList.selectedItems()) and None is not self.photosList.currentItem():
             photo = self.photosList.currentItem()
             line_break = ""
             for obj in [photo.captions, photo.properties]:
@@ -848,7 +878,7 @@ class PhotoAlbumUI(QtGui.QMainWindow, album_generator.ui.Ui_MainWindow):
         and down-scaled photos.  """
         album = self._saveUIData()
         album["albumVersion"] = FILE_FORMAT_VERSION
-        album["metadataDir"] = METADATA_DIR + "/"
+        album["metadataDir"] = urllib.parse.quote(METADATA_DIR + "/")
         album["title"] = self.titleText.toPlainText()
         album["description"] = self.descriptionText.toPlainText()
         album["photos"] = \
@@ -915,16 +945,23 @@ class PhotoAlbumUI(QtGui.QMainWindow, album_generator.ui.Ui_MainWindow):
                 # In Python 3.4, I might be able to use functools.partialmethod to create a generic 
                 # wrapper that calls self._incProgressSignal.emit() after an arbitrary method call, 
                 # rather than needing to write wrappers for every method call.
-                tasks.append(self._threads.submit(self._bgGeneratePhotoJSON, photo, 
-                                                  metadata_dir_path, album["photoResolution"][0], 
-                                                  album["photoResolution"][1], captions, 
-                                                  properties, metadata_dir_task))
-                tasks.append(self._threads.submit(self._bgGeneratePhoto, photo, photo_dir_path, 
-                                                  album["photoResolution"][0], 
-                                                  album["photoResolution"][1], photo_dir_task))
-                tasks.append(self._threads.submit(self._bgGenerateThumbnail, photo, 
-                                                  thumbnail_dir_path, THUMB_WIDTH, THUMB_HEIGHT, 
-                                                  thumbnail_dir_task))
+                task = self._threads.submit(self._bgGeneratePhotoJSON, photo, metadata_dir_path, 
+                                            album["photoResolution"][0], 
+                                            album["photoResolution"][1], captions, properties, 
+                                            metadata_dir_task)
+                task.photoName = photo.getPath()
+                tasks.append(task)
+                task = self._threads.submit(self._bgGeneratePhoto, photo, photo_dir_path, 
+                                            album["photoResolution"][0], 
+                                            album["photoResolution"][1], self._config.photoQuality, 
+                                            photo_dir_task)
+                task.photoName = photo.getPath()
+                tasks.append(task)
+                task = self._threads.submit(self._bgGenerateThumbnail, photo, thumbnail_dir_path, 
+                                            THUMB_WIDTH, THUMB_HEIGHT, THUMB_QUALITY, 
+                                            thumbnail_dir_task)
+                task.photoName = photo.getPath()
+                tasks.append(task)
 
         self._threads.submit(functools.partial(handle_exceptions, self._bgTasksComplete), tasks, 
                              "generating the album")
@@ -978,6 +1015,9 @@ class PhotoAlbumUI(QtGui.QMainWindow, album_generator.ui.Ui_MainWindow):
                 task.result()
             except concurrent.futures.CancelledError:
                 pass
+            except (subprocess.CalledProcessError, subprocess.TimeoutExpired):
+                # convert failed or timed out.
+                errors.append("Error resizing " + task.photoName)
             except:
                 (exc_type, exc_value, exc_traceback) = sys.exc_info()
                 traceback.print_exception(exc_type, exc_value, exc_traceback)
@@ -998,20 +1038,20 @@ class PhotoAlbumUI(QtGui.QMainWindow, album_generator.ui.Ui_MainWindow):
         photo.generateJSON(out_dir_name, width, height, captions, properties)
         self._incProgressSignal.emit()
 
-    def _bgGeneratePhoto(self, photo, out_dir_name, width, height, dir_creation_task):
+    def _bgGeneratePhoto(self, photo, out_dir_name, width, height, quality, dir_creation_task):
         """Background task to generate a down-scaled photo."""
         # Wait for the directory to be created, then generate the photo
         if None is not dir_creation_task:
             concurrent.futures.wait([dir_creation_task])
-        photo.generatePhoto(out_dir_name, width, height)
+        photo.generatePhoto(out_dir_name, width, height, quality)
         self._incProgressSignal.emit()
 
-    def _bgGenerateThumbnail(self, photo, out_dir_name, width, height, dir_creation_task):
+    def _bgGenerateThumbnail(self, photo, out_dir_name, width, height, quality, dir_creation_task):
         """Background task to generate a photo thumbnail."""
         # Wait for the directory to be created, then generate the thumbnail
         if None is not dir_creation_task:
             concurrent.futures.wait([dir_creation_task])
-        photo.generateThumbnail(out_dir_name, width, height)
+        photo.generateThumbnail(out_dir_name, width, height, quality)
         self._incProgressSignal.emit()
 
     def _openAlbum(self):
@@ -1029,8 +1069,11 @@ class PhotoAlbumUI(QtGui.QMainWindow, album_generator.ui.Ui_MainWindow):
                         self._restoreUIData(data, require_fields=True)
                         self.titleText.setPlainText(data["title"])
                         self.descriptionText.setPlainText(data["description"])
-                        self._addPhotoFiles([(os.path.expanduser(photo["path"]), 
-                                    os.path.basename(photo["path"])) for photo in data["photos"]])
+                        photos = []
+                        for photo in data["photos"]:
+                            path = urllib.parse.unquote(photo["path"])
+                            photos.append((os.path.expanduser(path), os.path.basename(path)))
+                        self._addPhotoFiles(photos)
                         return
                     raise ValueError("Invalid album file")
             except (KeyError, ValueError, OSError):

@@ -140,10 +140,29 @@ ended up with this.
 The main disadvantage of the new album over the old gThumb-generated one is 
 that I can no longer rely on gThumb to select the photos to include, create 
 down-sized versions of them, and extract their metadata.  Instead, I wrote my 
-own tool.  gThumb, despite a couple annoying mis-features, still has the best 
-support for photo metadata of any Linux photo manager that I could find, so my 
-tool pulls metadata from the places where gThumb stores it and pulls lists of 
-photos from gThumb collections.
+own tool, AlbumGenerator.  gThumb, despite a couple annoying mis-features, 
+still has the best support for photo metadata of any Linux photo manager that I 
+could find, so AlbumGenerator pulls metadata from the places where gThumb 
+stores it and pulls lists of photos from gThumb collections.
+
+
+Security Model
+--------------
+
+AlbumGenerator, which generates the server-side data, fills the role of a 
+server component.  It is trusted, as are the shell commands that it invokes and 
+the JSON that it emits.  The image files loaded by AlbumGenerator are *not* 
+trusted and are assumed to contain arbitrary malicious content.  Therefore, to 
+be secure, AlbumGenerator must never emit photo URLs outside of the album 
+directory and albums must never execute any scripts or interpret any markup 
+found in properties, captions, or other fields.  Additionally, albums must 
+never load JSON file or images from outside of the album directory.
+
+I'm aware that partial local paths are leaked in the album JSON file.  See BUGS 
+(2014-04-07) for details.
+
+Why am I so concerned with TOCTOU in AlbumGenerator when there's no privilege 
+separation to be attacked?  Practice.
 
 
 Version 3.0  $Date$

@@ -480,15 +480,15 @@ function loadPhotoContent()
     var rows = propertyTable.getElementsByTagName("tr");
     while (0 != rows.length)
         propertyTable.removeChild(rows[0]);
-    for (propName in photoData.properties)
+    for (idx in photoData.properties)
     {
         var rowElement = document.createElement("tr");
         var cellElement = document.createElement("td");
-        cellElement.textContent = propName;
+        cellElement.textContent = photoData.properties[idx][0];
         rowElement.appendChild(cellElement);
 
         cellElement = document.createElement("td");
-        cellElement.textContent = photoData.properties[propName];
+        cellElement.textContent = photoData.properties[idx][1];
         rowElement.appendChild(cellElement);
 
         propertyTable.appendChild(rowElement);

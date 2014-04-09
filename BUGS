@@ -91,3 +91,42 @@
     scale the photo, and force the sidebars to stick to its edges?  I can live 
     without the layout automatically adjusting when the window is resized if 
     necessary.
+
+2014-04-05  Rennie deGraaf  <rennie.degraaf@gmail.com>
+    The configuration file parser for AlbumGenerator doesn't handle improperly 
+    formatted settings.  For instance, setting "threads" to a string will 
+    result in AlbumGenerator crashing with a cryptic stack trace.  Ideally, 
+    it'd just ignore the bad setting and continue.
+
+    POSTPONED: There doesn't appear to be any way for AlbumGenerator to 
+    generate bad config files.  If a user edits it manually and breaks it, 
+    then s/he should be able to figure out how to fix it.  Simply deleting the 
+    config file will get things working again.
+
+2014-04-07  Rennie deGraaf  <rennie.degraaf@gmail.com>
+    Album JSON files store photo paths relative to the user's home directory 
+    and don't state the user name.  This limits their ability to be shared 
+    while still being openable in AlbumGenerator.
+
+    WONTFIX: Paths are necessarily system-specific and most contents of user 
+    home directories are only readable by their owner.  There's no clear need 
+    for users on the same system to be able to import each other's album files. 
+    Also, addressing this issue would aggrevate the next bug.
+
+2014-04-07  Rennie deGraaf  <rennie.degraaf@gmail.com>
+    Album JSON files contain paths to the original photos and are shared to the 
+    world.  This leaks information about the user's system environment.
+    
+    POSTPONED: This is an artefact of not wanting separate save and album 
+    files.  The paths likely aren't valid on the machine serving photo albums 
+    to the web, so the usefulness of the paths to an attacker is limited.  To 
+    fix this, I'd either need to create separate save files or encrypt the 
+    paths.
+
+2014-04-08  Rennie deGraaf  <rennie.degraaf@gmail.com>
+    If photos are removed while an album is being generated, album generation 
+    may fail.
+
+2014-04-08  Rennie deGraaf <rennie.degraaf@gmail.com>
+    Starting a second background activity while a first is still in progress 
+    stomps on the first activity's progress count.

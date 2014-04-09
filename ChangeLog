@@ -1,3 +1,31 @@
+2014-04-08  Rennie deGraaf  <rennie.degraaf@gmail.com>
+
+    * tools/AlbumGenerator.py: Implemented photo and thumbnail generation.  
+
+    * tools/AlbumGenerator.py: Moved the maximum number of worker threads into 
+      the configuration file.
+    
+    * tools/AlbumGenerator.py: Added url encoding of all JSON fields that are 
+      used to build URLs.
+
+    * README: Added a description of the security model.
+
+    * tools/AlbumGenerator: (PhotoFile.generateJSON), www/album.js 
+      (loadPhotoContent), test/img000.jpeg.json, test/img_0281.jpg.json, 
+      test/img_2235.jpg.json: Changed the encoding of the properties list in 
+      photo JSON to ensure that they're stored in the order selected in the UI.
+
+    * tools/AlbumGenerator.py (PhotoAlbumUI._showProperties): Fixed a bug that 
+      caused an exception to be thrown if the user used Ctrl-A to select all 
+      photos without ever having selected a single photo.
+
+    * tools/AlbumGenerator.py (PhotoFile): Don't set _linkPath before creating 
+      the link, because otherwise if the link already exists, we'll get 
+      FileExistsError and then delete it when handling the exception, breaking 
+      the other PhotoFile instance that owns it.
+
+2014-04-05  Rennie deGraaf  <rennie.degraaf@gmail.com>
+
     * tools/AlbumGenerator.py: Re-formatted the code to approximately follow 
       Python standards (http://legacy.python.org/dev/peps/pep-0008/) and added 
       better docstrings.  Ran pylint and fixed some of the things that it 

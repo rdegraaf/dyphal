@@ -1,7 +1,5 @@
 For version 3:
 
-    * Create a tool to generate appropriately-scaled photos and JSON files.
-
     * Create an alternate CSS layout suitable for smartphone browsers.  See 
       BUGS (2014-01-17) for more details.
 
@@ -27,12 +25,18 @@ For version 3:
       I tried to change the padding with a QMenu::item stylesheet, but this 
       removed the hover effect.  I can't figure out how to get both.
 
-    * Build a better test set, including a photo with an odd aspect ratio and 
-      photos with different sets of comments.
+    * Build a better test set, including a photo with an odd aspect ratio, 
+      photos with different sets of comments, a photo with special 
+      characters in its name, and a really small photo.
 
     * Need a better name than "DHTML Photo Album".
 
     * jslint or something similar?
+
+    * Licence.  GPLv2?  Something similar to GPLv3 but without the political 
+      screed?  Apache 2.0?  MPL 2.0?
+
+    * Tool to update gthumb comments.
 
 
 For future versions:
