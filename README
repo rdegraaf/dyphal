@@ -150,16 +150,32 @@ Security Model
 --------------
 
 AlbumGenerator, which generates the server-side data, fills the role of a 
-server component.  It is trusted, as are the shell commands that it invokes and 
-the JSON that it emits.  The image files loaded by AlbumGenerator are *not* 
-trusted and are assumed to contain arbitrary malicious content.  Therefore, to 
-be secure, AlbumGenerator must never emit photo URLs outside of the album 
+server component.  It is trusted, as are the shell commands that it invokes.  
+The image files loaded by AlbumGenerator are *not* trusted and are assumed to 
+contain arbitrary malicious content.  The JSON files emitted by AlbumGenerator 
+are partially trusted.  The following fields are safe to insert into URLs with 
+no additional encoding:
+    * 'metadataDir'
+    * 'thumbnail'
+    * 'path'
+    * 'name'
+    * 'photo'
+The following fields are restricted to hard-coded values:
+    * 'orientation'
+    * 'albumVersion'
+    * 'captionFields'
+    * 'propertyFields'
+    * 'photoResolution'
+    * the first element of each 'properties' tuple.
+All other values should be assumed to be attacker-controlled.
+
+To be secure, AlbumGenerator must never emit photo URLs outside of the album 
 directory and albums must never execute any scripts or interpret any markup 
 found in properties, captions, or other fields.  Additionally, albums must 
 never load JSON file or images from outside of the album directory.
 
-I'm aware that partial local paths are leaked in the album JSON file.  See BUGS 
-(2014-04-07) for details.
+I'm aware that partial local paths are leaked in the 'path' fields of album 
+JSON files.  See bug 2014-04-07_001 for details.
 
 Why am I so concerned with TOCTOU in AlbumGenerator when there's no privilege 
 separation to be attacked?  Practice.

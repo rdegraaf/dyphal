@@ -1,4 +1,4 @@
-2014-01-05  Rennie deGraaf  <rennie.degraaf@gmail.com>
+2014-01-05_001  Rennie deGraaf  <rennie.degraaf@gmail.com>
     Fonts are bigger than expected in Konqueror and Opera
 
     WONTFIX.  This appears to be due to those browsers using a default font 
@@ -6,32 +6,32 @@
     and Chromium, and I don't want to get in the business of requesting 
     specific fonts by name.
 
-2014-01-06  Rennie deGraaf  <rennie.degraaf@gmail.com>
+2014-01-06_001  Rennie deGraaf  <rennie.degraaf@gmail.com>
     Old page contents remain visible when a hash change results in a load error.
 
     WONTFIX.  Only occurs in error paths, and not worth the effort of fixing.
 
-2014-01-06  Rennie deGraaf  <rennie.degraaf@gmail.com>
+2014-01-06_002  Rennie deGraaf  <rennie.degraaf@gmail.com>
     Backspace doesn't work for navigation in IE8, Konqueror or Opera.
 
     WONTFIX.  This is not a core feature and 100% support for IE8, Konqueror, 
     and Opera is not necessary.  It appears that backspace is tied to "back" in 
     those browsers and cannot be handled in Javascript.
 
-2014-01-08  Rennie deGraaf  <rennie.degraaf@gmail.com>
+2014-01-08_001  Rennie deGraaf  <rennie.degraaf@gmail.com>
     The full-screen photo overlay doesn't work properly in Opera when the 
     window is small.
 
     WONTFIX.  This is not a core feature and 100% support for Opera is not 
     necessary.
 
-2014-01-10  Rennie deGraaf  <rennie.degraaf@gmail.com>
+2014-01-10_001  Rennie deGraaf  <rennie.degraaf@gmail.com>
     The error event doesn't fire if the debug stylesheet fails to load in Opera.
 
     WONTFIX.  This is not a core feature and 100% support for Opera is not 
     necessary.  Bug reported to Opera (DSK-387854).
     
-2014-01-12  Rennie deGraaf  <rennie.degraaf@gmail.com>
+2014-01-12_001  Rennie deGraaf  <rennie.degraaf@gmail.com>
     CSS properties loaded through obj.style[prop] need to be camelCase.  The 
     preferred way to get them is obj.style.getPropertyValue(prop), but this 
     isn't supported by IE8 and is apparently buggy on some Firefox versions for 
@@ -43,7 +43,7 @@
     camelCasing property names as needed seems to work on all supported 
     platforms.
 
-2014-01-17  Rennie deGraaf  <rennie.degraaf@gmail.com>
+2014-01-17_001  Rennie deGraaf  <rennie.degraaf@gmail.com>
     The first photo doesn't load and debug mode doesn't work on Android 4.3
     and and earlier (4.4.2 works).  Apparently, they don't support the load 
     event for link elements.  
@@ -52,14 +52,14 @@
     so I check for a version of Android earlier than 4.4 and start a poll loop
     with an exponential backoff until the stylesheet is present. 
 
-2014-01-17  Rennie deGraaf  <rennie.degraaf@gmail.com>
+2014-01-17_002  Rennie deGraaf  <rennie.degraaf@gmail.com>
     The photo view layout breaks down on very small windows, such as 
     smartphones.  It might be best to give the photo as much space as it wants 
     and put all of the text together beside or below it.  
 
     OPEN:
 
-2014-01-18  Rennie deGraaf  <rennie.degraaf@gmail.com>
+2014-01-18_001  Rennie deGraaf  <rennie.degraaf@gmail.com>
     Despite photos being cached, browsers still check the server for new 
     versions of photos and thumbnails when displaying photo pages.  This could 
     probably be fixed by caching Image objects for the photos and thumbnails 
@@ -69,7 +69,7 @@
     not be a big deal, and I need to stop adding unnecessary features if I'm 
     ever going to get this to a useful state.
 
-2014-02-04  Rennie deGraaf  <rennie.degraaf@gmail.com>
+2014-02-04_001  Rennie deGraaf  <rennie.degraaf@gmail.com>
     Everything gets really spread-out on large wide windows.  It would look 
     better if the description, properties, and navigation stuff were pushed 
     over beside the photo.  
@@ -92,18 +92,19 @@
     without the layout automatically adjusting when the window is resized if 
     necessary.
 
-2014-04-05  Rennie deGraaf  <rennie.degraaf@gmail.com>
+2014-04-05_001  Rennie deGraaf  <rennie.degraaf@gmail.com>
     The configuration file parser for AlbumGenerator doesn't handle improperly 
     formatted settings.  For instance, setting "threads" to a string will 
     result in AlbumGenerator crashing with a cryptic stack trace.  Ideally, 
-    it'd just ignore the bad setting and continue.
+    it'd just ignore the bad setting and continue.  This probably also applies 
+    to saved albums.
 
     POSTPONED: There doesn't appear to be any way for AlbumGenerator to 
     generate bad config files.  If a user edits it manually and breaks it, 
     then s/he should be able to figure out how to fix it.  Simply deleting the 
     config file will get things working again.
 
-2014-04-07  Rennie deGraaf  <rennie.degraaf@gmail.com>
+2014-04-07_001  Rennie deGraaf  <rennie.degraaf@gmail.com>
     Album JSON files store photo paths relative to the user's home directory 
     and don't state the user name.  This limits their ability to be shared 
     while still being openable in AlbumGenerator.
@@ -111,9 +112,9 @@
     WONTFIX: Paths are necessarily system-specific and most contents of user 
     home directories are only readable by their owner.  There's no clear need 
     for users on the same system to be able to import each other's album files. 
-    Also, addressing this issue would aggrevate the next bug.
+    Also, addressing this issue would aggrevate bug 2014-04-07_002.
 
-2014-04-07  Rennie deGraaf  <rennie.degraaf@gmail.com>
+2014-04-07_002  Rennie deGraaf  <rennie.degraaf@gmail.com>
     Album JSON files contain paths to the original photos and are shared to the 
     world.  This leaks information about the user's system environment.
     
@@ -123,10 +124,14 @@
     fix this, I'd either need to create separate save files or encrypt the 
     paths.
 
-2014-04-08  Rennie deGraaf  <rennie.degraaf@gmail.com>
-    If photos are removed while an album is being generated, album generation 
-    may fail.
-
-2014-04-08  Rennie deGraaf <rennie.degraaf@gmail.com>
+2014-04-08_002  Rennie deGraaf  <rennie.degraaf@gmail.com>
     Starting a second background activity while a first is still in progress 
     stomps on the first activity's progress count.
+
+    OPEN:
+
+2014-04-09_001  Rennie deGraaf  <rennie.degraaf@gmail.com>
+    PhotoAlbumUI._openAlbum() runs in UI callbacks but contains file I/O.  This 
+    needs to be moved to a background task.
+
+    OPEN:

@@ -44,7 +44,8 @@ import urllib.parse
 from PyQt4 import QtCore
 from PyQt4 import QtGui
 
-import album_generator.ui
+from album_generator.ui import *
+from album_generator.util import *
 
 # These variables may be re-written by the installation script
 DATA_PATH = os.path.expanduser("~/.share/AlbumGenerator/")
@@ -74,27 +75,6 @@ FILTER_ALBUMS = "Albums (*.json)"
 METADATA_DIR = "metadata"
 PHOTO_DIR = "photos"
 THUMBNAIL_DIR = "thumbnails"
-
-
-def handle_exceptions(func, *args, **kwargs):
-    """Call a function and log any exceptions that it throws.  Pass 
-    'functools.partial(handle_exceptions, func)' to something that 
-    expects a callable."""
-    try:
-        func(*args, **kwargs)
-    except:
-        (exc_type, exc_value, exc_traceback) = sys.exc_info()
-        traceback.print_exception(exc_type, exc_value, exc_traceback)
-        raise
-
-
-def ensure_directory(name):
-    """Ensure that a directory exists."""
-    try:
-        # This will throw FileExistsError if the permissions are different than expected.
-        os.makedirs(name, exist_ok=True)
-    except FileExistsError:
-        pass
 
 
 class PropertyError(Exception):
@@ -165,7 +145,7 @@ def format_display_time(timestamp):
         raise PropertyError("Display time", timestamp)
 
 
-class PhotoFile(QtGui.QListWidgetItem):
+class PhotoFile(RefCounted, QtGui.QListWidgetItem):
     """A photo to add to the album.
     
     Attributes:
@@ -297,13 +277,14 @@ class PhotoFile(QtGui.QListWidgetItem):
             # If something failed, make sure to not leave any dangling resources.  Ignore any 
             # failures that this causes.
             try:
-                self.close()
+                self._dispose()
             except:
                 pass
             raise
 
-    def close(self):
-        """Close a photo file and unlink it from the temporary directory."""
+    def _dispose(self):
+        """Close a photo file and unlink it from the temporary directory.
+        Overrides RefCounted._dispose()."""
         try:
             if None is not self._linkPath:
                 os.unlink(self._linkPath)
@@ -495,7 +476,7 @@ class ListKeyFilter(QtCore.QObject):
         return False
 
 
-class PhotoAlbumUI(QtGui.QMainWindow, album_generator.ui.Ui_MainWindow):
+class PhotoAlbumUI(QtGui.QMainWindow, Ui_MainWindow):
     """The Photo album generator UI.
 
     Attributes (not including UI objects):
@@ -683,7 +664,7 @@ class PhotoAlbumUI(QtGui.QMainWindow, album_generator.ui.Ui_MainWindow):
         for item in self.photosList.selectedItems():
             # removeItemWidget() doesn't seem to work
             photo = self.photosList.takeItem(self.photosList.indexFromItem(item).row())
-            photo.close()
+            photo.release()
 
         # Update the available properties list
         self.showAllPropertiesFlag.stateChanged.emit(0)
@@ -749,6 +730,7 @@ class PhotoAlbumUI(QtGui.QMainWindow, album_generator.ui.Ui_MainWindow):
         """Background task to load a photo and signal the UI to add it 
         to the album when done."""
         photo = PhotoFile(path, name, self._config)
+        photo.addRef()
         # Wait for the previous photo to be loaded so that photos are added to the list in the 
         # correct order.
         if None is not prev_task:
@@ -949,17 +931,20 @@ class PhotoAlbumUI(QtGui.QMainWindow, album_generator.ui.Ui_MainWindow):
                                             album["photoResolution"][0], 
                                             album["photoResolution"][1], captions, properties, 
                                             metadata_dir_task)
+                photo.addRef()
                 task.photoName = photo.getPath()
                 tasks.append(task)
                 task = self._threads.submit(self._bgGeneratePhoto, photo, photo_dir_path, 
                                             album["photoResolution"][0], 
                                             album["photoResolution"][1], self._config.photoQuality, 
                                             photo_dir_task)
+                photo.addRef()
                 task.photoName = photo.getPath()
                 tasks.append(task)
                 task = self._threads.submit(self._bgGenerateThumbnail, photo, thumbnail_dir_path, 
                                             THUMB_WIDTH, THUMB_HEIGHT, THUMB_QUALITY, 
                                             thumbnail_dir_task)
+                photo.addRef()
                 task.photoName = photo.getPath()
                 tasks.append(task)
 
@@ -1036,6 +1021,7 @@ class PhotoAlbumUI(QtGui.QMainWindow, album_generator.ui.Ui_MainWindow):
         if None is not dir_creation_task:
             concurrent.futures.wait([dir_creation_task])
         photo.generateJSON(out_dir_name, width, height, captions, properties)
+        photo.release()
         self._incProgressSignal.emit()
 
     def _bgGeneratePhoto(self, photo, out_dir_name, width, height, quality, dir_creation_task):
@@ -1044,6 +1030,7 @@ class PhotoAlbumUI(QtGui.QMainWindow, album_generator.ui.Ui_MainWindow):
         if None is not dir_creation_task:
             concurrent.futures.wait([dir_creation_task])
         photo.generatePhoto(out_dir_name, width, height, quality)
+        photo.release()
         self._incProgressSignal.emit()
 
     def _bgGenerateThumbnail(self, photo, out_dir_name, width, height, quality, dir_creation_task):
@@ -1052,6 +1039,7 @@ class PhotoAlbumUI(QtGui.QMainWindow, album_generator.ui.Ui_MainWindow):
         if None is not dir_creation_task:
             concurrent.futures.wait([dir_creation_task])
         photo.generateThumbnail(out_dir_name, width, height, quality)
+        photo.release()
         self._incProgressSignal.emit()
 
     def _openAlbum(self):

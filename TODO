@@ -1,7 +1,7 @@
 For version 3:
 
     * Create an alternate CSS layout suitable for smartphone browsers.  See 
-      BUGS (2014-01-17) for more details.
+      bug 2014-01-17_002) for more details.
 
     * Extend or replace deploy.sh to generate release builds that don't include 
       the test data.  An option for minified release builds would also be nice. 
@@ -38,6 +38,7 @@ For version 3:
 
     * Tool to update gthumb comments.
 
+    * Split AlbumGenerator.py into a couple different files.
 
 For future versions:
 
@@ -51,17 +52,30 @@ For future versions:
       compat crap.
 
     * Revisit whether Android <4.4 support is still needed.  If not, get rid of 
-      the poll loop.  See BUGS (2014-01-17) for more details.
+      the poll loop.  See bug 2014-01-17_001 for more details.
 
     * Reference CSS properties in a consistent and standards-compatible way.  
-      See BUGS (2014-01-12) for more details.
+      See bug 2014-01-12_001 for more details.
 
     * Cache all photos and thumbnails that have been downloaded so that the 
       browser doesn't need to keep polling the server to see if they've 
-      changed.  See BUGS (2014-01-18) for more details.
+      changed.  See bug 2014-01-18_001 for more details.
 
-    * Design a more compact layout for large windows.  See BUGS (2014-02-04) 
+    * Design a more compact layout for large windows.  See bug 2014-02-04_001 
       for more details.
 
     * Handle thumbnails with aspect ratios other than 4:3 (eg, for panorama 
       photos).
+
+    * Handle unexpected values in the AlbumGenerator configuration file and 
+      album files without crashing.  See bug 2014-04-05_001 for more details.
+
+    * Add a checkbox to the AlbumGenerator UI to make it possible to re-open 
+      an album.  If checked, AlbumGenerator will continue to output file paths 
+      and other information that's not used by the web page.  If unchecked, 
+      only output information needed by the web page.  This will address bug 
+      2014-04-07_002.
+
+    * Support other operating systems besides Linux.
+
+    * Create a proper bug-tracking system.

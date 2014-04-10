@@ -1,3 +1,22 @@
+2014-04-09  Rennie deGraaf  <rennie.degraaf@gmail.com>
+
+    * tools/util.py: New file to contain simple utility functions and classes.  
+
+    * tools/util.py: Wrote a base class to implement COM-style reference 
+      counting.
+
+    * tools/util.py, tools/AlbumGenerator.py: Moved handle_exceptions and 
+      ensure_directory to util.py.
+
+    * tools/AlbumGenerator.py: Added reference counting to PhotoFile so that 
+      photos can be safely removed from the list while an album is being 
+      generated in the background.
+
+    * BUGS: Turned the bug dates into unique bug IDs.
+
+    * README: Documented the security assumptions about the JSON file emitted 
+      by AlbumGenerator.
+
 2014-04-08  Rennie deGraaf  <rennie.degraaf@gmail.com>
 
     * tools/AlbumGenerator.py: Implemented photo and thumbnail generation.  
