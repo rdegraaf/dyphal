@@ -8,13 +8,9 @@ For version 3:
       So would an option to build a tarball of everything.  And a way to get 
       get rid of README.html and any other generated files.
 
-    * Find a way to push the version date into README, album.html, and 
+    * Find a way to push the version date into README, index.html, and 
       AlbumGenerator.py.  A git filter might be able to do the job, if I used 
       git.  Maybe add something to install.sh?
-
-    * Replace getElementsByClass() with document.getElementsByClassName() and a 
-      MSIE8-compat shim (https://stackoverflow.com/questions/13261506/getelement
-      sbyclassname-in-ie8) or with document.querySelectorAll().
 
     * Generate an HTML version of README and install it with the template.  
       'discount-mkd2html' generates html4.  'pandoc -t html5 -s' generates 
@@ -47,11 +43,10 @@ For future versions:
 
     * Create an index view, populated from an index JSON that lists all albums. 
       Add album thumbnails to album JSON; load all album JSONs from the index 
-      view and display the title and thumbnail for each album.  Rename 
-      album.html to index.html and change the page argument syntax from 
-      #album,page,debug to #/album/page/debug.  Note that this will prevent 
-      albums from being loaded from subdirectories.  Consider automatically 
-      copying the album template when generating albums in AlbumGenerator.
+      view and display the title and thumbnail for each album.  Come up with 
+      some way to locate the index JSON and add albums to it when they're 
+      generated.  Consider automatically copying the album template when 
+      generating albums in AlbumGenerator.
 
     * Revisit whether IE8 support is still needed.  If not, get rid of the 
       compat crap and replace PNG buttons with SVG.  Maybe use data URLs in CSS 

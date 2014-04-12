@@ -46,25 +46,25 @@ This photo album was designed to satisfy the following goals:
 Technical details
 -----------------
 
-The album is represented by a single web page, album.html.  JavaScript running 
+The album is represented by a single web page, index.html.  JavaScript running 
 within that page determines what to display based on hash parameters.  The 
-first parameter, which must always be present, identifies the album.  It's a 
-relative path to the JSON file that describes the album with the file name 
-suffix omitted.  If your directory structure looks like this:
+first parameter, which must always be present, identifies the album.  It's the 
+name of the JSON file that describes the album with the file name suffix 
+omitted.  If your directory structure looks like this:
 
         album.css
-        album.html
         album.js
         common.css
+        index.html
         photo.css
-        Vacation/vacation.json
-        Vacation/photo1.jpeg
-        Vacation/photo1.jpeg.json
+        vacation.json
+        photos/photo1.jpeg
+        metadata/photo1.jpeg.json
         ...
 
-then the URL to load the "Vacation" album is 
+then the URL to load the "vacation" album is 
 
-        album.html#Vacation/vacation
+        /#/vacation
 
 This URL will load *album view*, which shows the title and description of the 
 album as a whole alongside thumbnails for every photo in the album.  Clicking 
@@ -82,7 +82,7 @@ Each photo view has its own URL, consisting of the URL to the album followed by
 the index number of the photo (indices start from 1).  For example, the URL for 
 the third photo in the "Vacation" album might be
 
-        album.html#Vacation/vacation,3
+        /#/vacation/3
 
 The full-screen photo overlay and help overlay do not have independent URLs.
 
@@ -98,7 +98,7 @@ appended), containing the name of the photo file, its dimensions, and its
 metadata.  JSON files, thumbnails, and photos are loaded on demand; the JSON 
 and photo for the next photo in the album are pre-cached to reduce load time. 
 
-Appending "`,debug`" to any album or photo URL will load it in debug mode, 
+Appending "`/debug`" to any album or photo URL will load it in debug mode, 
 which suppresses some of the styling, outlines various document elements in 
 various colours, and logs some information to the browser console.
 
@@ -128,7 +128,7 @@ album.  However, it was limited by the hacks required to support Internet
 Explorer 6 and albums built from that template consisted of a large number of 
 repetitive generated HTML files.  
 
-At some point after 2008, gThumb dropped the BestFit template without telling 
+At some point after 2008, gThumb removed the BestFit template without telling 
 its author (ie, me) why.  Since working with the gThumb maintainer in the past 
 had been a pain, I opted to not try to get it reinstated.  Instead, I dropped 
 support for IE6 (simplifying the code considerably) and started work on a 
@@ -150,23 +150,27 @@ Security Model
 --------------
 
 AlbumGenerator, which generates the server-side data, fills the role of a 
-server component.  It is trusted, as are the shell commands that it invokes.  
+server component.  It is trusted, as are the shell commands that it invokes. 
 The image files loaded by AlbumGenerator are *not* trusted and are assumed to 
 contain arbitrary malicious content.  The JSON files emitted by AlbumGenerator 
 are partially trusted.  The following fields are safe to insert into URLs with 
 no additional encoding:
-    * 'metadataDir'
-    * 'thumbnail'
-    * 'path'
-    * 'name'
-    * 'photo'
+
+*   `metadataDir`
+*   `thumbnail`
+*   `path`
+*   `name`
+*   `photo`
+
 The following fields are restricted to hard-coded values:
-    * 'orientation'
-    * 'albumVersion'
-    * 'captionFields'
-    * 'propertyFields'
-    * 'photoResolution'
-    * the first element of each 'properties' tuple.
+
+*   `orientation`
+*   `albumVersion`
+*   `captionFields`
+*   `propertyFields`
+*   `photoResolution`
+*   the first element of each `properties` tuple
+
 All other values should be assumed to be attacker-controlled.
 
 To be secure, AlbumGenerator must never emit photo URLs outside of the album 
@@ -174,7 +178,7 @@ directory and albums must never execute any scripts or interpret any markup
 found in properties, captions, or other fields.  Additionally, albums must 
 never load JSON file or images from outside of the album directory.
 
-I'm aware that partial local paths are leaked in the 'path' fields of album 
+I'm aware that partial local paths are leaked in the `path` fields of album 
 JSON files.  See bug 2014-04-07_001 for details.
 
 Why am I so concerned with TOCTOU in AlbumGenerator when there's no privilege 

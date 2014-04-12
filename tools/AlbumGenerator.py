@@ -77,8 +77,8 @@ class Config(object):
     THUMB_HEIGHT = 120
     THUMB_QUALITY = 50
     BG_TIMEOUT = 5
-    TEMPLATE_FILE_NAMES = ["album.css", "album.html", "album.js", "back.png", "common.css", 
-                           "debug.css", "help.png", "ie8compat.js", "lib.js", "next.png", 
+    TEMPLATE_FILE_NAMES = ["album.css", "album.js", "back.png", "common.css", "debug.css", 
+                           "help.png", "ie8compat.js", "index.html", "lib.js", "next.png", 
                            "photo.css", "placeholder.png", "prev.png"]
 
     DEFAULT_PHOTO_DIR = os.path.expanduser("~")

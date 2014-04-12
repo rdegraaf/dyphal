@@ -1,5 +1,29 @@
 2014-04-12  Rennie deGraaf  <rennie.degraaf@gmail.com>
 
+    * www/album.html: Renamed to www/index.html so that the URL format 
+      shouldn't need to change when I add an index view in the future.
+
+    * www/album.js: Changed the album arguments syntax from "#album,page,debug" 
+      to "#/album/page/debug".  To load an album from a subdirectory, you'll 
+      need to double-encode it; for example, to load the first photo from 
+      "subdir/album.json", use the arguments "#/subdir%252falbum/1".
+
+    * www/album.js (start): Added a kludge to work around the lack of an album 
+      view: loading the album with no arguments triggers a redirection to 
+      "album-list.html", which the operator is responsible for writing.
+
+    * README: Updated the description of URL syntax to match the changes 
+      described above and changed the example to match AlbumGenerator's output. 
+
+    * README: Fixed some markup issues in the Security Model section.
+
+    * www/album.js: Replaced all calls to getElementsByClass() with 
+      document.querySelectorAll(), which works in IE8.
+
+    * www/lib.js: Removed getElementsByClass().
+
+2014-04-12  Rennie deGraaf  <rennie.degraaf@gmail.com>
+
     * tools/photo.py: New file.
 
     * tools/photo.py, tools/AlbumGenerator.py: Moved PhotoFile and supporting 

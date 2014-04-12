@@ -86,20 +86,26 @@ function start()
         var albumNameNew = null;
         var debugNew = false;
         var pageNew = 0;
-        var args = window.location.hash.substring(1).split(",");
-        if ((1 > args.length) || (3 < args.length) || ("" == args[0]))
-            throw new Error("Incorrect page arguments");
-        albumNameNew = args[0];
-        if ((2 == args.length) && ("debug" == args[1]))
-            debugNew = true;
-        else if (2 <= args.length)
+        var args = window.location.hash.split("/");
+        if ((1 == args.length) && ("" == args[0]))
         {
-            if (/^[0-9]+$/.test(args[1]))
+            // Kludge to support the current lack of an index view
+            window.location = "album-list.html";
+            return;
+        }
+        if ((2 > args.length) || ("" == args[1]) || ("#" != args[0]))
+            throw new Error("Incorrect page arguments");
+        albumNameNew = decodeURIComponent(args[1]);
+        if ((3 == args.length) && ("debug" == args[2]))
+            debugNew = true;
+        else if (3 <= args.length)
+        {
+            if (/^[0-9]+$/.test(args[2]))
             {
-                pageNew = parseInt(args[1])
-                if ((3 == args.length) && ("debug" == args[2]))
+                pageNew = parseInt(args[2])
+                if ((4 == args.length) && ("debug" == args[3]))
                     debugNew = true;
-                else if (3 <= args.length)
+                else if (4 <= args.length)
                     throw new Error("Incorrect page arguments");
             }
             else
@@ -212,7 +218,7 @@ function loadDebugAfterStylesheet()
         document.getElementsByTagName("body")[0].appendChild(debugPanel);
 
         // Add the debug keyword to navigation links
-        var links = getElementsByClass("a", "navigationlink");
+        var links = document.querySelectorAll("a.navigationlink");
         for (var i=0; i<links.length; ++i)
             links[i].setAttribute("href", generatePhotoURL(links[i].getAttribute("data-target")));
 
@@ -269,7 +275,7 @@ function unloadDebug()
     debugPanel.parentNode.removeChild(debugPanel);
 
     // Remove the debug keyword from navivation links
-    var links = getElementsByClass("a", "navigationlink");
+    var links = document.querySelectorAll("a.navigationlink");
     for (var i=0; i<links.length; ++i)
         links[i].setAttribute("href", generatePhotoURL(links[i].getAttribute("data-target")));
 
@@ -676,11 +682,11 @@ function fitPhoto()
 // Return a URL to a photo.
 function generatePhotoURL(index, suppressDebug)
 {
-    var link = "#" + albumName;
+    var link = "#/" + encodeURIComponent(encodeURIComponent(albumName));
     if (null != index && 0 != index)
-        link += "," + index;
+        link += "/" + index;
     if (debug && (true != suppressDebug))
-        link += ",debug";
+        link += "/debug";
     return link;
 }
 

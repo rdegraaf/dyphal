@@ -56,21 +56,6 @@ function pollUntil(interval, maxtries, test, action, error)
 }
 
 
-// returns all elements of a certain type (tag) and class
-function getElementsByClass ( tag, classname )
-{
-    // Note: MSIE 8 doesn't support getElementsByClassName()
-    var objs = new Array();
-    var all = document.getElementsByTagName(tag);
-    for (var i=0; i<all.length; i++)
-    {
-        if (all[i].className == classname)
-            objs[objs.length] = all[i];
-    }
-    return objs;
-}
-
-
 // Convert a dashed-lowercase string to camelCase.
 function camel(str)
 {
