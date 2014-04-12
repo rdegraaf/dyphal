@@ -167,25 +167,7 @@
           <property name="title">
            <string>Caption</string>
           </property>
-          <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1,0">
-           <item>
-            <widget class="QPushButton" name="addCaptionButton">
-             <property name="toolTip">
-              <string>Add a field to the photos' captions.</string>
-             </property>
-             <property name="styleSheet">
-              <string notr="true">QPushButton{text-align: left;} QPushButton::menu-indicator{subcontrol-position: right center; left: -10px;}</string>
-             </property>
-             <property name="text">
-              <string>Add Caption...</string>
-             </property>
-             <property name="icon">
-              <iconset theme="list-add">
-               <normaloff/>
-              </iconset>
-             </property>
-            </widget>
-           </item>
+          <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,0">
            <item>
             <widget class="QListWidget" name="captionsList">
              <property name="toolTip">
@@ -205,12 +187,20 @@
            <item>
             <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,1,0">
              <item>
-              <widget class="QCheckBox" name="showAllCaptionsFlag">
+              <widget class="QPushButton" name="addCaptionButton">
                <property name="toolTip">
-                <string>Show all caption fields, not just the ones present in every selected photo.</string>
+                <string>Add a field to the photos' captions.</string>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">QPushButton{text-align: left;} QPushButton::menu-indicator{subcontrol-position: right center; left: -10px;}</string>
                </property>
                <property name="text">
-                <string>Show all</string>
+                <string>Add Caption...</string>
+               </property>
+               <property name="icon">
+                <iconset theme="list-add">
+                 <normaloff/>
+                </iconset>
                </property>
               </widget>
              </item>
@@ -244,6 +234,33 @@
              </item>
             </layout>
            </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_7">
+             <item>
+              <spacer name="horizontalSpacer_4">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QCheckBox" name="showAllCaptionsFlag">
+               <property name="toolTip">
+                <string>Show all caption fields, not just the ones present in every selected photo.</string>
+               </property>
+               <property name="text">
+                <string>Show all</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
           </layout>
          </widget>
         </item>
@@ -252,25 +269,7 @@
           <property name="title">
            <string>Properties</string>
           </property>
-          <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,1,0">
-           <item>
-            <widget class="QPushButton" name="addPropertyButton">
-             <property name="toolTip">
-              <string>Add a field to the photos' properties.</string>
-             </property>
-             <property name="styleSheet">
-              <string notr="true">QPushButton{text-align: left;} QPushButton::menu-indicator{subcontrol-position: right center; left: -10px;} QMenu {menu-scrollable: 1;}</string>
-             </property>
-             <property name="text">
-              <string>Add Property...</string>
-             </property>
-             <property name="icon">
-              <iconset theme="list-add">
-               <normaloff/>
-              </iconset>
-             </property>
-            </widget>
-           </item>
+          <layout class="QVBoxLayout" name="verticalLayout_3" stretch="1,0,0">
            <item>
             <widget class="QListWidget" name="propertiesList">
              <property name="toolTip">
@@ -290,12 +289,20 @@
            <item>
             <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="0,1,0">
              <item>
-              <widget class="QCheckBox" name="showAllPropertiesFlag">
+              <widget class="QPushButton" name="addPropertyButton">
                <property name="toolTip">
-                <string>Show all property fields, not just the ones present in every selected photo.</string>
+                <string>Add a field to the photos' properties.</string>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">QPushButton{text-align: left;} QPushButton::menu-indicator{subcontrol-position: right center; left: -10px;} QMenu {menu-scrollable: 1;}</string>
                </property>
                <property name="text">
-                <string>Show all</string>
+                <string>Add Property...</string>
+               </property>
+               <property name="icon">
+                <iconset theme="list-add">
+                 <normaloff/>
+                </iconset>
                </property>
               </widget>
              </item>
@@ -324,6 +331,33 @@
                 <iconset theme="list-remove">
                  <normaloff/>
                 </iconset>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_6">
+             <item>
+              <spacer name="horizontalSpacer_3">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QCheckBox" name="showAllPropertiesFlag">
+               <property name="toolTip">
+                <string>Show all property fields, not just the ones present in every selected photo.</string>
+               </property>
+               <property name="text">
+                <string>Show all</string>
                </property>
               </widget>
              </item>

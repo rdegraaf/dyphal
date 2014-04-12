@@ -33,23 +33,29 @@ For version 3:
 
     * jslint or something similar?
 
+    * Move PhotoAlbumUI into its own file?  Pydoc for album_generator?
+
+    * Get rid of deploy.sh and the pre-generated album.
+
     * Licence.  GPLv2?  Something similar to GPLv3 but without the political 
       screed?  Apache 2.0?  MPL 2.0?
 
-    * Tool to update gthumb comments.
+    * Script to update gthumb comments.
 
-    * Split AlbumGenerator.py into a couple different files.
 
 For future versions:
 
-    * Create an auto-generated index page.  Include a reference to a thumbnail 
-      of a photo to represent the album in each album JSON, then create an 
-      index JSON that lists all albums.  Have an index page load the index JSON 
-      and all of the album JSONs, and display the title and thumbnail for each 
-      album.
+    * Create an index view, populated from an index JSON that lists all albums. 
+      Add album thumbnails to album JSON; load all album JSONs from the index 
+      view and display the title and thumbnail for each album.  Rename 
+      album.html to index.html and change the page argument syntax from 
+      #album,page,debug to #/album/page/debug.  Note that this will prevent 
+      albums from being loaded from subdirectories.  Consider automatically 
+      copying the album template when generating albums in AlbumGenerator.
 
     * Revisit whether IE8 support is still needed.  If not, get rid of the 
-      compat crap.
+      compat crap and replace PNG buttons with SVG.  Maybe use data URLs in CSS 
+      to reduce server round-trips?
 
     * Revisit whether Android <4.4 support is still needed.  If not, get rid of 
       the poll loop.  See bug 2014-01-17_001 for more details.
@@ -76,6 +82,11 @@ For future versions:
       only output information needed by the web page.  This will address bug 
       2014-04-07_002.
 
-    * Support other operating systems besides Linux.
+    * Add a "sort mode" option to AlbumGenerator, which can be set to "by file 
+      name", "by time", or "none".  If set to "by file name", automatically 
+      sort photos by file name.  If "by time", automatically sort by time.  If 
+      "none", don't sort by default and allow the user to sort manually.
 
-    * Create a proper bug-tracking system.
+    * Support other operating systems besides Linux in AlbumGenerator.
+
+    * Switch to a proper bug-tracking system.

@@ -1,3 +1,23 @@
+2014-04-12  Rennie deGraaf  <rennie.degraaf@gmail.com>
+
+    * tools/photo.py: New file.
+
+    * tools/photo.py, tools/AlbumGenerator.py: Moved PhotoFile and supporting 
+      code to photo.py.
+
+    * tools/AlbumGenerator.py: Stopped attempting to get the program to load 
+      under Python 2.x, since it seems that getting the imports to work 
+      correctly will be too much hassle.
+
+    * tools/AlbumGenerator.py: Moved most of the global constants to Config.  
+      Moved the FILTER_* strings to PhotoAlbumUI.  The two remaining global 
+      constants are there because they might be re-written by the installation 
+      script and that's simpler if they have no indentation.
+
+    * tools/AlbumGeneratorUI.ui: Moved the Add Caption and Add Properties 
+      buttons to beside their respective delete buttons and moved the Show All 
+      checkboxes to new rows.
+
 2014-04-09  Rennie deGraaf  <rennie.degraaf@gmail.com>
 
     * tools/util.py: New file to contain simple utility functions and classes.  

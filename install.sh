@@ -11,7 +11,7 @@ PKG_NAME="album_generator"
 mkdir -p "$PKG_PATH"/"$PKG_NAME"
 echo "__all__ = []" > "$PKG_PATH"/"$PKG_NAME"/__init__.py
 pyuic4 tools/AlbumGeneratorUI.ui > "$PKG_PATH"/"$PKG_NAME"/ui.py
-cp tools/util.py "$PKG_PATH"/"$PKG_NAME"/
+cp tools/util.py tools/photo.py "$PKG_PATH"/"$PKG_NAME"/
 
 mkdir -p "$BIN_PATH"
 cat tools/AlbumGenerator.py | sed -e "s@^DATA_PATH[ ]*=.*\$@DATA_PATH = \"${DATA_PATH}\"@" > "$BIN_PATH"/AlbumGenerator

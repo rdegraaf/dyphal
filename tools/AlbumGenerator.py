@@ -15,7 +15,7 @@ requires that the commands 'convert' from the ImageMagick package and
 __author__ = "Rennie deGraaf <rennie.degraaf@gmail.com>"
 __version__ = "3.0"
 __credits__ = ["Rennie deGraaf"]
-__date__ = "2014-04-05"
+__date__ = "2014-04-09"
 
 __copyright__ = "Copyright (c) Rennie deGraaf, 2005-2014.  All rights reserved."
 __license__ = "GPLv2.0"
@@ -28,16 +28,13 @@ import sys
 import os
 import os.path
 import xml.etree.ElementTree
-import re
-#import concurrent.futures # Imported later so that the program will load under Python 2.7
+import concurrent.futures
 import threading
 import subprocess
 import json
 import tempfile
 import traceback
-import time
 import functools
-import math
 import shutil
 import urllib.parse
 
@@ -46,323 +43,11 @@ from PyQt4 import QtGui
 
 from album_generator.ui import *
 from album_generator.util import *
+from album_generator.photo import *
 
 # These variables may be re-written by the installation script
 DATA_PATH = os.path.expanduser("~/.share/AlbumGenerator/")
 CONFIG_FILE = os.path.expanduser("~/.config/AlbumGenerator.conf")
-
-PROGRAM_NAME = "Album Generator"
-FILE_FORMAT_VERSION = 1
-THUMB_WIDTH = 160
-THUMB_HEIGHT = 120
-THUMB_QUALITY = 50
-BG_TIMEOUT = 5
-TEMPLATE_FILE_NAMES = ["album.css", "album.html", "album.js", "back.png", "common.css", 
-                       "debug.css", "help.png", "ie8compat.js", "lib.js", "next.png", 
-                       "photo.css", "placeholder.png", "prev.png"]
-
-DEFAULT_PHOTO_DIR = os.path.expanduser("~")
-DEFAULT_GTHUMB3_DIR = os.path.expanduser("~/.local/share/gthumb/catalogs")
-DEFAULT_GTHUMB2_DIR = os.path.expanduser("~/.gnome2/gthumb/collections")
-DEFAULT_OUTPUT_DIR = os.path.expanduser("~")
-DEFAULT_PHOTO_QUALITY = 75
-DEFAULT_THREADS = 8
-
-FILTER_IMAGES = "Images (*.jpeg *.jpg *.png *.tiff *.tif)"
-FILTER_GTHUMB3_CATALOGS = "gThumb catalogs (*.catalog)"
-FILTER_ALBUMS = "Albums (*.json)"
-
-METADATA_DIR = "metadata"
-PHOTO_DIR = "photos"
-THUMBNAIL_DIR = "thumbnails"
-
-
-class PropertyError(Exception):
-    """Exception raised if a photo property has an unexpected value."""
-
-    def __init__(self, name, value):
-        """Initializes a PropertyError."""
-        super().__init__()
-        self.prop = name
-        self.value = value
-
-    def __str__(self):
-        """Returns a printable message for a PropertyError."""
-        return "Property '%s' had an unexpected value: %s" % (self.prop, self.value)
-
-
-class Property(object):
-    """A photo property."""
-
-    def __init__(self, name, text, default=None, transform=None):
-        """Initializes a property."""
-        self.name = name
-        self.text = text
-        self.default = default
-        if None is not transform:
-            self.transform = transform
-
-    @staticmethod
-    def transform(value):
-        """The default (null) transformation to perform on a property."""
-        return value
-
-
-def transform_exif_time(timestamp):
-    """Converts an EXIF timestamp into something more appropriate for 
-    viewing."""
-    try:
-        parsed_time = time.strptime(timestamp, "%Y:%m:%d %H:%M:%S")
-        return time.strftime("%Y-%m-%d %H:%M:%SZ", parsed_time)
-    except ValueError:
-        raise PropertyError("EXIF time", timestamp)
-
-
-def format_display_time(timestamp):
-    """Convert an IPTC or XMP timestamp into something more appropriate for 
-    viewing."""
-    try:
-        parsed_time = None
-        if re.match("^[0-9]{4}:[0-9]{2}:[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}[+-][0-9]{2}:[0-9]{2}$", 
-                    timestamp):
-            # IPTC and XMP timestamps are stored in the following odd format:
-            #     YYYY:mm:dd HH:MM:SS[+-]HH:MM
-            # strptime() can't parse these because of the colon in the time zone
-            parsed_time = time.strptime(timestamp[:-3] + timestamp[-2:], "%Y:%m:%d %H:%M:%S%z")
-        elif re.match("^[0-9]{4}:[0-9]{2}:[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}$", timestamp):
-            parsed_time = time.strptime(timestamp, "%Y:%m:%d %H:%M:%S")
-        formatted_time = time.strftime("%d %B %Y, %H:%M", parsed_time)
-
-        # Python 3.3's strftime ignores tm_gmtoff when formatting "%z", so I need to do it myself.
-        time_zone = "UTC"
-        if 0 > parsed_time.tm_gmtoff:
-            time_zone += time.strftime("-%H%M", time.gmtime(-parsed_time.tm_gmtoff))
-        elif 0 < parsed_time.tm_gmtoff:
-            time_zone += time.strftime("+%H%M", time.gmtime(parsed_time.tm_gmtoff))
-
-        return (formatted_time, time_zone)
-    except (ValueError, TypeError):
-        raise PropertyError("Display time", timestamp)
-
-
-class PhotoFile(RefCounted, QtGui.QListWidgetItem):
-    """A photo to add to the album.
-    
-    Attributes:
-        properties (dict): The properties that have been extracted from 
-                this photo.
-        captions (dict): The captions that have been extracted from 
-                this photo.
-        _fileFullPath (str): The path to the file.  May use "~" to 
-                represent the user's home directory.  
-                eg, "~/Photos/2013-04-03/img_3201a.jpg"
-        _fileName (str): The name to use for this photo in the album.  
-                Must be unique.  eg, "img_3201a.jpg"
-        _jsonName (str): The name of the JSON file for this photo in 
-                the album.
-        _thumbName (str): The name of the thumbnail file for this photo 
-                in the album.
-        _linkPath (str): The full path to the link to this photo in the 
-                album's temporary directory.
-        _fileDescriptor (int): A file descriptor for the photo file.
-        _width (int): The photo's width in pixels.
-        _height (int): The photo's height in pixels.
-    """
-
-    _recognizedProperties = [
-        Property("Composite:Aperture", "Aperture", transform=lambda f : "f/"+str(f)),
-        Property("Composite:DigitalZoom", "Digital zoom", default="None"),
-        Property("Composite:DriveMode", "Drive mode", default="Normal"),
-        Property("Composite:FlashType", "Flash type", default="None"),
-        Property("Composite:FOV", "Field of view", transform=lambda s : s+"rees"),
-        Property("Composite:FocalLength35efl", "Focal length"),
-        Property("Composite:HyperfocalDistance", "Hyperfocal distance"),
-        Property("Composite:ImageSize", "Image dimensions", transform=lambda s : s+" pixels"),
-        #Property("Composite:ISO", "ISO"),
-        Property("Composite:Lens35efl", "Lens"),
-        Property("Composite:LensID", "Lens ID"),
-        Property("Composite:LightValue", "Light value"),
-        Property("Composite:ScaleFactor35efl", "Scale factor"),
-        Property("Composite:ShootingMode", "Shooting mode"),
-        Property("Composite:ShutterSpeed", "Exposure", transform=lambda s : s+" sec."),
-        Property("EXIF:DateTimeOriginal", "Creation time", transform=transform_exif_time),
-        Property("EXIF:ExposureCompensation", "Exposure compensation"),
-        Property("EXIF:ExposureMode", "Exposure mode"),
-        Property("EXIF:Flash", "Flash"),
-        Property("EXIF:FocalLength", "Focal length"),
-        Property("EXIF:ISO", "ISO"),
-        Property("EXIF:Make", "Camera make"),
-        Property("EXIF:Model", "Camera model"),
-        Property("EXIF:Orientation", "Orientation"),
-        Property("File:FileSize", "File size"),
-        Property("File:FileType", "File type"),
-        Property("MakerNotes:MacroMode", "Macro mode"),
-        Property("MakerNotes:Rotation", "Rotation", transform=lambda i : str(i)+" degrees")
-    ]
-
-    def __init__(self, filepath, fileName, config):
-        """Initializes a PhotoFile.  Opens the file, links it to a 
-        temporary directory, and extracts properties and captions 
-        from it."""
-        self._fileName = fileName
-        self._fileFullPath = re.sub("^"+os.path.expanduser("~"), "~", filepath)
-        super().__init__("%s (%s)" % (self._fileName, self._fileFullPath))
-        self._jsonName = self._fileName + ".json"
-        (name, suffix) = os.path.splitext(self._fileName)
-        self._thumbName = name + ".thumbnail" + suffix
-        # Don't set linkPath until after the link has been created.  Otherwise, a FileExistsError 
-        # due to us already having the file open somewhere else will result in us deleting the link 
-        # when we try to clean up.
-        self._linkPath = None
-        self._fileDescriptor = None
-
-        # To avoid TOCTOU when passing file names to other programs, we do the following:
-        #  1. Create a secure temporary directory.
-        #  2. Open the file.  Get its file descriptor.
-        #  3. Construct the /proc/<pid>/fd/<fd> path to the file using the file descriptor.
-        #  4. Create a symlink from the temporary directory to the /proc path.  The link's name is 
-        #     unique but predictable; that's ok because the directory is secure.
-        #  5. Pass the symlink's path to other programs.
-
-        try:
-            self._fileDescriptor = os.open(filepath, os.O_RDONLY)
-            linkPath = os.path.join(config.tempDir.name, self._fileName)
-            os.symlink("/proc/%d/fd/%d" % (os.getpid(), self._fileDescriptor), linkPath)
-            self._linkPath = linkPath
-            properties_text = subprocess.check_output(
-                            ["exiftool", "-json", "-a", "-G", "-All", self._linkPath], 
-                            timeout=BG_TIMEOUT, universal_newlines=True, stderr=subprocess.STDOUT)
-            properties_obj = json.loads(properties_text)[0]
-
-            # exiftool finds way too many properties to force the user to sift through, so we 
-            # extract only a hard-coded list of properties that are likely to be interesting.
-            self.properties = {}
-            for prop in self._recognizedProperties:
-                if prop.name in properties_obj:
-                    self.properties[prop.text] = prop.transform(properties_obj[prop.name])
-                elif None is not prop.default:
-                    self.properties[prop.text] = prop.default
-
-            # Override the file name property because exiftool saw the our generated file name
-            self.properties["File name"] = os.path.basename(filepath)
-
-            # Get the photo dimensions
-            self._width = properties_obj["File:ImageWidth"]
-            self._height = properties_obj["File:ImageHeight"]
-
-            self.captions = {}
-
-            # Get the display date, if one exists
-            for tag in ["XMP:DateTimeOriginal", "Composite:DateTimeCreated", 
-                        "EXIF:DateTimeOriginal"]:
-                if tag in properties_obj:
-                    (display_time, time_zone) = format_display_time(properties_obj[tag])
-                    self.captions["Date"] = display_time
-                    self.properties["Time zone"] = time_zone
-                    break
-
-            # Get the location, if one exists
-            for tag in ["XMP:Location", "IPTC:ContentLocationName"]:
-                if tag in properties_obj:
-                    self.captions["Location"] = properties_obj[tag]
-                    break
-
-            # Get the description, if one exists
-            for tag in ["XMP:Description", "IPTC:Caption-Abstract", "EXIF:UserComment"]:
-                if tag in properties_obj:
-                    self.captions["Description"] = properties_obj[tag]
-                    break
-
-        except:
-            # If something failed, make sure to not leave any dangling resources.  Ignore any 
-            # failures that this causes.
-            try:
-                self._dispose()
-            except:
-                pass
-            raise
-
-    def _dispose(self):
-        """Close a photo file and unlink it from the temporary directory.
-        Overrides RefCounted._dispose()."""
-        try:
-            if None is not self._linkPath:
-                os.unlink(self._linkPath)
-        except OSError:
-            pass
-        self._linkPath = None
-        try:
-            if None is not self._fileDescriptor:
-                os.close(self._fileDescriptor)
-        except OSError:
-            pass
-        self._fileDescriptor = None
-
-    def getPath(self):
-        """Return the path to the photo file."""
-        return self._linkPath
-
-    def _rescale(self, pixels):
-        """Calculate the optimal width and height for the photo to keep 
-        it under the given size."""
-        aspect = self._width / self._height
-
-        if pixels >= self._width * self._height:
-            return (self._width, self._height)
-        else:
-            # Need to find the largest w,h such that w*h <= pixels and w/h == aspect.
-            # w/h == aspect, so w == h*aspect.  Substutiting that for w, h*h*aspect <= pixels.
-            # Rearranging for h gives h <= sqrt(pixels/aspect)
-            height = math.sqrt(pixels / aspect)
-            width = height * aspect
-            return (int(width), int(height))
-
-    def getAlbumJSON(self):
-        """Return the information about the photo that's necessary for 
-        the album JSON file."""
-        props = {}
-        props["name"] = urllib.parse.quote(self._fileName)
-        props["thumbnail"] = urllib.parse.quote(os.path.join(THUMBNAIL_DIR, self._thumbName))
-        props["orientation"] = "horizontal" if self._width >= self._height else "vertical"
-        props["path"] = urllib.parse.quote(self._fileFullPath)
-        return props
-
-    def generateJSON(self, out_dir_name, width_base, height_base, captions, properties):
-        """Generate the JSON file for the photo."""
-        (width, height) = self._rescale(width_base * height_base)
-
-        data = {}
-        data["photo"] = urllib.parse.quote(os.path.join(PHOTO_DIR, self._fileName))
-        data["width"] = str(width)
-        data["height"] = str(height)
-        data["caption"] = \
-            [self.captions[tag] for tag in captions if tag in self.captions]
-        data["properties"] = \
-            [(tag, self.properties[tag]) for tag in properties if tag in self.properties]
-        #print(json.dumps(data, indent=2, sort_keys=True))
-
-        with open(os.path.join(out_dir_name, self._jsonName), "w") as json_file:
-            json.dump(data, json_file)
-
-    def generatePhoto(self, out_dir_name, width_base, height_base, quality):
-        """Generate a scaled-down photo."""
-        (width, height) = self._rescale(width_base * height_base)
-        # See http://www.imagemagick.org/Usage/resize/
-        subprocess.check_call(["convert", self._linkPath, "-resize", "%dx%d>" % (width, height), 
-                               "-strip", "-quality", str(quality), 
-                               os.path.join(out_dir_name, self._fileName)], timeout=BG_TIMEOUT)
-
-    def generateThumbnail(self, out_dir_name, width_base, height_base, quality):
-        """Generate a thumbnail for the photo."""
-        # width_base and height_base assume a horizontal photo.  Swap them for a vertical.
-        width, height = (width_base, height_base)
-        if self._width < self._height:
-            width, height = (height_base, width_base)
-        # See http://www.imagemagick.org/Usage/thumbnails/
-        subprocess.check_call(["convert", self._linkPath, "-thumbnail", "%dx%d^" % (width, height), 
-                               "-gravity", "center", "-extent", "%dx%d" % (width, height), 
-                               "-quality", str(quality), 
-                               os.path.join(out_dir_name, self._thumbName)], timeout=BG_TIMEOUT)
 
 
 class Config(object):
@@ -385,6 +70,28 @@ class Config(object):
                 directory to hold links to photos and generated files.
         _file (file): A handle to the configuration file.
     """
+
+    PROGRAM_NAME = "Album Generator"
+    FILE_FORMAT_VERSION = 1
+    THUMB_WIDTH = 160
+    THUMB_HEIGHT = 120
+    THUMB_QUALITY = 50
+    BG_TIMEOUT = 5
+    TEMPLATE_FILE_NAMES = ["album.css", "album.html", "album.js", "back.png", "common.css", 
+                           "debug.css", "help.png", "ie8compat.js", "lib.js", "next.png", 
+                           "photo.css", "placeholder.png", "prev.png"]
+
+    DEFAULT_PHOTO_DIR = os.path.expanduser("~")
+    DEFAULT_GTHUMB3_DIR = os.path.expanduser("~/.local/share/gthumb/catalogs")
+    DEFAULT_GTHUMB2_DIR = os.path.expanduser("~/.gnome2/gthumb/collections")
+    DEFAULT_OUTPUT_DIR = os.path.expanduser("~")
+    DEFAULT_PHOTO_QUALITY = 75
+    DEFAULT_THREADS = 8
+
+    METADATA_DIR = "metadata"
+    PHOTO_DIR = "photos"
+    THUMBNAIL_DIR = "thumbnails"
+
     def __init__(self):
         """Set up run-time configuration.  Load the configuration file 
         and set up shared resources.  Populate any run-time properties 
@@ -408,16 +115,16 @@ class Config(object):
             traceback.print_exception(exc_type, exc_value, exc_traceback)
 
         # Used during operation and stored in the configuration file
-        self.photoDir = data["photoDir"] if "photoDir" in data else DEFAULT_PHOTO_DIR
-        self.gthumb3Dir = data["gthumb3Dir"] if "gthumb3Dir" in data else DEFAULT_GTHUMB3_DIR
-        #self.gthumb2Dir = data["gthumb2Dir"] if "gthumb2Dir" in data else DEFAULT_GTHUMB2_DIR
-        self.outputDir = data["outputDir"] if "outputDir" in data else DEFAULT_OUTPUT_DIR
-        self.photoQuality = DEFAULT_PHOTO_QUALITY
+        self.photoDir = data["photoDir"] if "photoDir" in data else self.DEFAULT_PHOTO_DIR
+        self.gthumb3Dir = data["gthumb3Dir"] if "gthumb3Dir" in data else self.DEFAULT_GTHUMB3_DIR
+        #self.gthumb2Dir = data["gthumb2Dir"] if "gthumb2Dir" in data else self.DEFAULT_GTHUMB2_DIR
+        self.outputDir = data["outputDir"] if "outputDir" in data else self.DEFAULT_OUTPUT_DIR
+        self.photoQuality = self.DEFAULT_PHOTO_QUALITY
         if "photoQuality" in data and 0 < data["photoQuality"] and 100 >= data["photoQuality"]:
             self.photoQuality = data["photoQuality"]
 
         # Used only at startup and stored in the configuration file
-        self.maxWorkers = DEFAULT_THREADS
+        self.maxWorkers = self.DEFAULT_THREADS
         if "threads" in data and 0 < data["threads"] and 50 >= data["threads"]:
             self.maxWorkers = data["threads"]
         self.dimensions = data["dimensions"] if "dimensions" in data else None
@@ -490,6 +197,10 @@ class PhotoAlbumUI(QtGui.QMainWindow, Ui_MainWindow):
         _directoriesLock (threading.Lock): Lock to control access to 
                 _directories.
     """
+
+    FILTER_IMAGES = "Images (*.jpeg *.jpg *.png *.tiff *.tif)"
+    FILTER_GTHUMB3_CATALOGS = "gThumb catalogs (*.catalog)"
+    FILTER_ALBUMS = "Albums (*.json)"
 
     _addPhotoSignal = QtCore.pyqtSignal(PhotoFile)  # Photo is ready to be added to the UI.
     _showErrorSignal = QtCore.pyqtSignal(str)  # An error message needs to be displayed.
@@ -623,15 +334,16 @@ class PhotoAlbumUI(QtGui.QMainWindow, Ui_MainWindow):
         if self._addPhotosFiles is sender:
             # Browse for photos
             file_names = QtGui.QFileDialog.getOpenFileNames(self, "Select photos", 
-                                                            self._config.photoDir, FILTER_IMAGES)
+                                                            self._config.photoDir, 
+                                                            self.FILTER_IMAGES)
             self._addPhotoFiles([(name, os.path.basename(name)) for name in file_names])
             if 0 < len(file_names):
                 self._config.photoDir = os.path.dirname(file_names[len(file_names)-1])
         elif self._addPhotosGthumb3 is sender:
             # Add a gThumb 3 catalog
             catalog_file_name = QtGui.QFileDialog.getOpenFileName(self, "Select catalog", 
-                                                                 self._config.gthumb3Dir, 
-                                                                 FILTER_GTHUMB3_CATALOGS)
+                                                               self._config.gthumb3Dir, 
+                                                               self.FILTER_GTHUMB3_CATALOGS)
             # The QT documentation says that getOpenFileName returns a null string on cancel.  But 
             # it returns an empty string here.  Maybe that's a PyQt bug?
             if "" != catalog_file_name:
@@ -695,7 +407,7 @@ class PhotoAlbumUI(QtGui.QMainWindow, Ui_MainWindow):
 
     def _showError(self, err):
         """Show an error message."""
-        QtGui.QMessageBox.question(self, PROGRAM_NAME, err, QtGui.QMessageBox.Ok, 
+        QtGui.QMessageBox.question(self, Config.PROGRAM_NAME, err, QtGui.QMessageBox.Ok, 
                                    QtGui.QMessageBox.Ok)
 
     def _incProgress(self):
@@ -859,8 +571,8 @@ class PhotoAlbumUI(QtGui.QMainWindow, Ui_MainWindow):
         background tasks to generate album and photo JSON, thumbnails, 
         and down-scaled photos.  """
         album = self._saveUIData()
-        album["albumVersion"] = FILE_FORMAT_VERSION
-        album["metadataDir"] = urllib.parse.quote(METADATA_DIR + "/")
+        album["albumVersion"] = Config.FILE_FORMAT_VERSION
+        album["metadataDir"] = urllib.parse.quote(Config.METADATA_DIR + "/")
         album["title"] = self.titleText.toPlainText()
         album["description"] = self.descriptionText.toPlainText()
         album["photos"] = \
@@ -868,7 +580,8 @@ class PhotoAlbumUI(QtGui.QMainWindow, Ui_MainWindow):
 
         # Get the output file name
         album_file_name = QtGui.QFileDialog.getSaveFileName(self, "Album File", 
-                                                            self._config.outputDir, FILTER_ALBUMS)
+                                                            self._config.outputDir, 
+                                                            self.FILTER_ALBUMS)
         album_dir_name = os.path.dirname(album_file_name)
 
         # To prevent the output directory from being changed while generating files, we do the 
@@ -891,25 +604,28 @@ class PhotoAlbumUI(QtGui.QMainWindow, Ui_MainWindow):
         album_dir_task = self._threads.submit(self._bgCreateOutputDirectory, album_dir_name, 
                                               album_dir_path)
         tasks.append(album_dir_task)
-        metadata_dir_path = os.path.join(self._config.tempDir.name, METADATA_DIR)
+        metadata_dir_path = os.path.join(self._config.tempDir.name, Config.METADATA_DIR)
         metadata_dir_task = None
-        if 0 != len(METADATA_DIR):
+        if 0 != len(Config.METADATA_DIR):
             metadata_dir_task = self._threads.submit(self._bgCreateOutputDirectory, 
-                                                     os.path.join(album_dir_name, METADATA_DIR),
+                                                     os.path.join(album_dir_name, 
+                                                                  Config.METADATA_DIR), 
                                                      metadata_dir_path)
             tasks.append(metadata_dir_task)
-        photo_dir_path = os.path.join(self._config.tempDir.name, PHOTO_DIR)
+        photo_dir_path = os.path.join(self._config.tempDir.name, Config.PHOTO_DIR)
         photo_dir_task = None
-        if 0 != len(PHOTO_DIR):
+        if 0 != len(Config.PHOTO_DIR):
             photo_dir_task = self._threads.submit(self._bgCreateOutputDirectory, 
-                                                  os.path.join(album_dir_name, PHOTO_DIR),
+                                                  os.path.join(album_dir_name, 
+                                                               Config.PHOTO_DIR), 
                                                   photo_dir_path)
             tasks.append(photo_dir_task)
-        thumbnail_dir_path = os.path.join(self._config.tempDir.name, THUMBNAIL_DIR)
+        thumbnail_dir_path = os.path.join(self._config.tempDir.name, Config.THUMBNAIL_DIR)
         thumbnail_dir_task = None
-        if 0 != len(THUMBNAIL_DIR):
+        if 0 != len(Config.THUMBNAIL_DIR):
             thumbnail_dir_task = self._threads.submit(self._bgCreateOutputDirectory, 
-                                                      os.path.join(album_dir_name, THUMBNAIL_DIR),
+                                                      os.path.join(album_dir_name, 
+                                                                   Config.THUMBNAIL_DIR),
                                                       thumbnail_dir_path)
             tasks.append(thumbnail_dir_task)
 
@@ -942,8 +658,8 @@ class PhotoAlbumUI(QtGui.QMainWindow, Ui_MainWindow):
                 task.photoName = photo.getPath()
                 tasks.append(task)
                 task = self._threads.submit(self._bgGenerateThumbnail, photo, thumbnail_dir_path, 
-                                            THUMB_WIDTH, THUMB_HEIGHT, THUMB_QUALITY, 
-                                            thumbnail_dir_task)
+                                            Config.THUMB_WIDTH, Config.THUMB_HEIGHT, 
+                                            Config.THUMB_QUALITY, thumbnail_dir_task)
                 photo.addRef()
                 task.photoName = photo.getPath()
                 tasks.append(task)
@@ -1046,14 +762,15 @@ class PhotoAlbumUI(QtGui.QMainWindow, Ui_MainWindow):
         """Load an album JSON file and populate the UI with its 
         contents."""
         album_file_name = QtGui.QFileDialog.getOpenFileName(self, "Select album", 
-                                                            self._config.outputDir, FILTER_ALBUMS)
+                                                            self._config.outputDir, 
+                                                            self.FILTER_ALBUMS)
         # The QT documentation says that getOpenFileName returns a null string on cancel.  But it
         # returns an empty string here.  Maybe that's a PyQt bug?
         if "" != album_file_name:
             try:
                 with open(album_file_name) as album_file:
                     data = json.load(album_file)
-                    if "albumVersion" in data and FILE_FORMAT_VERSION == data["albumVersion"]:
+                    if "albumVersion" in data and Config.FILE_FORMAT_VERSION == data["albumVersion"]:
                         self._restoreUIData(data, require_fields=True)
                         self.titleText.setPlainText(data["title"])
                         self.descriptionText.setPlainText(data["description"])
@@ -1065,7 +782,7 @@ class PhotoAlbumUI(QtGui.QMainWindow, Ui_MainWindow):
                         return
                     raise ValueError("Invalid album file")
             except (KeyError, ValueError, OSError):
-                QtGui.QMessageBox.warning(None, PROGRAM_NAME, 
+                QtGui.QMessageBox.warning(None, Config.PROGRAM_NAME, 
                                           "Unable to load an album from '%s'." % 
                                           (os.path.basename(album_file_name)), 
                                           QtGui.QMessageBox.Ok, QtGui.QMessageBox.Ok)
@@ -1082,7 +799,7 @@ class PhotoAlbumUI(QtGui.QMainWindow, Ui_MainWindow):
                                                          QtGui.QFileDialog.ShowDirsOnly|
                                                          QtGui.QFileDialog.DontUseNativeDialog)
 
-        self._backgroundInit(len(TEMPLATE_FILE_NAMES) + 1)
+        self._backgroundInit(len(Config.TEMPLATE_FILE_NAMES) + 1)
         tasks = []
 
         # Open the output directory so that it can't change under us.
@@ -1093,7 +810,7 @@ class PhotoAlbumUI(QtGui.QMainWindow, Ui_MainWindow):
         tasks.append(album_dir_task)
 
         # Spawn background tasks to do the copying.
-        for f in TEMPLATE_FILE_NAMES:
+        for f in Config.TEMPLATE_FILE_NAMES:
             tasks.append(self._threads.submit(self._bgCopyFile, os.path.join(DATA_PATH, f), 
                                               os.path.join(album_dir_path, f), album_dir_task))
 
@@ -1135,7 +852,7 @@ class PhotoAlbumUI(QtGui.QMainWindow, Ui_MainWindow):
                 # It seems that if I try to re-use the QFileDialog, changing the selected file has 
                 # no effect.
                 file_dialog = QtGui.QFileDialog(self, "New photo name", self._config.tempDir.name, 
-                                               FILTER_IMAGES)
+                                                self.FILTER_IMAGES)
                 file_dialog.setAcceptMode(QtGui.QFileDialog.AcceptSave)
                 file_dialog.setFileMode(QtGui.QFileDialog.AnyFile)
                 # The PhotoFile class won't let the user overwrite anything, but with overwrite 
@@ -1160,7 +877,7 @@ def main():
     # Check that the Python version is at least 3.3, that we're on an OS with /proc/<pid>/fd/<fd>, 
     # and that exiftool and convert are available.  Error out if not.
     if sys.version_info.major < 3 or (sys.version_info.major == 3 and sys.version_info.minor < 3):
-        QtGui.QMessageBox.critical(None, PROGRAM_NAME, 
+        QtGui.QMessageBox.critical(None, Config.PROGRAM_NAME, 
                                    "This program requires Python 3.3 or newer.", 
                                    QtGui.QMessageBox.Ok, QtGui.QMessageBox.Ok)
         sys.exit(1)
@@ -1168,29 +885,24 @@ def main():
         with open("/proc/%d/fd/0" % (os.getpid())) as f:
             pass
     except IOError:
-        QtGui.QMessageBox.critical(None, PROGRAM_NAME, 
+        QtGui.QMessageBox.critical(None, Config.PROGRAM_NAME, 
                                    "This program currently only runs on Linux.", 
                                    QtGui.QMessageBox.Ok, QtGui.QMessageBox.Ok)
         sys.exit(1)
     try:
         subprocess.check_call(["exiftool", "-ver"], stdout=subprocess.DEVNULL, timeout=1)
     except (subprocess.CalledProcessError, subprocess.TimeoutExpired):
-        QtGui.QMessageBox.critical(None, PROGRAM_NAME, 
+        QtGui.QMessageBox.critical(None, Config.PROGRAM_NAME, 
                                    "This program requires that 'exiftool' be available in your " \
                                    "PATH.", QtGui.QMessageBox.Ok, QtGui.QMessageBox.Ok)
         sys.exit(1)
     try:
         subprocess.check_call(["convert", "--version"], stdout=subprocess.DEVNULL, timeout=1)
     except (subprocess.CalledProcessError, subprocess.TimeoutExpired):
-        QtGui.QMessageBox.critical(None, PROGRAM_NAME, "This program requires that 'convert' " \
+        QtGui.QMessageBox.critical(None, Config.PROGRAM_NAME, "This program requires that 'convert' " \
                                    "from the 'ImageMagick' package be available in your PATH.", 
                                    QtGui.QMessageBox.Ok, QtGui.QMessageBox.Ok)
         sys.exit(1)
-
-    # Loaded here so that the program will load under Python 2.7 and then error out nicely rather 
-    # than crashing with a cryptic stack trace.
-    import concurrent.futures
-    global concurrent
 
     with Config() as config:
         wnd = PhotoAlbumUI(config)

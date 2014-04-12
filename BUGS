@@ -135,3 +135,12 @@
     needs to be moved to a background task.
 
     OPEN:
+
+2014-04-09_002  Rennie deGraaf  <rennie.degraaf@gmail.com>
+    AlbumGenerator doesn't load enough to get to the error message under Python 
+    2.x.  It fails to load urllib.parse.  If I remove that, it fails to load 
+    the album_generator modules.
+
+    WONTFIX: This looks like it will be a pain to fix and it's not worth the 
+    trouble.  The version check should still be useful if someone tries to load 
+    AlbumGenerator under a pre-3.3 version of Python 3.
