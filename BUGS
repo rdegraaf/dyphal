@@ -124,18 +124,6 @@
     fix this, I'd either need to create separate save files or encrypt the 
     paths.
 
-2014-04-08_002  Rennie deGraaf  <rennie.degraaf@gmail.com>
-    Starting a second background activity while a first is still in progress 
-    stomps on the first activity's progress count.
-
-    OPEN:
-
-2014-04-09_001  Rennie deGraaf  <rennie.degraaf@gmail.com>
-    PhotoAlbumUI._openAlbum() runs in UI callbacks but contains file I/O.  This 
-    needs to be moved to a background task.
-
-    OPEN:
-
 2014-04-09_002  Rennie deGraaf  <rennie.degraaf@gmail.com>
     AlbumGenerator doesn't load enough to get to the error message under Python 
     2.x.  It fails to load urllib.parse.  If I remove that, it fails to load 

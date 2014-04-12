@@ -1,10 +1,14 @@
 #!/bin/bash
 
-PATH=/bin:/usr/bin
-
+# Edit these paths to suit your local environment
 BIN_PATH="$HOME/bin"
 PKG_PATH="$HOME/.local/lib/python3.3/site-packages"
 DATA_PATH="$HOME/.share/AlbumGenerator"
+
+#
+# You probably shouldn't edit anything below this.
+#
+PATH=/bin:/usr/bin
 
 PKG_NAME="album_generator"
 
@@ -19,4 +23,5 @@ chmod +x "$BIN_PATH"/AlbumGenerator
 
 mkdir -p "$DATA_PATH"
 cp www/* "$DATA_PATH"/
+pandoc README -t html5 -s -S --template=misc/html5.pandoc >"$DATA_PATH"/README.html
 

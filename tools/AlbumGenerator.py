@@ -79,7 +79,7 @@ class Config(object):
     BG_TIMEOUT = 5
     TEMPLATE_FILE_NAMES = ["album.css", "album.js", "back.png", "common.css", "debug.css", 
                            "help.png", "ie8compat.js", "index.html", "lib.js", "next.png", 
-                           "photo.css", "placeholder.png", "prev.png"]
+                           "photo.css", "placeholder.png", "prev.png", "README.html"]
 
     DEFAULT_PHOTO_DIR = os.path.expanduser("~")
     DEFAULT_GTHUMB3_DIR = os.path.expanduser("~/.local/share/gthumb/catalogs")
@@ -190,6 +190,8 @@ class PhotoAlbumUI(QtGui.QMainWindow, Ui_MainWindow):
         _config (Config): The run-time configuration object.
         _threads (concurrent.futures.Executor): The thread pool for 
                 background tasks.
+        _backgroundCount (int): The number of background activities (*not* 
+                tasks) that are pending.
         _backgroundTasks (list of concurrent.futures.Future): Pending 
                 background tasks.
         _directories (list of (int, str)): Directory file descriptors 
@@ -207,6 +209,7 @@ class PhotoAlbumUI(QtGui.QMainWindow, Ui_MainWindow):
     _incProgressSignal = QtCore.pyqtSignal()  # A background processing step has completed.
     _backgroundCompleteSignal = QtCore.pyqtSignal()  # Background processing has completed.
     _renamePhotosSignal = QtCore.pyqtSignal(list)  # Photos need to be renamed due to collisions.
+    _setAlbumDataSignal = QtCore.pyqtSignal(str, dict)  # An album has been loaded.
 
     def __init__(self, config):
         """Initialize a PhotoAlbumUI.  Hooks up event handlers and 
@@ -215,6 +218,7 @@ class PhotoAlbumUI(QtGui.QMainWindow, Ui_MainWindow):
         super().__init__()
         self._config = config
         self._threads = concurrent.futures.ThreadPoolExecutor(self._config.maxWorkers)
+        self._backgroundCount = 0
         self._backgroundTasks = None
         self._directories = []
         self._directoriesLock = threading.Lock()
@@ -282,6 +286,7 @@ class PhotoAlbumUI(QtGui.QMainWindow, Ui_MainWindow):
         self._propertiesListFilter.delKeyPressed.connect(self._removePropertiesHandler)
         self._propertiesListFilter.escKeyPressed.connect(self.propertiesList.clearSelection)
         self._renamePhotosSignal.connect(self._renamePhotos)
+        self._setAlbumDataSignal.connect(self._setAlbumData)
 
     def closeEvent(self, event):
         """Main window close event handler.  Shutdown the thread pool 
@@ -407,8 +412,8 @@ class PhotoAlbumUI(QtGui.QMainWindow, Ui_MainWindow):
 
     def _showError(self, err):
         """Show an error message."""
-        QtGui.QMessageBox.question(self, Config.PROGRAM_NAME, err, QtGui.QMessageBox.Ok, 
-                                   QtGui.QMessageBox.Ok)
+        QtGui.QMessageBox.warning(self, Config.PROGRAM_NAME, err, QtGui.QMessageBox.Ok, 
+                                  QtGui.QMessageBox.Ok)
 
     def _incProgress(self):
         """Increment the progress bar counter."""
@@ -417,26 +422,32 @@ class PhotoAlbumUI(QtGui.QMainWindow, Ui_MainWindow):
     def _backgroundInit(self, steps):
         """Initialize the progress bar for a background action.  This 
         must occur before any background tasks can run."""
-        # Make sure that we're not already running a background task. 
-        assert(None is self._backgroundTasks)
-        self.generateAlbumButton.setVisible(False)
-        self.progressBar.setMaximum(steps)
+        self._backgroundCount += 1
+        if 1 == self._backgroundCount:
+            self._backgroundTasks = []
+            self.generateAlbumButton.setVisible(False)
+            self.progressBar.setMaximum(steps)
+            self.progressBar.setValue(0)
+        else:
+            self.progressBar.setMaximum(self.progressBar.maximum() + steps)
 
     def _backgroundStart(self, tasks):
         """Show the cancellation UI.  Don't do this until after the 
         background tasks are registered so that there's something to 
         cancel."""
-        self._backgroundTasks = tasks
-        self.progressBar.setValue(0)
+        self._backgroundTasks.extend(tasks)
         self.progressBar.setVisible(True)
         self.cancelButton.setVisible(True)
 
     def _backgroundComplete(self):
         """Dismiss the cancellation UI."""
-        self.cancelButton.setVisible(False)
-        self.progressBar.setVisible(False)
-        self.generateAlbumButton.setVisible(True)
-        self._backgroundTasks = None
+        assert(0 < self._backgroundCount)
+        if 1 == self._backgroundCount:
+            self.cancelButton.setVisible(False)
+            self.progressBar.setVisible(False)
+            self.generateAlbumButton.setVisible(True)
+            self._backgroundTasks = None
+        self._backgroundCount -= 1
 
     def _bgAddPhoto(self, path, name, prev_task):
         """Background task to load a photo and signal the UI to add it 
@@ -759,33 +770,51 @@ class PhotoAlbumUI(QtGui.QMainWindow, Ui_MainWindow):
         self._incProgressSignal.emit()
 
     def _openAlbum(self):
-        """Load an album JSON file and populate the UI with its 
-        contents."""
+        """Prompt the user for an album JSON file to load then spawn a 
+        background task to load it."""
         album_file_name = QtGui.QFileDialog.getOpenFileName(self, "Select album", 
                                                             self._config.outputDir, 
                                                             self.FILTER_ALBUMS)
         # The QT documentation says that getOpenFileName returns a null string on cancel.  But it
         # returns an empty string here.  Maybe that's a PyQt bug?
         if "" != album_file_name:
-            try:
-                with open(album_file_name) as album_file:
-                    data = json.load(album_file)
-                    if "albumVersion" in data and Config.FILE_FORMAT_VERSION == data["albumVersion"]:
-                        self._restoreUIData(data, require_fields=True)
-                        self.titleText.setPlainText(data["title"])
-                        self.descriptionText.setPlainText(data["description"])
-                        photos = []
-                        for photo in data["photos"]:
-                            path = urllib.parse.unquote(photo["path"])
-                            photos.append((os.path.expanduser(path), os.path.basename(path)))
-                        self._addPhotoFiles(photos)
-                        return
+            # Load the file in a background thread.
+            self._backgroundInit(1)
+            task = self._threads.submit(functools.partial(handle_exceptions, self._bgLoadAlbum, 
+                                                          album_file_name))
+            self._backgroundStart([task])
+
+    def _bgLoadAlbum(self, album_file_name):
+        """Background task to open and parse an album JSON file."""
+        try:
+            with open(album_file_name) as album_file:
+                data = json.load(album_file)
+                if "albumVersion" in data and Config.FILE_FORMAT_VERSION == data["albumVersion"]:
+                    # Call back to the foreground to populate the UI.
+                    self._setAlbumDataSignal.emit(album_file_name, data)
+                else:
                     raise ValueError("Invalid album file")
-            except (KeyError, ValueError, OSError):
-                QtGui.QMessageBox.warning(None, Config.PROGRAM_NAME, 
-                                          "Unable to load an album from '%s'." % 
-                                          (os.path.basename(album_file_name)), 
-                                          QtGui.QMessageBox.Ok, QtGui.QMessageBox.Ok)
+        except (KeyError, ValueError, OSError):
+            self._showErrorSignal.emit("Unable to load an album from '%s'." % 
+                                       (os.path.basename(album_file_name)))
+        self._backgroundCompleteSignal.emit()
+
+    def _setAlbumData(self, album_file_name, data):
+        """Pushes data from a loaded album JSON file into the UI."""
+        try:
+            self._restoreUIData(data, require_fields=True)
+            self.titleText.setPlainText(data["title"])
+            self.descriptionText.setPlainText(data["description"])
+            photos = []
+            for photo in data["photos"]:
+                path = urllib.parse.unquote(photo["path"])
+                photos.append((os.path.expanduser(path), os.path.basename(path)))
+            self._addPhotoFiles(photos)
+        except KeyError:
+            QtGui.QMessageBox.warning(None, Config.PROGRAM_NAME, 
+                                      "Unable to load an album from '%s'." % 
+                                      (os.path.basename(album_file_name)), 
+                                      QtGui.QMessageBox.Ok, QtGui.QMessageBox.Ok)
 
     def _installTemplate(self):
         """Install the photo album template files.  Prompt the user for 
@@ -799,24 +828,25 @@ class PhotoAlbumUI(QtGui.QMainWindow, Ui_MainWindow):
                                                          QtGui.QFileDialog.ShowDirsOnly|
                                                          QtGui.QFileDialog.DontUseNativeDialog)
 
-        self._backgroundInit(len(Config.TEMPLATE_FILE_NAMES) + 1)
-        tasks = []
+        if "" != out_dir:
+            self._backgroundInit(len(Config.TEMPLATE_FILE_NAMES) + 1)
+            tasks = []
 
-        # Open the output directory so that it can't change under us.
-        assert(0 == len(self._directories))
-        album_dir_path = os.path.join(self._config.tempDir.name, "album")
-        album_dir_task = self._threads.submit(self._bgCreateOutputDirectory, out_dir, 
-                                              album_dir_path)
-        tasks.append(album_dir_task)
+            # Open the output directory so that it can't change under us.
+            assert(0 == len(self._directories))
+            album_dir_path = os.path.join(self._config.tempDir.name, "album")
+            album_dir_task = self._threads.submit(self._bgCreateOutputDirectory, out_dir, 
+                                                  album_dir_path)
+            tasks.append(album_dir_task)
 
-        # Spawn background tasks to do the copying.
-        for f in Config.TEMPLATE_FILE_NAMES:
-            tasks.append(self._threads.submit(self._bgCopyFile, os.path.join(DATA_PATH, f), 
-                                              os.path.join(album_dir_path, f), album_dir_task))
+            # Spawn background tasks to do the copying.
+            for f in Config.TEMPLATE_FILE_NAMES:
+                tasks.append(self._threads.submit(self._bgCopyFile, os.path.join(DATA_PATH, f), 
+                                                  os.path.join(album_dir_path, f), album_dir_task))
 
-        self._threads.submit(functools.partial(handle_exceptions, self._bgTasksComplete, tasks, 
-                                               "installing the template"))
-        self._backgroundStart(tasks)
+            self._threads.submit(functools.partial(handle_exceptions, self._bgTasksComplete, tasks, 
+                                                   "installing the template"))
+            self._backgroundStart(tasks)
 
     def _bgCopyFile(self, source, destination, dir_creation_task):
         """Background task to copy a file."""

@@ -12,11 +12,6 @@ For version 3:
       AlbumGenerator.py.  A git filter might be able to do the job, if I used 
       git.  Maybe add something to install.sh?
 
-    * Generate an HTML version of README and install it with the template.  
-      'discount-mkd2html' generates html4.  'pandoc -t html5 -s' generates 
-      html5, but with an inline stylesheet and a IE-conditionally included 
-      third-party script.
-
     * Reduce the spacing on items in the Add Caption and Add Property menus.
       I tried to change the padding with a QMenu::item stylesheet, but this 
       removed the hover effect.  I can't figure out how to get both.
@@ -50,7 +45,8 @@ For future versions:
 
     * Revisit whether IE8 support is still needed.  If not, get rid of the 
       compat crap and replace PNG buttons with SVG.  Maybe use data URLs in CSS 
-      to reduce server round-trips?
+      to reduce server round-trips?  Replace top-level divs with html5 header, 
+      footer, main, details, nav elements?
 
     * Revisit whether Android <4.4 support is still needed.  If not, get rid of 
       the poll loop.  See bug 2014-01-17_001 for more details.
@@ -66,7 +62,7 @@ For future versions:
       for more details.
 
     * Handle thumbnails with aspect ratios other than 4:3 (eg, for panorama 
-      photos).
+      photos) without cropping.
 
     * Handle unexpected values in the AlbumGenerator configuration file and 
       album files without crashing.  See bug 2014-04-05_001 for more details.
@@ -85,3 +81,10 @@ For future versions:
     * Support other operating systems besides Linux in AlbumGenerator.
 
     * Switch to a proper bug-tracking system.
+
+    * Model-View separation in AlbumGenerator.  At the very least, I'd no 
+      longer need to make foreground-thread callbacks every time I want to 
+      change something.
+
+    * Move the help content into a separate file and load both the help and 
+      readme content in iframes on top of the album.

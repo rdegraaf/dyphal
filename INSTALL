@@ -1,0 +1,39 @@
+Installing DHTML Photo Album
+============================
+
+To install DHTML Photo Album:
+
+1.  Edit `BIN_PATH`, `PKG_PATH`, and `DATA_PATH` in `install.sh` to suit your 
+    local environment.  The defaults are designed to install to the current 
+    user's home directory; to install to `/usr/local` instead, use something 
+    like the following:
+
+        BIN_PATH="/usr/local/bin"
+        PKG_PATH="/usr/local/lib/python3.3/site-packages"
+        DATA_PATH="/usr/local/share/AlbumGenerator"
+
+2.  Run `install.sh` as a user with write permissions to the directories chosen 
+    above.
+
+
+Dependencies
+------------
+
+The following packages are required to install and run DHTML Photo Album.  The 
+exact package names may vary depending on your operating system.
+
+*   Python 3.3
+*   python3-PyQt4
+*   exiftool
+*   ImageMagick
+*   PyQt4-devel (for installation only)
+*   pandoc (for installation only)
+
+Please note that DHTML Photo Album only runs on Linux at this time.
+
+
+Web Server setup
+----------------
+
+Any web server on any operating system can be used with DHTML Photo Album. 
+Please see your web server's documentation for setup instructions.

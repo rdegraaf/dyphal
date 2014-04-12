@@ -20,6 +20,14 @@ body {
   margin-bottom: 80px; /* footerPanel.height */
 }
 
+a:link, a:visited {
+  color: #88CCCC;
+}
+
+a:active {
+  color: #4b4b4b; /* html.background-color */
+}
+
 h1 {
   margin: 0;
   font-size: 24pt;
@@ -110,8 +118,7 @@ div.centerBlock>*:first-child {
   background-image: url(help.png);
 }
 
-#helpTextPanel {
-  display: none;
+#helpTextPanel, #readmePanel {
   position: absolute;
   top: 0;
   left: 0;
@@ -120,12 +127,18 @@ div.centerBlock>*:first-child {
   background-color: rgba(0, 0, 0, 0.6);
 }
 
-#helpText{
+#helpTextPanel {
+  display: none;
+}
+
+#helpText, #readmeText{
   border: 3px solid #AAAAAA;
   border-radius: 10px;
   background-color: #4b4b4b;
   max-width: 800px;
   text-align: justify;
+  margin-top: 1em;
+  margin-bottom: 1em;
   margin-left: 20%;
   margin-right: 20%;
   padding-left: 1em;

@@ -1,3 +1,40 @@
+    * www/AlbumGenerator.py (PhotoAlbumUI): Added a count of background 
+      activities so that starting a second background activity while another 
+      one is in progress doesn't fail an assertion or stomp on the first one's 
+      progress count.  (bug 2014-04-08_002)
+
+    * www/AlbumGenerator.py (PhotoAlbumUI._installTemplate): Handled 
+      cancellation of the directory chooser dialog.
+
+    * www/AlbumGenerator.py (PhotoAlbumUI): Moved all file I/O from _loadAlbum 
+      to a background task.  Populating the UI still needs to happen on the 
+      foreground thread because I have no model-view separation.  (bug 
+      2014-04-09_001)
+
+    * www/AlbumGenerator.py (PhotoAlbumUI._showError): Changed the message box 
+      icon for background activity errors from 'question' to 'warning'.
+
+    * INSTALL: New file containing installation instructions.
+
+    * misc/html5.pandoc: New file containing a pandoc template for converting 
+      README to html.
+
+    * install.sh: Generate an HTML version of README and install it with the 
+      web files.
+
+    * www/common.css: Set the color for link text to something that's visible 
+      on the gray background but doesn't clash too badly.  Set the color for 
+      active links to the background color so that we don't get a red border 
+      that flashes around thumbnails when they're clicked upon.  Unfortunately, 
+      this makes text links disappear when active.
+
+    * www/common.css: Set a top margin on helpText because other browsers don't 
+      show the top margin that Firefox gets somewhere.
+
+    * www/common.css: Re-use the help text styles for the HTML readme.
+
+    * www/index.html: Link the HTML readme from the help panel.
+
 2014-04-12  Rennie deGraaf  <rennie.degraaf@gmail.com>
 
     * www/album.html: Renamed to www/index.html so that the URL format 
