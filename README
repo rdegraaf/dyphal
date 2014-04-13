@@ -6,9 +6,9 @@ work without needing to turn to commercial providers that inject advertising
 and may do ethically dubious things with the photos and information that they 
 host.
 
-A photo albums are shown as a list of photos; each photo can be opened to show 
-a larger view with metadata.  The photo's size scales to best fit the browser 
-window.  The album can be navigated by mouse, touch, or keyboard.
+An album is displayed as a list of photos; each photo can be opened to show a 
+larger view with metadata.  The photo's size scales to best fit the browser 
+window.  An album can be navigated by mouse, touch, or keyboard.
 
 An album can be hosted on any web document server; no server-side scripts or 
 databases are required.  All necessary files are generated from original 
@@ -183,6 +183,22 @@ JSON files.  See bug 2014-04-07_001 for details.
 
 Why am I so concerned with TOCTOU in DyphalGenerator when there's no privilege 
 separation to be attacked?  Practice.
+
+
+Licence
+-------
+
+Dyphal is copyright (c) Rennie deGraaf, 2005-2014.  It is distributed under the 
+terms of the GNU General Public Licence, either version 2 or (at your option) 
+version 3.  See LICENCE or <http://www.gnu.org/licenses/> for details.
+
+
+Contact information
+-------------------
+
+Rennie deGraaf <rennie.degraaf@gmail.com>
+
+<https://ciphertext.info/software/dyphal/>
 
 
 Version 3.0  $Date$

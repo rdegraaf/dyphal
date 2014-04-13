@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 """Server-side data generator for Dyphal, the Dynamic Photo Album.
+Copyright (c) Rennie deGraaf, 2005-2014.
 
 DyphalGenerator is a tool to create photo albums to display using 
 Dyphal.  It can import metadata from a variety of embedded photo tags 
@@ -11,15 +12,24 @@ detailed usage documentation at this time.
 DyphalGenerator requires Python 3.3 or later, only runs on Linux, and 
 requires that the commands 'convert' from the ImageMagick package and 
 'exiftool' are available in the current path.
+
+This program is free software; you can redistribute it and/or modify it 
+under the terms of the GNU General Public License as published by the 
+Free Software Foundation; either version 2 of the License, or (at your 
+option) version 3.
+
+This program is distributed in the hope that it will be useful, but 
+WITHOUT ANY WARRANTY; without even the implied warranty of 
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 __author__ = "Rennie deGraaf <rennie.degraaf@gmail.com>"
 __version__ = "3.0"
-__credits__ = ["Rennie deGraaf"]
+__credits__ = "Rennie deGraaf"
 __date__ = "2014-04-12"
-
-__copyright__ = "Copyright (c) Rennie deGraaf, 2005-2014.  All rights reserved."
-__license__ = "GPLv2.0"
-__email__ = "rennie.degraaf@gmail.com"
 
 #__all__ = "" # Uncomment to limit the amount of data tha pydoc spews out.
 

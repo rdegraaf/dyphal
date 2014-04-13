@@ -7,18 +7,11 @@ For version 3:
       DyphalGenerator.py.  A git filter might be able to do the job, if I used 
       git.  Maybe add something to install.sh?
 
-    * Reduce the spacing on items in the Add Caption and Add Property menus.
-      I tried to change the padding with a QMenu::item stylesheet, but this 
-      removed the hover effect.  I can't figure out how to get both.
-
-    * jslint or something similar?
-
     * Move PhotoAlbumUI into its own file?
 
-    * Licence.  GPLv2?  Something similar to GPLv3 but without the political 
-      screed?  Apache 2.0?  MPL 2.0?
-
     * Script to update gthumb comments.
+
+    * Rename album.js to dyphal.js
 
 
 For future versions:
@@ -78,4 +71,11 @@ For future versions:
 
     * A build option for minified release builds would be nice.  So would an 
       option to build an installation tarball of everything.  
+
+    * On-line help in DyphalGenerator.
+
+    * Reduce the spacing on items in the Add Caption and Add Property menus.
+      I tried to change the padding with a QMenu::item stylesheet, but this 
+      removed the hover effect.  I can't figure out how to get both.  It's 
+      probably not important unless the user is using a fairly small screen.
 

@@ -1,6 +1,19 @@
 /**
   Various library routines used by Dyphal.
-  Copyright (c) Rennie deGraaf, 2005-2014.  All rights reserved.
+  Copyright (c) Rennie deGraaf, 2005-2014.
+  
+  This program is free software; you can redistribute it and/or modify 
+  it under the terms of the GNU General Public License as published by 
+  the Free Software Foundation; either version 2 of the License, or (at 
+  your option) version 3.
+
+  This program is distributed in the hope that it will be useful, but 
+  WITHOUT ANY WARRANTY; without even the implied warranty of 
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
+  General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 // Retrieves and parses a JSON object, then makes a callback with the result 
@@ -13,9 +26,9 @@ function getJSON(object, callback, fatalErrors, args)
     req.onreadystatechange = function() {
         try
         {
-            if (4 == req.readyState)
+            if (4 === req.readyState)
             {
-                if (200 != req.status)
+                if (200 !== req.status)
                     callback(req.status, null, args);
                 else
                 {
@@ -63,9 +76,9 @@ function camel(str)
     var state=0;
     for (var i=0; i<str.length; ++i)
     {
-        if (0 == state)
+        if (0 === state)
         {
-            if ('-' == str[i])
+            if ('-' === str[i])
                 state = 1;
             else
                 newstr += str[i];
@@ -88,7 +101,7 @@ function getProperty ( obj, prop )
     // getComputedStyle() properly probably doesn't support CSP anyway.
     if (document.defaultView && document.defaultView.getComputedStyle)
     {
-        var val = document.defaultView.getComputedStyle(obj,null).getPropertyValue(prop)
+        var val = document.defaultView.getComputedStyle(obj,null).getPropertyValue(prop);
         if (val)
             return val;
         else
@@ -108,13 +121,13 @@ function getObjWidth ( obj )
 
     // find the begining of the number, after a space
     var a = w.indexOf(" ");
-    if (a == -1)
+    if (a === -1)
         a = 0;
     // find the end of the number, before "px"
     var b = w.indexOf("px");
 
-    if (b != -1)
-        return parseInt(w.substr(a, b-a));
+    if (b !== -1)
+        return parseInt(w.substr(a, b-a), 10);
     else // value not returned in pixels
         return obj.clientWidth;
 }
@@ -127,13 +140,13 @@ function getObjHeight ( obj )
 
     // find the begining of the number, after a space
     var a = w.indexOf(" ");
-    if (a == -1)
+    if (a === -1)
         a = 0;
     // find the end of the number, before "px"
     var b = w.indexOf("px");
 
-    if (b != -1)
-        return parseInt(w.substr(a, b-a));
+    if (b !== -1)
+        return parseInt(w.substr(a, b-a), 10);
     else // value not returned in pixels
         return obj.clientHeight;
 }
@@ -143,10 +156,10 @@ function getObjHeight ( obj )
 function getHBorder ( obj )
 {
     // this won't work if the units aren't pixels
-    var leftBorder = parseInt(getProperty(obj, "border-left-width").replace(/[^0-9\.]/gi, ""));
-    var leftPad = parseInt(getProperty(obj, "padding-left").replace(/[^0-9\.]/gi, ""));
-    var rightPad = parseInt(getProperty(obj, "padding-right").replace(/[^0-9\.]/gi, ""));
-    var rightBorder = parseInt(getProperty(obj, "border-right-width").replace(/[^0-9\.]/gi, ""));
+    var leftBorder = parseInt(getProperty(obj, "border-left-width").replace(/[^0-9\.]/gi, ""), 10);
+    var leftPad = parseInt(getProperty(obj, "padding-left").replace(/[^0-9\.]/gi, ""), 10);
+    var rightPad = parseInt(getProperty(obj, "padding-right").replace(/[^0-9\.]/gi, ""), 10);
+    var rightBorder = parseInt(getProperty(obj, "border-right-width").replace(/[^0-9\.]/gi, ""), 10);
 
     // assign a sane value if the unit wasn't in pixels
     if (isNaN(leftBorder))
@@ -166,10 +179,10 @@ function getHBorder ( obj )
 function getVBorder ( obj )
 {
     // this won't work if the units aren't pixels
-    var topBorder = parseInt(getProperty(obj, "border-top-width").replace(/[^0-9\.]/gi, ""));
-    var topPad = parseInt(getProperty(obj, "padding-top").replace(/[^0-9\.]/gi, ""));
-    var bottomPad = parseInt(getProperty(obj, "padding-bottom").replace(/[^0-9\.]/gi, ""));
-    var bottomBorder = parseInt(getProperty(obj, "border-bottom-width").replace(/[^0-9\.]/gi, ""));
+    var topBorder = parseInt(getProperty(obj, "border-top-width").replace(/[^0-9\.]/gi, ""), 10);
+    var topPad = parseInt(getProperty(obj, "padding-top").replace(/[^0-9\.]/gi, ""), 10);
+    var bottomPad = parseInt(getProperty(obj, "padding-bottom").replace(/[^0-9\.]/gi, ""), 10);
+    var bottomBorder = parseInt(getProperty(obj, "border-bottom-width").replace(/[^0-9\.]/gi, ""), 10);
 
     // assign a sane value if the unit wasn't in pixels
     if (isNaN(topBorder))
@@ -188,6 +201,6 @@ function getVBorder ( obj )
 // Add a suffix-match method to String.
 String.prototype.endsWith = function(suffix) {
     var lastIndex = this.lastIndexOf(suffix);
-    return (-1 != lastIndex) && (this.length == lastIndex + suffix.length);
-}
+    return (-1 !== lastIndex) && (this.length === lastIndex + suffix.length);
+};
 

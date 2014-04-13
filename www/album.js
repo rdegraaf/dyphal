@@ -1,6 +1,19 @@
 /**
   Scripts for Dyphal, the Dynamic Photo Album.
-  Copyright (c) Rennie deGraaf, 2005-2014.  All rights reserved.
+  Copyright (c) Rennie deGraaf, 2005-2014.
+  
+  This program is free software; you can redistribute it and/or modify 
+  it under the terms of the GNU General Public License as published by 
+  the Free Software Foundation; either version 2 of the License, or (at 
+  your option) version 3.
+
+  This program is distributed in the hope that it will be useful, but 
+  WITHOUT ANY WARRANTY; without even the implied warranty of 
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
+  General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 var debug=false;
@@ -87,23 +100,23 @@ function start()
         var debugNew = false;
         var pageNew = 0;
         var args = window.location.hash.split("/");
-        if ((1 == args.length) && ("" == args[0]))
+        if ((1 === args.length) && ("" === args[0]))
         {
             // Kludge to support the current lack of an index view
             window.location = "album-list.html";
             return;
         }
-        if ((2 > args.length) || ("" == args[1]) || ("#" != args[0]))
+        if ((2 > args.length) || ("" === args[1]) || ("#" !== args[0]))
             throw new Error("Incorrect page arguments");
         albumNameNew = decodeURIComponent(args[1]);
-        if ((3 == args.length) && ("debug" == args[2]))
+        if ((3 === args.length) && ("debug" === args[2]))
             debugNew = true;
         else if (3 <= args.length)
         {
             if (/^[0-9]+$/.test(args[2]))
             {
-                pageNew = parseInt(args[2])
-                if ((4 == args.length) && ("debug" == args[3]))
+                pageNew = parseInt(args[2], 10);
+                if ((4 === args.length) && ("debug" === args[3]))
                     debugNew = true;
                 else if (4 <= args.length)
                     throw new Error("Incorrect page arguments");
@@ -113,7 +126,7 @@ function start()
         }
 
         // We need to set albumName before we set debug so that loadDebugError() can work.
-        if (albumName != albumNameNew)
+        if (albumName !== albumNameNew)
         {
             albumName = albumNameNew;
             albumPath = "./" + albumName.replace(/[^\/]+$/, '');
@@ -121,7 +134,7 @@ function start()
             page = null;
         }
 
-        if (debug != debugNew)
+        if (debug !== debugNew)
         {
             debug = debugNew;
             if (debugNew)
@@ -134,16 +147,16 @@ function start()
             return;
         }
 
-        if (page != pageNew)
+        if (page !== pageNew)
         {
             page = pageNew;
-            if (null == album)
+            if (null === album)
                 getJSON("./" + albumName + ".json", loadAlbum, true, null);
-            else if (0 == page)
+            else if (0 === page)
                 loadAlbumContent();
             else if (page > album.photos.length)
                 error("Photo number out of range");
-            else if (null == pages[page-1])
+            else if (undefined === pages[page-1])
                 getJSON(albumPath + album.metadataDir + album.photos[page-1].name + ".json", loadPhoto, true, {"page":page});
             else
                 loadPhotoContent();
@@ -163,10 +176,10 @@ function start()
 function brokenLoadEventOnLink()
 {
     // Load events on link elements are broken on Android versions prior to 4.4
-    regex = /Android ([0-9]+)\.([0-9]+)(?:[^0-9]|$)/i
+    regex = /Android ([0-9]+)\.([0-9]+)(?:[^0-9]|$)/i;
     match = regex.exec(navigator.userAgent);
-    if (null != match && 3 == match.length)
-        return (match[1] < 4 || match[2] < 4)
+    if (null !== match && 3 === match.length)
+        return (match[1] < 4 || match[2] < 4);
 
     return false;
 }
@@ -291,19 +304,19 @@ function loadAlbum(status, albumData, args)
 {
     log("loadAlbum enter");
 
-    if (200 != status)
+    if (200 !== status)
         throw new Error("Album data is missing");
     else
     {
         verifyAlbum(albumData);
         album = albumData;
         // Now that we have the album loaded, set the keystroke handler
-        document.addEventListener("keydown", keyHandler, false);
-        if (0 == page)
+        document.addEventListener("keypress", keyHandler, false);
+        if (0 === page)
             loadAlbumContent();
         else if (page > album.photos.length)
             throw new Error("Photo number out of range");
-        else if (null == pages[page-1])
+        else if (undefined === pages[page-1])
             getJSON(albumPath + album.metadataDir + album.photos[page-1].name + ".json", loadPhoto, true, {"page":page});
         else
             loadPhotoContent();
@@ -316,25 +329,23 @@ function loadAlbum(status, albumData, args)
 // Sanity-check the album description.  Error out if it's invalid.
 function verifyAlbum(albumData)
 {
-    if ((null == albumData)
-        || (null == albumData.title)
-        || (null == albumData.footer)
-        || (null == albumData.description)
-        || (null == albumData.metadataDir)
-        || (null == albumData.photos))
+    if ((undefined === albumData) || 
+        (undefined === albumData.title) || 
+        (undefined === albumData.footer) || 
+        (undefined === albumData.description) || 
+        (undefined === albumData.metadataDir) || 
+        (undefined === albumData.photos))
     {
         throw new Error("Album data is invalid");
-        return;
     }
     for (i=0; i<albumData.photos.length; ++i)
     {
-        if ((null == albumData.photos[i])
-            || (null == albumData.photos[i].name)
-            || (null == albumData.photos[i].thumbnail)
-            || (null == albumData.photos[i].orientation))
+        if ((undefined === albumData.photos[i]) || 
+            (undefined === albumData.photos[i].name) || 
+            (undefined === albumData.photos[i].thumbnail) || 
+            (undefined === albumData.photos[i].orientation))
         {
-            throw new Error("Album data is invalid")
-            return;
+            throw new Error("Album data is invalid");
         }
     }
 }
@@ -354,7 +365,7 @@ function loadAlbumContent()
     document.getElementById("description").textContent = album.description;
 
     var listElement = document.getElementById("thumbnailList");
-    while (null != listElement.firstChild)
+    while (null !== listElement.firstChild)
         listElement.removeChild(listElement.firstChild);
 
     // Insert thumbnails as clones of a template
@@ -374,7 +385,7 @@ function loadAlbumContent()
         linkElement.setAttribute("class", "navigationlink");
         linkElement.setAttribute("data-target", i+1);
         photoElement.setAttribute("src", albumPath + album.photos[i].thumbnail);
-        if ("vertical" == album.photos[i].orientation)
+        if ("vertical" === album.photos[i].orientation)
             photoElement.setAttribute("class", "vthumbnail");
         else
             photoElement.setAttribute("class", "hthumbnail");
@@ -396,11 +407,11 @@ function loadPhoto(status, photoData, args)
 {
     log("loadPhoto enter");
 
-    if (200 != status)
+    if (200 !== status)
         throw new Error("Photo data is missing");
     else
     {
-        if (page == args.page)
+        if (page === args.page)
         {
             verifyPhoto(photoData);
             pages[page-1] = photoData;
@@ -415,15 +426,14 @@ function loadPhoto(status, photoData, args)
 // Verify that a photo description is well-formed.
 function verifyPhoto(photoData)
 {
-    if ((null == photoData)
-        || (null == photoData.photo)
-        || (null == photoData.width)
-        || (null == photoData.height)
-        || (null == photoData.properties)
-        || (null == photoData.caption))
+    if ((undefined === photoData) || 
+        (undefined === photoData.photo) || 
+        (undefined === photoData.width) || 
+        (undefined === photoData.height) || 
+        (undefined === photoData.properties) || 
+        (undefined === photoData.caption))
     {
         throw new Error("Photo data is invalid");
-        return;
     }
 }
 
@@ -442,7 +452,7 @@ function loadPhotoContent()
     // load event when the target of a link element changes, so we need to 
     // create a new link element.
     var cssElement = document.getElementById("stylesheet");
-    if ("photo.css" != cssElement.getAttribute("href"))
+    if ("photo.css" !== cssElement.getAttribute("href"))
     {
         var cssElementNew = cssElement.cloneNode();
         cssElementNew.addEventListener("load", loadPhotoAfterStylesheet, false);
@@ -470,8 +480,8 @@ function loadPhotoContent()
     document.getElementById("index").textContent = page + "/" + album.photos.length;
 
     // Load photo caption
-    var captionElement = document.getElementById("captionPanel");
-    while (null != captionPanel.firstChild)
+    var captionPanel = document.getElementById("captionPanel");
+    while (null !== captionPanel.firstChild)
         captionPanel.removeChild(captionPanel.firstChild);
     for (idx in photoData.caption)
     {
@@ -484,7 +494,7 @@ function loadPhotoContent()
     // Load photo properties
     var propertyTable = document.getElementById("propertyTable");
     var rows = propertyTable.getElementsByTagName("tr");
-    while (0 != rows.length)
+    while (0 !== rows.length)
         propertyTable.removeChild(rows[0]);
     for (idx in photoData.properties)
     {
@@ -500,7 +510,7 @@ function loadPhotoContent()
         propertyTable.appendChild(rowElement);
     }
 
-    if (1 == page)
+    if (1 === page)
     {
         // No previous photo
         document.getElementById("prevThumbPanel").style["visibility"] = "hidden";
@@ -514,7 +524,7 @@ function loadPhotoContent()
         prevLinkElement.setAttribute("data-target", page-1);
         var prevThumbElement = document.getElementById("prevThumbImage");
         prevThumbElement.setAttribute("src", albumPath + album.photos[page-1-1].thumbnail);
-        if ("vertical" == album.photos[page-1-1].orientation)
+        if ("vertical" === album.photos[page-1-1].orientation)
             prevThumbElement.setAttribute("class", "vnavigation");
         else
             prevThumbElement.setAttribute("class", "hnavigation");
@@ -527,7 +537,7 @@ function loadPhotoContent()
         document.getElementById("prevImage").style["visibility"] = "visible";
     }
 
-    if (page == album.photos.length)
+    if (page === album.photos.length)
     {
         // No next photo
         document.getElementById("nextThumbPanel").style["visibility"] = "hidden";
@@ -541,7 +551,7 @@ function loadPhotoContent()
         nextLinkElement.setAttribute("data-target", page+1);
         var nextThumbElement = document.getElementById("nextThumbImage");
         nextThumbElement.setAttribute("src", albumPath + album.photos[page-1+1].thumbnail);
-        if ("vertical" == album.photos[page-1+1].orientation)
+        if ("vertical" === album.photos[page-1+1].orientation)
             nextThumbElement.setAttribute("class", "vnavigation");
         else
             nextThumbElement.setAttribute("class", "hnavigation");
@@ -582,7 +592,7 @@ function loadPhotoAfterStylesheet()
             // Webkit doesn't fire a load event if the src doesn't change.  So let's make sure it changes.
             photoElement.setAttribute("src", "");
             photoElement.style["width"] = photoData.width + "px";
-            photoElement.style["height"] = photoData.height + "px"
+            photoElement.style["height"] = photoData.height + "px";
             photoElement.addEventListener("load", fitPhoto, false);
             // Make sure that the event listener is in place before we set the photo
             photoElement.setAttribute("src", albumPath + photoData.photo);
@@ -683,9 +693,9 @@ function fitPhoto()
 function generatePhotoURL(index, suppressDebug)
 {
     var link = "#/" + encodeURIComponent(encodeURIComponent(albumName));
-    if (null != index && 0 != index)
+    if (null !== index && 0 !== index)
         link += "/" + index;
-    if (debug && (true != suppressDebug))
+    if (debug && (true !== suppressDebug))
         link += "/debug";
     return link;
 }
@@ -696,7 +706,7 @@ function cacheNext()
 {
     log("cacheNext enter");
 
-    if (null != page && page < album.photos.length && null == pages[page])
+    if (null !== page && page < album.photos.length && undefined === pages[page])
     {
         getJSON(albumPath + album.metadataDir + album.photos[page].name + ".json", cachePhoto, false, {"page" : page});
     }
@@ -710,11 +720,11 @@ function cachePhoto(status, photoData, args)
 {
     log("cachePhoto enter");
 
-    if (200 != req.status)
+    if (200 !== req.status)
         throw new Error("Photo data is missing");
     else
     {
-        if (null == pages[args.page])
+        if (undefined === pages[args.page])
         {
             verifyPhoto(photoData);
             pages[args.page] = photoData;
@@ -732,52 +742,52 @@ function keyHandler(e)
 {
     try
     {
-        if (helpVisible && (27 /*escape*/ == e.keyCode))
+        if (helpVisible && (27 /*escape*/ === e.keyCode))
         {
             hideHelp();
-            return false;
+            e.preventDefault();
         }
         else if (0 < page)
         {
             // On a photo page
-            if (overlayVisible && (27 /*escape*/ == e.keyCode))
+            if (overlayVisible && (27 /*escape*/ === e.keyCode))
             {
                 hidePhotoOverlay();
-                return false;
+                e.preventDefault();
             }
-            else if (13 /*enter*/ == e.keyCode)
+            else if (13 /*enter*/ === e.keyCode)
             {
                 if (overlayVisible)
                     hidePhotoOverlay();
                 else if (!helpVisible)
                     document.getElementById("photo").click();
-                return false;
+                e.preventDefault();
             }
-            else if ((34 /*page down*/ == e.keyCode) || (32 /*space*/ == e.keyCode))
+            else if ((34 /*page down*/ === e.keyCode) || (32 /*space*/ === e.keyCode))
             {
-                if (album.photos.length != page)
+                if (album.photos.length !== page)
                     document.location.href = generatePhotoURL(page+1);
-                return false;
+                e.preventDefault();
             }
-            else if ((33 /*page up*/ == e.keyCode) || (8 /*backspace*/ == e.keyCode))
+            else if ((33 /*page up*/ === e.keyCode) || (8 /*backspace*/ === e.keyCode))
             {
-                if (1 != page)
+                if (1 !== page)
                     document.location.href = generatePhotoURL(page-1);
-                return false;
+                e.preventDefault();
             }
-            else if ((36 /*home*/ == e.keyCode) || (27 /*escape*/ == e.keyCode))
+            else if ((36 /*home*/ === e.keyCode) || (27 /*escape*/ === e.keyCode))
             {
                 document.location.href = generatePhotoURL(0);
-                return false;
+                e.preventDefault();
             }
         }
-        else if (0 == page)
+        else if (0 === page)
         {
             // On an album page
-            if (!helpVisible && (13 /*enter*/ == e.keyCode))
+            if (!helpVisible && (13 /*enter*/ === e.keyCode))
             {
                 document.location.href = generatePhotoURL(1);
-                return false;
+                e.preventDefault();
             }
         }
     }
@@ -795,8 +805,8 @@ function touchStart(evt)
 {
     try
     {
-        currentX = parseInt(evt.touches[0].clientX);
-        currentY = parseInt(evt.touches[0].clientY);
+        currentX = parseInt(evt.touches[0].clientX, 10);
+        currentY = parseInt(evt.touches[0].clientY, 10);
     }
     catch (e)
     {
@@ -814,14 +824,14 @@ function touchEnd(evt)
         var thresholdY = 40;
         var thresholdX = 100;
 
-        var motionX = parseInt(evt.changedTouches[0].clientX) - currentX;
-        var motionY = parseInt(evt.changedTouches[0].clientY) - currentY;
+        var motionX = parseInt(evt.changedTouches[0].clientX, 10) - currentX;
+        var motionY = parseInt(evt.changedTouches[0].clientY, 10) - currentY;
 
         if ((thresholdY > Math.abs(motionY)) && (thresholdX < Math.abs(motionX)))
         {
             if (0 > motionX)
             {
-                if (0 < page && album.photos.length != page)
+                if (0 < page && album.photos.length !== page)
                     document.location.href = generatePhotoURL(page+1);
             }
             else

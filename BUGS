@@ -121,11 +121,11 @@
     POSTPONED: This is an artefact of not wanting separate save and album 
     files.  The paths likely aren't valid on the machine serving photo albums 
     to the web, so the usefulness of the paths to an attacker is limited.  To 
-    fix this, I'd either need to create separate save files or encrypt the 
+    fix this, I'll need to either create separate save files or encrypt the 
     paths.
 
 2014-04-09_002  Rennie deGraaf  <rennie.degraaf@gmail.com>
-    DyphalGenerator doesn't load enough to get to the error message under 
+    DyphalGenerator doesn't load far enough to get to the error message under 
     Python 2.x.  It fails to load urllib.parse.  If I remove that, it fails to 
     load the dyphal modules.
 

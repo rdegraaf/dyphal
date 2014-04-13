@@ -14,8 +14,9 @@ PATH=/bin:/usr/bin
 PKG_NAME="dyphal"
 
 mkdir -p "$PKG_PATH"/"$PKG_NAME"
+# Copy the header of DyphalGenerator.py into __init__.py
 cat tools/DyphalGenerator.py | sed -e '/^#!.*/d' -e '/^import/,$d' >"$PKG_PATH"/"$PKG_NAME"/__init__.py
-echo '"""Generated UI classes for DyphalGenerator."""' >"$PKG_PATH"/"$PKG_NAME"/ui.py
+cp tools/ui-header.py "$PKG_PATH"/"$PKG_NAME"/ui.py
 pyuic4 tools/DyphalGenerator.ui >>"$PKG_PATH"/"$PKG_NAME"/ui.py
 cp tools/util.py tools/photo.py "$PKG_PATH"/"$PKG_NAME"/
 

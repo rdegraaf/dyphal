@@ -1,3 +1,19 @@
+2014-04-13  Rennie deGraaf  <rennie.degraaf@gmail.com>
+
+    * www/album.js, www/lib.js, www/ie8compat.js: Cleaned up most jslint 
+      warnings.
+
+    * Added a GPLv2 header to all code files.
+    
+    * LICENCE: New file containing the GNU GPLv2.
+    
+    * README: Added licence and contact information.
+
+    * ui-header.py: New file containing header text for ui.py, which is 
+      generated at install-time from tools/DyphalGenerator.ui.
+
+    * install.sh: Use ui-header.py as a header for ui.py.
+
 2014-04-12  Rennie deGraaf  <rennie.degraaf@gmail.com>
 
     * Replaced the test files with a better set of photos with various 
