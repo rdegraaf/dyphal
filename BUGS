@@ -132,3 +132,12 @@
     WONTFIX: This looks like it will be a pain to fix and it's not worth the 
     trouble.  The version check should still be useful if someone tries to load 
     DyphalGenerator under a pre-3.3 version of Python 3.
+
+2014-04-12_001  Rennie deGraaf  <rennie.degraaf@gmail.com>
+    DyphalGenerator won't load files whose names contain double-quotes when 
+    they're selected in a file dialog.
+
+    EXTERNAL: This seems to be a known bug with the KDE file dialog (see 
+    https://bugs.kde.org/show_bug.cgi?id=185433).  It presumably won't occur 
+    when using some other file dialog.  Files whose names contain double-quotes 
+    can be loaded from existing albums.

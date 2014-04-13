@@ -635,8 +635,8 @@ function fitPhoto()
             panelHeight = getObjHeight(photoPanel) - getVBorder(photo);
             panelAspect = panelWidth/panelHeight;
 
-            windowWidth = (window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth) - 6;
-            windowHeight = (window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight) - 6;
+            windowWidth = (window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth) - 10;
+            windowHeight = (window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight) - 10;
 
             // set the width and height of the photo
             if ((panelWidth >= photoData.width) && (panelHeight >= photoData.height))

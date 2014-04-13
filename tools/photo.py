@@ -70,11 +70,14 @@ def format_display_time(timestamp):
         formatted_time = time.strftime("%d %B %Y, %H:%M", parsed_time)
 
         # Python 3.3's strftime ignores tm_gmtoff when formatting "%z", so I need to do it myself.
+        # Use RFC 3339 conventions.
         time_zone = "UTC"
-        if 0 > parsed_time.tm_gmtoff:
-            time_zone += time.strftime("-%H%M", time.gmtime(-parsed_time.tm_gmtoff))
+        if None == parsed_time.tm_gmtoff:
+            time_zone += "-00:00"
+        elif 0 > parsed_time.tm_gmtoff:
+            time_zone += time.strftime("-%H:%M", time.gmtime(-parsed_time.tm_gmtoff))
         elif 0 < parsed_time.tm_gmtoff:
-            time_zone += time.strftime("+%H%M", time.gmtime(parsed_time.tm_gmtoff))
+            time_zone += time.strftime("+%H:%M", time.gmtime(parsed_time.tm_gmtoff))
 
         return (formatted_time, time_zone)
     except (ValueError, TypeError):

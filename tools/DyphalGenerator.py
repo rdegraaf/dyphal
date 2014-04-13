@@ -355,10 +355,15 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
                 tree = xml.etree.ElementTree.parse(catalog_file_name)
                 # Files appear in arbitrary order in a gThumb 3 catalog file.  
                 # I assume that the display order is the names sorted alphabetically.
-                filenames = sorted([QtCore.QUrl(elmt.attrib["uri"]).toLocalFile() 
-                                    for elmt in tree.getroot().iter("file")])
-                self._addPhotoFiles([(name, os.path.basename(name)) for name in filenames])
-                self._config.gthumb3Dir = os.path.dirname(catalog_file_name)
+                if "1.0" == tree.getroot().get("version"):
+                    filenames = sorted([QtCore.QUrl(elmt.attrib["uri"]).toLocalFile() 
+                                        for elmt in tree.getroot().iter("file")])
+                    self._addPhotoFiles([(name, os.path.basename(name)) for name in filenames])
+                    self._config.gthumb3Dir = os.path.dirname(catalog_file_name)
+                else:
+                    QtGui.QMessageBox.warning(self, Config.PROGRAM_NAME, 
+                                              "Unsupported gThumb catalog version", 
+                                              QtGui.QMessageBox.Ok, QtGui.QMessageBox.Ok)
         else:
             print("ERROR: unknown item selected in 'Add Photos' control")
 

@@ -1,22 +1,70 @@
 {
-    "title" : "Test Album",
-    "footer" : "Copyright © \"Rennie deGraaf\" 2005-2013. All rights reserved.\n       Blah blah blah\n    Blah",
-    "description" : "These are some of my best photos ever. And here's some more text, because I want this to be really long.  I want it to wrap around at least once; preferrably more than once.  But apparently it takes a lot of text to fill in a line.  Now that I limited the width of this field, it should wrap for reasonable window widths.",
-    "photos" : [
+    "albumVersion": 1,
+    "title": "Test Album",
+    "description": "This album is designed to test Dyphal.  It has photos with a mix of different caption types and date formats, a photo with an odd aspect ratio, a low-resolution photo, and a photo with a bunch of unusual characters in its name.",
+    "footer": "Copyright © \"Rennie deGraaf\" 2005-2013. <script>All rights \nreserved.&lt;script&gt;",
+    "photos": [
         {
-            "name" : "img000.jpeg",
-            "thumbnail" : "img000.jpeg.small.jpeg",
-            "orientation" : "horizontal"
+            "name": "img_0357.jpg",
+            "thumbnail": "thumbnails/img_0357.thumbnail.jpg",
+            "orientation": "horizontal",
+            "path": "%7E/Projects/PhotoAlbum/trunk/test/img_0357.jpg"
         },
         {
-            "name" : "img_2235.jpg",
-            "thumbnail" : "040-img_2235.jpg.small.jpeg",
-            "orientation" : "vertical"
+            "name": "img_2235.jpg",
+            "thumbnail": "thumbnails/img_2235.thumbnail.jpg",
+            "orientation": "vertical",
+            "path": "%7E/Projects/PhotoAlbum/trunk/test/img_2235.jpg"
         },
         {
-            "name" : "img_0281.jpg",
-            "thumbnail" : "096-img_0281.jpg.small.jpeg",
-            "orientation" : "horizontal"
+            "name": "img_0281.jpg",
+            "thumbnail": "thumbnails/img_0281.thumbnail.jpg",
+            "orientation": "horizontal",
+            "path": "%7E/Projects/PhotoAlbum/trunk/test/img_0281.jpg"
+        },
+        {
+            "name": "img_2540.jpg",
+            "thumbnail": "thumbnails/img_2540.thumbnail.jpg",
+            "orientation": "vertical",
+            "path": "%7E/Projects/PhotoAlbum/trunk/test/img_2540.jpg"
+        },
+        {
+            "name": "img_2552.jpg",
+            "thumbnail": "thumbnails/img_2552.thumbnail.jpg",
+            "orientation": "horizontal",
+            "path": "%7E/Projects/PhotoAlbum/trunk/test/img_2552.jpg"
+        },
+        {
+            "name": "img_2875.jpg",
+            "thumbnail": "thumbnails/img_2875.thumbnail.jpg",
+            "orientation": "horizontal",
+            "path": "%7E/Projects/PhotoAlbum/trunk/test/img_2875.jpg"
+        },
+        {
+            "name": "img_4748%C2%A9%27%3A%22%3E%E2%81%84.jpg",
+            "thumbnail": "thumbnails/img_4748%C2%A9%27%3A%22%3E%E2%81%84.thumbnail.jpg",
+            "orientation": "horizontal",
+            "path": "%7E/Projects/PhotoAlbum/trunk/test/img_4748%C2%A9%27%3A%22%3E%E2%81%84.jpg"
         }
+    ],
+    "metadataDir": "metadata/",
+    "captionFields": [
+        "Description",
+        "Location",
+        "Date"
+    ],
+    "propertyFields": [
+        "File name",
+        "File size",
+        "Image dimensions",
+        "Exposure",
+        "Aperture",
+        "ISO",
+        "Focal length",
+        "Camera model"
+    ],
+    "photoResolution": [
+        1024,
+        768
     ]
 }

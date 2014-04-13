@@ -3,10 +3,6 @@ For version 3:
     * Create an alternate CSS layout suitable for smartphone browsers.  See 
       bug 2014-01-17_002) for more details.
 
-    * Extend or replace deploy.sh to generate release builds that don't include 
-      the test data.  An option for minified release builds would also be nice. 
-      So would an option to build a tarball of everything.  
-
     * Find a way to push the version date into README, index.html, and 
       DyphalGenerator.py.  A git filter might be able to do the job, if I used 
       git.  Maybe add something to install.sh?
@@ -15,15 +11,9 @@ For version 3:
       I tried to change the padding with a QMenu::item stylesheet, but this 
       removed the hover effect.  I can't figure out how to get both.
 
-    * Build a better test set, including a photo with an odd aspect ratio, 
-      photos with different sets of comments, a photo with special 
-      characters in its name, and a really small photo.
-
     * jslint or something similar?
 
     * Move PhotoAlbumUI into its own file?
-
-    * Get rid of deploy.sh and the pre-generated album.
 
     * Licence.  GPLv2?  Something similar to GPLv3 but without the political 
       screed?  Apache 2.0?  MPL 2.0?
@@ -85,3 +75,7 @@ For future versions:
 
     * Move the help content into a separate file and load both the help and 
       readme content in iframes on top of the album.
+
+    * A build option for minified release builds would be nice.  So would an 
+      option to build an installation tarball of everything.  
+

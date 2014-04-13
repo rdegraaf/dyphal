@@ -1,4 +1,5 @@
 #!/bin/bash
+# Installation script for Dyphal.
 
 # Edit these paths to suit your local environment
 BIN_PATH="$HOME/bin"

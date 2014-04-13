@@ -1,5 +1,27 @@
 2014-04-12  Rennie deGraaf  <rennie.degraaf@gmail.com>
 
+    * Replaced the test files with a better set of photos with various 
+      different combinations of caption and property fields, various different 
+      date formats, different sizes and aspect ratios, and special characters 
+      in their names.  Removed the old files.
+
+    * tools/DyphalGenerator.py (DyphalUI._addPhotosHandler): Added a check to 
+      ensure that the gThumb catalog version is supported.
+
+    * tools/photo.py (format_display_time): Handle timestamps with no time 
+      zones.  Use RFC 3339 conventions for time zones.
+
+    * www/album.js (fitPhoto): Make the overlay photo slightly smaller to 
+      compensate for a few pixels that haven't been able to account for in 
+      Firefox.
+
+    * install-www.sh: New file; a script to install the web template files 
+      without needing to run DyphalGenerator.
+
+    * deploy.sh: Removed, replaced with install-www.sh
+
+2014-04-12  Rennie deGraaf  <rennie.degraaf@gmail.com>
+
     * Renamed the project to "Dyphal", for "Dynamic Photo Album".  Changed 
       documentation, comments, strings, class names, file names, etc. to 
       reflect this change.
