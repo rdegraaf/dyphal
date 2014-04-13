@@ -1,3 +1,6 @@
+"""Classes to represent a photo and its properties in 
+DyphalGenerator."""
+
 import time
 import re
 import os
@@ -8,7 +11,7 @@ import math
 
 from PyQt4 import QtGui
 
-from album_generator.util import *
+from dyphal.util import *
 
 class PropertyError(Exception):
     """Exception raised if a photo property has an unexpected value."""

@@ -3,23 +3,24 @@
 # Edit these paths to suit your local environment
 BIN_PATH="$HOME/bin"
 PKG_PATH="$HOME/.local/lib/python3.3/site-packages"
-DATA_PATH="$HOME/.share/AlbumGenerator"
+DATA_PATH="$HOME/.share/dyphal"
 
 #
 # You probably shouldn't edit anything below this.
 #
 PATH=/bin:/usr/bin
 
-PKG_NAME="album_generator"
+PKG_NAME="dyphal"
 
 mkdir -p "$PKG_PATH"/"$PKG_NAME"
-echo "__all__ = []" > "$PKG_PATH"/"$PKG_NAME"/__init__.py
-pyuic4 tools/AlbumGeneratorUI.ui > "$PKG_PATH"/"$PKG_NAME"/ui.py
+cat tools/DyphalGenerator.py | sed -e '/^#!.*/d' -e '/^import/,$d' >"$PKG_PATH"/"$PKG_NAME"/__init__.py
+echo '"""Generated UI classes for DyphalGenerator."""' >"$PKG_PATH"/"$PKG_NAME"/ui.py
+pyuic4 tools/DyphalGenerator.ui >>"$PKG_PATH"/"$PKG_NAME"/ui.py
 cp tools/util.py tools/photo.py "$PKG_PATH"/"$PKG_NAME"/
 
 mkdir -p "$BIN_PATH"
-cat tools/AlbumGenerator.py | sed -e "s@^DATA_PATH[ ]*=.*\$@DATA_PATH = \"${DATA_PATH}\"@" > "$BIN_PATH"/AlbumGenerator
-chmod +x "$BIN_PATH"/AlbumGenerator
+cat tools/DyphalGenerator.py | sed -e "s@^DATA_PATH[ ]*=.*\$@DATA_PATH = \"${DATA_PATH}\"@" > "$BIN_PATH"/DyphalGenerator
+chmod +x "$BIN_PATH"/DyphalGenerator
 
 mkdir -p "$DATA_PATH"
 cp www/* "$DATA_PATH"/

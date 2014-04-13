@@ -1,16 +1,16 @@
-DHTML Photo Album
-=================
+Dyphal, the Dynamic Photo Album
+===============================
 
-This package is a web photo album template designed to allow photographers to 
-show off their work without needing to turn to commercial providers that inject 
-advertising and may do ethically dubious things with the photos and information 
-that they host.
+Dyphal is a web photo album designed to allow photographers to show off their
+work without needing to turn to commercial providers that inject advertising 
+and may do ethically dubious things with the photos and information that they 
+host.
 
-Photo albums are shown as a list of photos; each photo can be opened to show a 
-larger view with metadata.  The photo's size scales to best fit your browser 
+A photo albums are shown as a list of photos; each photo can be opened to show 
+a larger view with metadata.  The photo's size scales to best fit the browser 
 window.  The album can be navigated by mouse, touch, or keyboard.
 
-The album can be hosted on any web document server; no server-side scripts or 
+An album can be hosted on any web document server; no server-side scripts or 
 databases are required.  All necessary files are generated from original 
 photographs and their metadata up front and stored on the server.  The album 
 and its metadata files are designed to require minimal storage space and 
@@ -20,7 +20,7 @@ minimal network traffic.
 Design principles
 -----------------
 
-This photo album was designed to satisfy the following goals:
+Dyphal was designed to satisfy the following goals:
 
 1.  The photo is central.  It must be the most prominent element of the page. 
     It must be entirely visible within the browser window; scrolling is not 
@@ -46,7 +46,7 @@ This photo album was designed to satisfy the following goals:
 Technical details
 -----------------
 
-The album is represented by a single web page, index.html.  JavaScript running 
+An album is represented by a single web page, index.html.  JavaScript running 
 within that page determines what to display based on hash parameters.  The 
 first parameter, which must always be present, identifies the album.  It's the 
 name of the JSON file that describes the album with the file name suffix 
@@ -120,8 +120,8 @@ who taught himself JavaScript by trial and error.
 History
 -------
 
-The original version of this album was the BestFit template for gThumb, which 
-I wrote in 2005 and became part of gThumb starting with version 2.9.1 in 2006. 
+The original version of Dyphal was the BestFit template for gThumb, which I 
+wrote in 2005 and became part of gThumb starting with version 2.9.1 in 2006. 
 That template was designed to take scale the photo to fit in the browser window 
 and show metadata around its edges; superficially, it looked a lot like this 
 album.  However, it was limited by the hacks required to support Internet 
@@ -140,19 +140,19 @@ ended up with this.
 The main disadvantage of the new album over the old gThumb-generated one is 
 that I can no longer rely on gThumb to select the photos to include, create 
 down-sized versions of them, and extract their metadata.  Instead, I wrote my 
-own tool, AlbumGenerator.  gThumb, despite a couple annoying mis-features, 
+own tool, DyphalGenerator.  gThumb, despite a couple annoying mis-features, 
 still has the best support for photo metadata of any Linux photo manager that I 
-could find, so AlbumGenerator pulls metadata from the places where gThumb 
+could find, so DyphalGenerator pulls metadata from the places where gThumb 
 stores it and pulls lists of photos from gThumb collections.
 
 
 Security Model
 --------------
 
-AlbumGenerator, which generates the server-side data, fills the role of a 
+DyphalGenerator, which generates the server-side data, fills the role of a 
 server component.  It is trusted, as are the shell commands that it invokes. 
-The image files loaded by AlbumGenerator are *not* trusted and are assumed to 
-contain arbitrary malicious content.  The JSON files emitted by AlbumGenerator 
+The image files loaded by DyphalGenerator are *not* trusted and are assumed to 
+contain arbitrary malicious content.  The JSON files emitted by DyphalGenerator 
 are partially trusted.  The following fields are safe to insert into URLs with 
 no additional encoding:
 
@@ -173,7 +173,7 @@ The following fields are restricted to hard-coded values:
 
 All other values should be assumed to be attacker-controlled.
 
-To be secure, AlbumGenerator must never emit photo URLs outside of the album 
+To be secure, DyphalGenerator must never emit photo URLs outside of the album 
 directory and albums must never execute any scripts or interpret any markup 
 found in properties, captions, or other fields.  Additionally, albums must 
 never load JSON file or images from outside of the album directory.
@@ -181,7 +181,7 @@ never load JSON file or images from outside of the album directory.
 I'm aware that partial local paths are leaked in the `path` fields of album 
 JSON files.  See bug 2014-04-07_001 for details.
 
-Why am I so concerned with TOCTOU in AlbumGenerator when there's no privilege 
+Why am I so concerned with TOCTOU in DyphalGenerator when there's no privilege 
 separation to be attacked?  Practice.
 
 

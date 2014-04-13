@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Photo Album Generator</string>
+   <string>Dyphal Generator</string>
   </property>
   <property name="windowIcon">
    <iconset theme="insert-image"/>

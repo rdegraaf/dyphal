@@ -1,3 +1,5 @@
+"""Utility functions and  classes for DyphalGenerator."""
+
 import threading
 import os
 import sys

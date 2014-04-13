@@ -1,5 +1,5 @@
 /**
-  Various library routines used by the DHTML photo album.
+  Various library routines used by Dyphal.
   Copyright (c) Rennie deGraaf, 2005-2014.  All rights reserved.
 */
 

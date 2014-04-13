@@ -1,21 +1,21 @@
 #!/usr/bin/python3
 
-"""Server-side data generator for DHTML Photo Album.
+"""Server-side data generator for Dyphal, the Dynamic Photo Album.
 
-AlbumGenerator is a tool to create photo albums using DHTML Photo 
-Album.  It can import metadata from a variety of embedded photo tags 
+DyphalGenerator is a tool to create photo albums to display using 
+Dyphal.  It can import metadata from a variety of embedded photo tags 
 (EXIF, IPTC, etc.) and it understands catalog files created by gThumb 
 3.x.  Hopefully the UI is self-explanatory, because there isn't any 
 detailed usage documentation at this time.
 
-AlbumGenerator requires Python 3.3 or later, only runs on Linux, and 
+DyphalGenerator requires Python 3.3 or later, only runs on Linux, and 
 requires that the commands 'convert' from the ImageMagick package and 
 'exiftool' are available in the current path.
 """
 __author__ = "Rennie deGraaf <rennie.degraaf@gmail.com>"
 __version__ = "3.0"
 __credits__ = ["Rennie deGraaf"]
-__date__ = "2014-04-09"
+__date__ = "2014-04-12"
 
 __copyright__ = "Copyright (c) Rennie deGraaf, 2005-2014.  All rights reserved."
 __license__ = "GPLv2.0"
@@ -41,13 +41,13 @@ import urllib.parse
 from PyQt4 import QtCore
 from PyQt4 import QtGui
 
-from album_generator.ui import *
-from album_generator.util import *
-from album_generator.photo import *
+from dyphal.ui import *
+from dyphal.util import *
+from dyphal.photo import *
 
 # These variables may be re-written by the installation script
-DATA_PATH = os.path.expanduser("~/.share/AlbumGenerator/")
-CONFIG_FILE = os.path.expanduser("~/.config/AlbumGenerator.conf")
+DATA_PATH = os.path.expanduser("~/.share/dyphal/")
+CONFIG_FILE = os.path.expanduser("~/.config/DyphalGenerator.conf")
 
 
 class Config(object):
@@ -71,7 +71,7 @@ class Config(object):
         _file (file): A handle to the configuration file.
     """
 
-    PROGRAM_NAME = "Album Generator"
+    PROGRAM_NAME = "Dyphal Generator"
     FILE_FORMAT_VERSION = 1
     THUMB_WIDTH = 160
     THUMB_HEIGHT = 120
@@ -183,15 +183,15 @@ class ListKeyFilter(QtCore.QObject):
         return False
 
 
-class PhotoAlbumUI(QtGui.QMainWindow, Ui_MainWindow):
-    """The Photo album generator UI.
+class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
+    """The Dyphal Generator UI.
 
     Attributes (not including UI objects):
         _config (Config): The run-time configuration object.
         _threads (concurrent.futures.Executor): The thread pool for 
                 background tasks.
-        _backgroundCount (int): The number of background activities (*not* 
-                tasks) that are pending.
+        _backgroundCount (int): The number of background activities 
+                (*not* tasks) that are pending.
         _backgroundTasks (list of concurrent.futures.Future): Pending 
                 background tasks.
         _directories (list of (int, str)): Directory file descriptors 
@@ -212,7 +212,7 @@ class PhotoAlbumUI(QtGui.QMainWindow, Ui_MainWindow):
     _setAlbumDataSignal = QtCore.pyqtSignal(str, dict)  # An album has been loaded.
 
     def __init__(self, config):
-        """Initialize a PhotoAlbumUI.  Hooks up event handlers and 
+        """Initialize a DyphalUI.  Hooks up event handlers and 
         performs other UI initialization that the generated code from 
         Designer can't do."""
         super().__init__()
@@ -935,7 +935,7 @@ def main():
         sys.exit(1)
 
     with Config() as config:
-        wnd = PhotoAlbumUI(config)
+        wnd = DyphalUI(config)
         wnd.show()
         sys.exit(app.exec_())
 

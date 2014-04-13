@@ -1,5 +1,5 @@
 /**
-  Scripts for DHTML photo album.
+  Scripts for Dyphal, the Dynamic Photo Album.
   Copyright (c) Rennie deGraaf, 2005-2014.  All rights reserved.
 */
 

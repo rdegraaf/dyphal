@@ -93,13 +93,13 @@
     necessary.
 
 2014-04-05_001  Rennie deGraaf  <rennie.degraaf@gmail.com>
-    The configuration file parser for AlbumGenerator doesn't handle improperly 
+    The configuration file parser for DyphalGenerator doesn't handle improperly 
     formatted settings.  For instance, setting "threads" to a string will 
-    result in AlbumGenerator crashing with a cryptic stack trace.  Ideally, 
+    result in DyphalGenerator crashing with a cryptic stack trace.  Ideally, 
     it'd just ignore the bad setting and continue.  This probably also applies 
     to saved albums.
 
-    POSTPONED: There doesn't appear to be any way for AlbumGenerator to 
+    POSTPONED: There doesn't appear to be any way for DyphalGenerator to 
     generate bad config files.  If a user edits it manually and breaks it, 
     then s/he should be able to figure out how to fix it.  Simply deleting the 
     config file will get things working again.
@@ -107,7 +107,7 @@
 2014-04-07_001  Rennie deGraaf  <rennie.degraaf@gmail.com>
     Album JSON files store photo paths relative to the user's home directory 
     and don't state the user name.  This limits their ability to be shared 
-    while still being openable in AlbumGenerator.
+    while still being openable in DyphalGenerator.
 
     WONTFIX: Paths are necessarily system-specific and most contents of user 
     home directories are only readable by their owner.  There's no clear need 
@@ -125,10 +125,10 @@
     paths.
 
 2014-04-09_002  Rennie deGraaf  <rennie.degraaf@gmail.com>
-    AlbumGenerator doesn't load enough to get to the error message under Python 
-    2.x.  It fails to load urllib.parse.  If I remove that, it fails to load 
-    the album_generator modules.
+    DyphalGenerator doesn't load enough to get to the error message under 
+    Python 2.x.  It fails to load urllib.parse.  If I remove that, it fails to 
+    load the dyphal modules.
 
     WONTFIX: This looks like it will be a pain to fix and it's not worth the 
     trouble.  The version check should still be useful if someone tries to load 
-    AlbumGenerator under a pre-3.3 version of Python 3.
+    DyphalGenerator under a pre-3.3 version of Python 3.

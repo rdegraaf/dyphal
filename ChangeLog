@@ -1,3 +1,17 @@
+2014-04-12  Rennie deGraaf  <rennie.degraaf@gmail.com>
+
+    * Renamed the project to "Dyphal", for "Dynamic Photo Album".  Changed 
+      documentation, comments, strings, class names, file names, etc. to 
+      reflect this change.
+
+    * tools/AlbumGeneratorUI.ui: Renamed to tools/DyphalGenerator.ui.
+
+    * tools/AlbumGenerator.py: Renamed to tools/DyphalGenerator.py.
+
+    * notes.txt: Removed.
+
+2014-04-12  Rennie deGraaf  <rennie.degraaf@gmail.com>
+
     * www/AlbumGenerator.py (PhotoAlbumUI): Added a count of background 
       activities so that starting a second background activity while another 
       one is in progress doesn't fail an assertion or stomp on the first one's 
