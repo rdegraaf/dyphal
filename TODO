@@ -7,11 +7,7 @@ For version 3:
       DyphalGenerator.py.  A git filter might be able to do the job, if I used 
       git.  Maybe add something to install.sh?
 
-    * Move PhotoAlbumUI into its own file?
-
     * Script to update gthumb comments.
-
-    * Rename album.js to dyphal.js
 
 
 For future versions:

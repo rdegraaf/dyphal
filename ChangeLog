@@ -1,3 +1,5 @@
+    * www/album.js: Renamed to www/dyphal.js.
+
 2014-04-13  Rennie deGraaf  <rennie.degraaf@gmail.com>
 
     * www/album.js, www/lib.js, www/ie8compat.js: Cleaned up most jslint 
