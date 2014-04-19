@@ -178,6 +178,8 @@ directory and albums must never execute any scripts or interpret any markup
 found in properties, captions, or other fields.  Additionally, albums must 
 never load JSON file or images from outside of the album directory.
 
+See [javascript.html](javascript.html) for information about Dyphal's use of JavaScript.
+
 I'm aware that partial local paths are leaked in the `path` fields of album 
 JSON files.  See bug 2014-04-07_001 for details.
 

@@ -30,7 +30,7 @@
 
     WONTFIX.  This is not a core feature and 100% support for Opera is not 
     necessary.  Bug reported to Opera (DSK-387854).
-    
+
 2014-01-12_001  Rennie deGraaf  <rennie.degraaf@gmail.com>
     CSS properties loaded through obj.style[prop] need to be camelCase.  The 
     preferred way to get them is obj.style.getPropertyValue(prop), but this 
@@ -117,7 +117,7 @@
 2014-04-07_002  Rennie deGraaf  <rennie.degraaf@gmail.com>
     Album JSON files contain paths to the original photos and are shared to the 
     world.  This leaks information about the user's system environment.
-    
+
     POSTPONED: This is an artefact of not wanting separate save and album 
     files.  The paths likely aren't valid on the machine serving photo albums 
     to the web, so the usefulness of the paths to an attacker is limited.  To 
@@ -141,3 +141,4 @@
     https://bugs.kde.org/show_bug.cgi?id=185433).  It presumably won't occur 
     when using some other file dialog.  Files whose names contain double-quotes 
     can be loaded from existing albums.
+

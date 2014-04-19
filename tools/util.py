@@ -48,14 +48,14 @@ class Counter(object):
 
 class RefCounted(object):
     """Base class for reference counted objects.
-    
+
     This class implements COM-style reference counting.  The initial reference 
     count is 0; the caller must call addRef().  When the reference count 
     returns to 0, _dispose() is called; subclasses should override this method. 
     The object isn't actually destroyed because that's up to Python, but 
     subsequent calls to addRef() or release() will raise exceptions.
     """
-    
+
     def __init__(self, *args, **kwargs):
         """Initialize a RefCounted."""
         # Pass constructor parameters along in case some base class gets inserted that wants them.

@@ -1,7 +1,7 @@
 /**
   Scripts for Dyphal, the Dynamic Photo Album.
   Copyright (c) Rennie deGraaf, 2005-2014.
-  
+
   This program is free software; you can redistribute it and/or modify 
   it under the terms of the GNU General Public License as published by 
   the Free Software Foundation; either version 2 of the License, or (at 
@@ -24,6 +24,7 @@ var page=null; // number of the current page, 0 for the album thumbnail view
 var pages=[]; // objects describing all pages that have been retrieved.  Corresponds to album.photos.
 var overlayVisible=false;
 var helpVisible = false;
+var smallScreen = false;
 var logall = false;
 
 
@@ -32,11 +33,15 @@ window.addEventListener("load", start, false);
 window.addEventListener("hashchange", start, false);
 // Since JavaScript is clearly enabled, hide the warning as early as possible
 document.addEventListener("DOMContentLoaded", suppressWarning, false);
+document.addEventListener("DOMContentLoaded", setScreenSize, false);
+window.addEventListener("resize", setScreenSize, false);
+window.addEventListener("orientationchange", setScreenSize, false);
 window.addEventListener("touchstart", touchStart);
 window.addEventListener("touchend", touchEnd);
 
 log(navigator.appName);
 log(navigator.userAgent);
+log(window.innerWidth + "x" + window.innerHeight);
 
 // Display an error message in the warning panel
 function error(msg)
@@ -76,6 +81,42 @@ function warning(msg)
 function suppressWarning()
 {
     document.getElementById("warning").style["display"] = "none";
+}
+
+
+// Check for a small screen and make layout changes if necessary.
+function setScreenSize()
+{
+    log ("setScreenSize enter");
+    
+    try
+    {
+        // Check for a small screen and load the overrides if so.
+        var small = false;
+        if (window.innerWidth < 600 || window.innerHeight < 600)
+            small = true;
+        if (small)
+        {
+            if (document.documentElement.clientHeight <= document.documentElement.clientWidth)
+            {
+                /* landscape */
+                document.getElementById("titlePanel").style.width = 
+                                            (document.documentElement.clientHeight - 110) + "px";
+            }
+        }
+        else if (smallScreen)
+        {
+            document.getElementById("titlePanel").style.width = "";
+        }
+        smallScreen = small;
+    }
+    catch (e)
+    {
+        error(e.name + ": " + e.message);
+        throw e;
+    }
+
+    log("setScreenSize exit");
 }
 
 
@@ -167,7 +208,7 @@ function start()
         error(e.name + ": " + e.message);
         throw e;
     }
-    
+
     log("start exit");
 }
 
@@ -654,25 +695,28 @@ function fitPhoto()
                 // unconstrained
                 photo.style["width"] = photoData.width + "px";
                 photo.style["height"] = photoData.height + "px";
-                photo.removeEventListener("click", showPhotoOverlay, false);
+                if (!smallScreen)
+                    photo.removeEventListener("click", showPhotoOverlay, false);
+                else
+                    photo.addEventListener("click", showPhotoOverlay, false);
             }
             else if (photoAspect >= panelAspect)
             {
                 // constrained by width
                 photo.style["width"] = panelWidth + "px";
                 photo.style["height"] = photoData.height*panelWidth/photoData.width + "px";
-                photo.addEventListener("click", showPhotoOverlay, false);
                 photoOverlay.style["width"] = Math.min(windowWidth, photoData.width) + "px";
                 photoOverlay.style["height"] = Math.min((photoData.height*windowWidth/photoData.width), photoData.height) + "px";
+                photo.addEventListener("click", showPhotoOverlay, false);
             }
             else
             {
                 // constrained by height
                 photo.style["height"] = panelHeight + "px";
                 photo.style["width"] = photoData.width*panelHeight/photoData.height + "px";
-                photo.addEventListener("click", showPhotoOverlay, false);
                 photoOverlay.style["height"] = Math.min(windowHeight, photoData.height) + "px";
                 photoOverlay.style["width"] = Math.min((photoData.width*windowHeight/photoData.height), photoData.width) + "px";
+                photo.addEventListener("click", showPhotoOverlay, false);
             }
 
             photo.style["visibility"] = "visible";
@@ -853,9 +897,37 @@ function showPhotoOverlay()
     try
     {
         overlayVisible = true;
-        var overlay = document.getElementById("overlay");
-        overlay.style["display"] = "block";
-        overlay.addEventListener("click", hidePhotoOverlay, false);
+        if (smallScreen)
+        {
+            // On a small screen, show the footer and photo metadata
+            var captionPanel = document.getElementById("captionPanel");
+            var propertyPanel = document.getElementById("propertyPanel");
+
+            var photo = document.getElementById("photo");
+            photo.removeEventListener("click", showPhotoOverlay, false);
+            photo.addEventListener("click", hidePhotoOverlay, false);
+            captionPanel.addEventListener("click", hidePhotoOverlay, false);
+            propertyPanel.addEventListener("click", hidePhotoOverlay, false);
+
+            // Make the caption and property panels have the same height.
+            var captionHeight = getObjHeight(captionPanel);
+            var propertyHeight = getObjHeight(propertyPanel);
+            if (captionHeight > propertyHeight)
+                propertyPanel.style["height"] = captionHeight + "px";
+            else
+                captionPanel.style["height"] = propertyHeight + "px";
+
+            captionPanel.style["visibility"] = "visible";
+            propertyPanel.style["visibility"] = "visible";
+            document.getElementById("footerPanel").style["visibility"] = "visible";
+        }
+        else
+        {
+            // On a non-small screen, show the photo at its full size.
+            var overlay = document.getElementById("overlay");
+            overlay.style["display"] = "block";
+            overlay.addEventListener("click", hidePhotoOverlay, false);
+        }
     }
     catch (e)
     {
@@ -871,7 +943,28 @@ function hidePhotoOverlay()
     {
         if (overlayVisible)
         {
-            document.getElementById("overlay").style["display"] = "none";
+            if (smallScreen)
+            {
+                var captionPanel = document.getElementById("captionPanel");
+                var propertyPanel = document.getElementById("propertyPanel");
+
+                document.getElementById("footerPanel").style["visibility"] = "hidden";
+                propertyPanel.style["visibility"] = "hidden";
+                captionPanel.style["visibility"] = "hidden";
+
+                propertyPanel.style["height"] = "auto";
+                captionPanel.style["height"] = "auto";
+
+                var photo = document.getElementById("photo");
+                propertyPanel.removeEventListener("click", hidePhotoOverlay, false);
+                captionPanel.removeEventListener("click", hidePhotoOverlay, false);
+                photo.removeEventListener("click", hidePhotoOverlay, false);
+                photo.addEventListener("click", showPhotoOverlay, false);
+            }
+            else
+            {
+                document.getElementById("overlay").style["display"] = "none";
+            }
             overlayVisible = false;
         }
     }
@@ -918,3 +1011,32 @@ function hideHelp()
         error(e.name + ": " + e.message);
     }
 }
+
+
+/*function loadSmallScreenOverride()
+{
+    hidePhotoOverlay();
+    var cssElement = document.createElement("link");
+    // We'll only update the links if the stylesheet loads correctly.
+    cssElement.setAttribute("rel", "stylesheet");
+    cssElement.setAttribute("href", "small.css");
+    cssElement.setAttribute("id", "smallScreenStylesheet");
+    document.getElementsByTagName("head")[0].appendChild(cssElement);
+}*/
+
+
+/*function unloadSmallScreenOverride()
+{
+    hidePhotoOverlay();
+    var cssElement = document.getElementById("smallScreenStylesheet");
+    cssElement.parentNode.removeChild(cssElement);
+
+    // Undo whatever crap we might have done to the document
+    var captionPanel = document.getElementById("captionPanel");
+    var propertyPanel = document.getElementById("propertyPanel");
+
+    document.getElementById("footerPanel").style["visibility"] = "";
+    propertyPanel.style["visibility"] = "";
+    captionPanel.style["visibility"] = "";
+}*/
+

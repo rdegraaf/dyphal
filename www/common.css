@@ -1,7 +1,7 @@
 /**
   Styles shared by all views of Dyphal, the Dynamic Photo Album.
   Copyright (c) Rennie deGraaf, 2005-2014.
-  
+
   This program is free software; you can redistribute it and/or modify 
   it under the terms of the GNU General Public License as published by 
   the Free Software Foundation; either version 2 of the License, or (at 
@@ -150,6 +150,7 @@ div.centerBlock>*:first-child {
   background-color: #4b4b4b;
   max-width: 800px;
   text-align: justify;
+  font-size: 12pt;
   margin-top: 1em;
   margin-bottom: 1em;
   margin-left: 20%;
@@ -185,4 +186,79 @@ div.centerBlock>*:first-child {
   border-bottom: 0;
 }
 
+@media (max-width: 600px), (max-height: 600px)
+{
+  #titlePanel {
+    margin-left: 0;
+    margin-right: 110px; /* indexPanel.width */
+    height: 110px;
+  }
 
+  #titlePanel>h1 {
+    max-width: 800px;
+  }
+
+  #footerPanel {
+    width: 100%;
+    left: 0;
+    right: 0;
+  }
+
+  #footerPanel>p {
+    max-width: 800px;
+  }
+
+  #indexPanel {
+    top: 17px;
+    width: 110px;
+    right: 0;
+    max-width: none;
+  }
+
+}
+
+@media (max-width: 600px) and (orientation: landscape), (max-height: 600px) and (orientation: landscape) {
+  body {
+    margin-bottom: 0;
+  }
+
+  /* If CSS had a way to lay out text from bottom left to top right, then I wouldn't need all of 
+   this rotation crap. */
+  #titlePanel {
+    position: absolute;
+    top: 0;
+    left: 0;
+    /* Since titlePanel is variable-width and transformations are applied after layout, we need to 
+      use JavaScript to adjust titlePanel's width.  See setScreenSize() in dyphal.js. */
+    transform-origin: left top;
+    transform: rotate(-90deg) translate(-100%) translate(-110px);
+    -webkit-transform-origin: left top;
+    -webkit-transform: rotate(-90deg) translate(-100%) translate(-110px);
+    -ms-transform-origin: left top;
+    -ms-transform: rotate(-90deg) translate(-100%) translate(-110px);
+  }
+
+  #titlePanel>h1 {
+    font-size: 16pt;
+  }
+
+  #indexPanel {
+    right: auto;
+    top: 0;
+    left: 17px;
+    transform-origin: left top;
+    transform: rotate(-90deg) translate(-110px);
+    -webkit-transform-origin: left top;
+    -webkit-transform: rotate(-90deg) translate(-110px);
+    -ms-transform-origin: left top;
+    -ms-transform: rotate(-90deg) translate(-110px);
+  }
+
+  #helpLink {
+    right: auto;
+    left: 0;
+    transform: rotate(-90deg);
+    -webkit-transform: rotate(-90deg);
+    -ms-transform: rotate(-90deg);
+  }
+}

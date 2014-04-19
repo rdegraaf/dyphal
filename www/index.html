@@ -3,7 +3,7 @@
 <!--
   Master page for Dyphal, the Dynamic Photo Album.
   Copyright (c) Rennie deGraaf, 2005-2014.
-  
+
   This program is free software; you can redistribute it and/or modify 
   it under the terms of the GNU General Public License as published by 
   the Free Software Foundation; either version 2 of the License, or (at 
@@ -39,10 +39,6 @@
       <h1 id="titleContent"></h1>
     </div>
 
-    <div id="footerPanel" class="centerBlock">
-      <p id="footerContent"></p> <!-- IE8 doesn't support <footer> -->
-    </div>
-
     <div id="indexPanel">
       <h2 title="Return to thumbnail index">
         <a id="indexLink" class="navigationlink" href="placeholder.png">Return to thumbnail index</a>
@@ -71,6 +67,18 @@
       </a>
     </div>
 
+    <div id="contentPanel">
+      <div id="warning">
+        <p>This page requires JavaScript, but it appears to be disabled in your browser.</p>
+        <p><a href="javascript.html">Why Dyphal requires JavaScript.</a></p>
+      </div>
+      <p id="description"></p>
+      <ul id="thumbnailList">
+        <!-- Photo thumbnails -->
+      </ul>
+      <img id="photo" src="placeholder.png" alt="Photo"/>
+    </div>
+
     <div id="captionPanel">
       <!-- Photo caption -->
     </div>
@@ -81,23 +89,16 @@
       </table>
     </div>
 
-    <div id="contentPanel">
-      <div id="warning">
-        This page requires JavaScript, but it appears to be disabled in your browser.
-      </div>
-      <p id="description"></p>
-      <ul id="thumbnailList">
-        <!-- Photo thumbnails -->
-      </ul>
-      <img id="photo" src="placeholder.png" alt="Photo"/>
+    <div id="footerPanel" class="centerBlock">
+      <p id="footerContent"></p> <!-- IE8 doesn't support <footer> -->
     </div>
-    
+
     <div id="overlay" class="centerBlock">
       <div id="photoOverlay"></div>
     </div>
-    
+
     <div id="helpLink"></div>
-    
+
     <div id="helpTextPanel" class="centerBlock">
       <div id="helpText">
         <h2>Dyphal Help</h2>

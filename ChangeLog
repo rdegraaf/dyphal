@@ -1,3 +1,22 @@
+2014-04-19  Rennie deGraaf  <rennie.degraaf@gmail.com>
+
+    * tools/gthtime.sh: New file containing a script to fix the timestamps 
+      saved by gthumb.
+
+    * www/javascript.html: New file containing a description of why and how 
+      Dyphal uses JavaScript.
+
+    * tools/DyphalGenerator.py: Update to the names of file names to install.
+
+    * www/common.css: Increase the font size for help and readme text.
+
+    * www/album.css, www/common.css, www/dyphal.js, www/index.html: Added a new 
+      layout optimized for small screens (album view only for now).
+
+    * README: Linked to javascript.html.
+
+2014-04-13  Rennie deGraaf  <rennie.degraaf@gmail.com>
+
     * www/album.js: Renamed to www/dyphal.js.
 
 2014-04-13  Rennie deGraaf  <rennie.degraaf@gmail.com>
@@ -6,9 +25,9 @@
       warnings.
 
     * Added a GPLv2 header to all code files.
-    
+
     * LICENCE: New file containing the GNU GPLv2.
-    
+
     * README: Added licence and contact information.
 
     * ui-header.py: New file containing header text for ui.py, which is 
@@ -158,7 +177,7 @@
 
     * tools/AlbumGenerator.py: Moved the maximum number of worker threads into 
       the configuration file.
-    
+
     * tools/AlbumGenerator.py: Added url encoding of all JSON fields that are 
       used to build URLs.
 
@@ -505,7 +524,7 @@
     * www/album.js: Added support for albums in subdirectories.  The relative 
       path to the album JSON file is given in the argument, and we parse out 
       the directory and prefix it to other album objects as they are loaded.
-    
+
     * www/album.css: Made colours more consistent between different parts of 
       the album.
 
@@ -628,7 +647,7 @@
       when only the hash changes.
 
     * www/album.js: generatePhotoURL() is now used for all links.
-    
+
     * www/index.html: Set the class of indexLink to navigationLink so that 
       adding and removing the debug argument to/from it doesn't need to be 
       handled separately from other links.

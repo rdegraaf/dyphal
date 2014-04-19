@@ -87,9 +87,9 @@ class Config(object):
     THUMB_HEIGHT = 120
     THUMB_QUALITY = 50
     BG_TIMEOUT = 5
-    TEMPLATE_FILE_NAMES = ["album.css", "album.js", "back.png", "common.css", "debug.css", 
-                           "help.png", "ie8compat.js", "index.html", "lib.js", "next.png", 
-                           "photo.css", "placeholder.png", "prev.png", "README.html"]
+    TEMPLATE_FILE_NAMES = ["album.css", "back.png", "common.css", "debug.css", "dyphal.js", 
+                           "help.png", "ie8compat.js", "index.html", "javascript.html", "lib.js", 
+                           "next.png", "photo.css", "placeholder.png", "prev.png", "README.html"]
 
     DEFAULT_PHOTO_DIR = os.path.expanduser("~")
     DEFAULT_GTHUMB3_DIR = os.path.expanduser("~/.local/share/gthumb/catalogs")
@@ -180,7 +180,7 @@ class ListKeyFilter(QtCore.QObject):
 
     delKeyPressed = QtCore.pyqtSignal() # 'del' key pressed.
     escKeyPressed = QtCore.pyqtSignal() # 'esc' key pressed.
-    
+
     def eventFilter(self, obj, event):
         """Handle 'del' and 'esc' keypress events."""
         if QtCore.QEvent.KeyPress == event.type():

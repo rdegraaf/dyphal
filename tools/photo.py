@@ -101,7 +101,7 @@ def format_display_time(timestamp):
 
 class PhotoFile(RefCounted, QtGui.QListWidgetItem):
     """A photo to add to the album.
-    
+
     Attributes:
         properties (dict): The properties that have been extracted from 
                 this photo.

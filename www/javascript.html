@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="common.css"/>
+  <title>Dyphal and JavaScript</title>
+</head>
+<body>
+  <div id="readmePanel" class="centerBlock">
+    <div id="readmeText">
+      <h1>Dyphal's use of JavaScript</h1>
+      <p>Dyphal uses JavaScript for the following purposes <strong>only</strong>:</p>
+      <ul>
+        <li>to manipulate document elements, and</li>
+        <li>to retrieve data from the server hosting the album.</li>
+      </ul>
+      <p>Notably, Dyphal does <strong>not</strong> do any of the following:</p>
+      <ul>
+        <li>retrieve code or data from third-party servers,</li>
+        <li>send any information to third-party servers,</li>
+        <li>gather personal information or statistics about users or their usage habits, beyond 
+          that normally logged by web servers, or</li>
+        <li>store cookies or other persistent data on users' computers.</li>
+      </ul>
+      <p>Dyphal uses JavaScript to improve its users' experience and to reduce the costs borne by 
+        the maintainers of Dyphal albums.  Without using JavaScript, users of Dyphal albums would 
+        need to download considerably more data, increasing page load times, and albums would be 
+        less able to adapt themselves to users' browser windows.  Likewise, without using 
+        JavaScript, album maintainers would need to either store considerably more data or run 
+        server-side scripts to generate it on demand; either way, they would need to transmit more 
+        data, increasing their costs.  </p>
+      <p>Unfortunately, web browsers don't give users fine-grained control over the types of 
+        actions that JavaScript code is allowed to perform.  However, Dyphal follows security 
+        best practices to limit the risk of malicious scripts being injected into albums.  It 
+        supports <a href="https://developer.mozilla.org/en-US/docs/Web/Security/CSP/Introducing_Content_Security_Policy">
+        Content Security Policy (CSP)</a>, which allows web servers to instruct browsers to 
+        restrict the permitted sources of scripts, stylesheets, images, and other information that 
+        can be loaded into web pages.  The authors of Dyphal encourage album maintainers to serve 
+        albums over HTTPS with the following headers:</p>
+      <ul>
+        <li><code>Content-Security-Policy: default-src 'none'; script-src 'self'; style-src 'self'; 
+          img-src 'self'; connect-src 'self';</code></li>
+        <li><code>X-Frame-Options: DENY</code></li>
+        <li><code>Strict-Transport-Security: max-age=31536000</code></li>
+      </ul>
+      <p><a href="README.html">About Dyphal.</a></p>
+    </div>
+  </div>
+</body>
+</html>
