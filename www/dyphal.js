@@ -43,6 +43,7 @@ log(navigator.appName);
 log(navigator.userAgent);
 log(window.innerWidth + "x" + window.innerHeight);
 
+
 // Display an error message in the warning panel
 function error(msg)
 {
@@ -51,6 +52,8 @@ function error(msg)
     warningPanel.style["display"] = "block";
 }
 
+
+// Log a message to the JavaScript console if running in debug mode.
 function log(msg)
 {
     if (debug || logall)
@@ -88,7 +91,7 @@ function suppressWarning()
 function setScreenSize()
 {
     log ("setScreenSize enter");
-    
+
     try
     {
         // Check for a small screen and load the overrides if so.
@@ -99,13 +102,14 @@ function setScreenSize()
         {
             if (document.documentElement.clientHeight <= document.documentElement.clientWidth)
             {
-                /* landscape */
+                // landscape
                 document.getElementById("titlePanel").style.width = 
                                             (document.documentElement.clientHeight - 110) + "px";
             }
         }
         else if (smallScreen)
         {
+            // Remove whatever overrides we may have applied.
             document.getElementById("titlePanel").style.width = "";
         }
         smallScreen = small;
@@ -198,7 +202,10 @@ function start()
             else if (page > album.photos.length)
                 error("Photo number out of range");
             else if (undefined === pages[page-1])
-                getJSON(albumPath + album.metadataDir + album.photos[page-1].name + ".json", loadPhoto, true, {"page":page});
+            {
+                getJSON(albumPath + album.metadataDir + album.photos[page-1].name + ".json", 
+                        loadPhoto, true, {"page":page});
+            }
             else
                 loadPhotoContent();
         }
@@ -245,9 +252,9 @@ function loadDebug()
     // until the stylesheet is present.
     if (brokenLoadEventOnLink())
     {
-        pollUntil(50, 6, function() {
-                return document.styleSheets[document.styleSheets.length-1].href.endsWith("/debug.css");
-            }, loadDebugAfterStylesheet, loadDebugError);
+        pollUntil(50, 6, function() { return document.styleSheets[document.styleSheets.length-1]
+                                                                .href.endsWith("/debug.css"); }, 
+                  loadDebugAfterStylesheet, loadDebugError);
     }
 
     log("loadDebug exit");
@@ -358,7 +365,10 @@ function loadAlbum(status, albumData, args)
         else if (page > album.photos.length)
             throw new Error("Photo number out of range");
         else if (undefined === pages[page-1])
-            getJSON(albumPath + album.metadataDir + album.photos[page-1].name + ".json", loadPhoto, true, {"page":page});
+        {
+            getJSON(albumPath + album.metadataDir + album.photos[page-1].name + ".json", loadPhoto, 
+                    true, {"page":page});
+        }
         else
             loadPhotoContent();
     }
@@ -504,9 +514,9 @@ function loadPhotoContent()
         // poll until the stylesheet is present.
         if (brokenLoadEventOnLink())
         {
-            pollUntil(50, 6, function() {
-                    return document.styleSheets.length >= 2 && document.styleSheets[1].href.endsWith("/photo.css");
-                }, loadPhotoAfterStylesheet, function() { error("Error loading stylesheet"); });
+            pollUntil(50, 6, function() { return (document.styleSheets.length >= 2)
+                                        && document.styleSheets[1].href.endsWith("/photo.css"); },
+                      loadPhotoAfterStylesheet, function() { error("Error loading stylesheet"); });
         }
     }
     else
@@ -627,10 +637,13 @@ function loadPhotoAfterStylesheet()
             // Load the photo.  Run "fitPhoto()" when it's ready.
             photoData = pages[page-1];
             var photoElement = document.getElementById("photo");
-            // Remove the event listeners before we change anything so that we don't get fitPhoto storms in IE8
+            // Remove the event listeners before we change anything so that we don't get fitPhoto 
+            // storms in IE8
             photoElement.removeEventListener("load", fitPhoto, false);
             window.removeEventListener("resize", fitPhoto, false);
-            // Webkit doesn't fire a load event if the src doesn't change.  So let's make sure it changes.
+            window.removeEventListener("orientationchange", fitPhoto, false);
+            // Webkit doesn't fire a load event if the src doesn't change.  So let's make sure it 
+            // changes.
             photoElement.setAttribute("src", "");
             photoElement.style["width"] = photoData.width + "px";
             photoElement.style["height"] = photoData.height + "px";
@@ -638,8 +651,10 @@ function loadPhotoAfterStylesheet()
             // Make sure that the event listener is in place before we set the photo
             photoElement.setAttribute("src", albumPath + photoData.photo);
             window.addEventListener("resize", fitPhoto, false);
+            window.addEventListener("orientationchange", fitPhoto, false);
 
-            document.getElementById("photoOverlay").style["backgroundImage"] = "url(" + albumPath + photoData.photo + ")";
+            document.getElementById("photoOverlay").style["backgroundImage"] = "url(" + albumPath 
+                                                                        + photoData.photo + ")";
         }
     }
     catch (e)
@@ -686,8 +701,8 @@ function fitPhoto()
             panelHeight = getObjHeight(photoPanel) - getVBorder(photo);
             panelAspect = panelWidth/panelHeight;
 
-            windowWidth = (window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth) - 10;
-            windowHeight = (window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight) - 10;
+            windowWidth = (window.innerWidth || document.documentElement.clientWidth) - 10;
+            windowHeight = (window.innerHeight || document.documentElement.clientHeight) - 10;
 
             // set the width and height of the photo
             if ((panelWidth >= photoData.width) && (panelHeight >= photoData.height))
@@ -704,18 +719,20 @@ function fitPhoto()
             {
                 // constrained by width
                 photo.style["width"] = panelWidth + "px";
-                photo.style["height"] = photoData.height*panelWidth/photoData.width + "px";
-                photoOverlay.style["width"] = Math.min(windowWidth, photoData.width) + "px";
-                photoOverlay.style["height"] = Math.min((photoData.height*windowWidth/photoData.width), photoData.height) + "px";
+                photo.style["height"] = (panelWidth / photoAspect) + "px";
+                var overlayWidth = Math.min(windowWidth, photoData.width);
+                photoOverlay.style["width"] =  overlayWidth + "px";
+                photoOverlay.style["height"] = (overlayWidth / photoAspect) + "px";
                 photo.addEventListener("click", showPhotoOverlay, false);
             }
             else
             {
                 // constrained by height
                 photo.style["height"] = panelHeight + "px";
-                photo.style["width"] = photoData.width*panelHeight/photoData.height + "px";
-                photoOverlay.style["height"] = Math.min(windowHeight, photoData.height) + "px";
-                photoOverlay.style["width"] = Math.min((photoData.width*windowHeight/photoData.height), photoData.width) + "px";
+                photo.style["width"] = (panelHeight * photoAspect) + "px";
+                var overlayHeight = Math.min(windowHeight, photoData.height)
+                photoOverlay.style["height"] = overlayHeight + "px";
+                photoOverlay.style["width"] = (overlayHeight * photoAspect) + "px";
                 photo.addEventListener("click", showPhotoOverlay, false);
             }
 
@@ -752,7 +769,8 @@ function cacheNext()
 
     if (null !== page && page < album.photos.length && undefined === pages[page])
     {
-        getJSON(albumPath + album.metadataDir + album.photos[page].name + ".json", cachePhoto, false, {"page" : page});
+        getJSON(albumPath + album.metadataDir + album.photos[page].name + ".json", cachePhoto, 
+                false, {"page" : page});
     }
 
     log("cacheNext exit");
@@ -899,15 +917,8 @@ function showPhotoOverlay()
         overlayVisible = true;
         if (smallScreen)
         {
-            // On a small screen, show the footer and photo metadata
             var captionPanel = document.getElementById("captionPanel");
             var propertyPanel = document.getElementById("propertyPanel");
-
-            var photo = document.getElementById("photo");
-            photo.removeEventListener("click", showPhotoOverlay, false);
-            photo.addEventListener("click", hidePhotoOverlay, false);
-            captionPanel.addEventListener("click", hidePhotoOverlay, false);
-            propertyPanel.addEventListener("click", hidePhotoOverlay, false);
 
             // Make the caption and property panels have the same height.
             var captionHeight = getObjHeight(captionPanel);
@@ -917,9 +928,17 @@ function showPhotoOverlay()
             else
                 captionPanel.style["height"] = propertyHeight + "px";
 
+            // Show the footer and photo metadata
             captionPanel.style["visibility"] = "visible";
             propertyPanel.style["visibility"] = "visible";
             document.getElementById("footerPanel").style["visibility"] = "visible";
+
+            // Set event handlers to hide this stuff.
+            var photo = document.getElementById("photo");
+            photo.removeEventListener("click", showPhotoOverlay, false);
+            photo.addEventListener("click", hidePhotoOverlay, false);
+            captionPanel.addEventListener("click", hidePhotoOverlay, false);
+            propertyPanel.addEventListener("click", hidePhotoOverlay, false);
         }
         else
         {
@@ -948,18 +967,19 @@ function hidePhotoOverlay()
                 var captionPanel = document.getElementById("captionPanel");
                 var propertyPanel = document.getElementById("propertyPanel");
 
-                document.getElementById("footerPanel").style["visibility"] = "hidden";
-                propertyPanel.style["visibility"] = "hidden";
-                captionPanel.style["visibility"] = "hidden";
-
-                propertyPanel.style["height"] = "auto";
-                captionPanel.style["height"] = "auto";
-
+                // Remove event listeners.
                 var photo = document.getElementById("photo");
                 propertyPanel.removeEventListener("click", hidePhotoOverlay, false);
                 captionPanel.removeEventListener("click", hidePhotoOverlay, false);
                 photo.removeEventListener("click", hidePhotoOverlay, false);
                 photo.addEventListener("click", showPhotoOverlay, false);
+
+                // Remove the style overrides that we applied.
+                document.getElementById("footerPanel").style["visibility"] = "";
+                propertyPanel.style["visibility"] = "";
+                captionPanel.style["visibility"] = "";
+                propertyPanel.style["height"] = "";
+                captionPanel.style["height"] = "";
             }
             else
             {
@@ -986,7 +1006,7 @@ function showHelp()
 
         // Displaying the help text may resize the window.  Delay setting helpVisible to ensure 
         // that the call to fitPhoto() on the initial resize doesn't immediately suppress help.
-        setTimeout( function() { helpVisible = true; }, 50);
+        setTimeout(function() { helpVisible = true; }, 50);
     }
     catch (e)
     {
@@ -1011,32 +1031,4 @@ function hideHelp()
         error(e.name + ": " + e.message);
     }
 }
-
-
-/*function loadSmallScreenOverride()
-{
-    hidePhotoOverlay();
-    var cssElement = document.createElement("link");
-    // We'll only update the links if the stylesheet loads correctly.
-    cssElement.setAttribute("rel", "stylesheet");
-    cssElement.setAttribute("href", "small.css");
-    cssElement.setAttribute("id", "smallScreenStylesheet");
-    document.getElementsByTagName("head")[0].appendChild(cssElement);
-}*/
-
-
-/*function unloadSmallScreenOverride()
-{
-    hidePhotoOverlay();
-    var cssElement = document.getElementById("smallScreenStylesheet");
-    cssElement.parentNode.removeChild(cssElement);
-
-    // Undo whatever crap we might have done to the document
-    var captionPanel = document.getElementById("captionPanel");
-    var propertyPanel = document.getElementById("propertyPanel");
-
-    document.getElementById("footerPanel").style["visibility"] = "";
-    propertyPanel.style["visibility"] = "";
-    captionPanel.style["visibility"] = "";
-}*/
 

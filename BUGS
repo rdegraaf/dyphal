@@ -52,13 +52,6 @@
     so I check for a version of Android earlier than 4.4 and start a poll loop
     with an exponential backoff until the stylesheet is present. 
 
-2014-01-17_002  Rennie deGraaf  <rennie.degraaf@gmail.com>
-    The photo view layout breaks down on very small windows, such as 
-    smartphones.  It might be best to give the photo as much space as it wants 
-    and put all of the text together beside or below it.  
-
-    OPEN:
-
 2014-01-18_001  Rennie deGraaf  <rennie.degraaf@gmail.com>
     Despite photos being cached, browsers still check the server for new 
     versions of photos and thumbnails when displaying photo pages.  This could 
@@ -141,4 +134,19 @@
     https://bugs.kde.org/show_bug.cgi?id=185433).  It presumably won't occur 
     when using some other file dialog.  Files whose names contain double-quotes 
     can be loaded from existing albums.
+
+2014-04-19_001  Rennie deGraaf <rennie.degraaf@gmail.com>
+    Photos don't always load or rotate properly and swipe navigation doesn't 
+    work on my Samsung Galaxy S3 cell phone (Android 4.3).  It does work in the 
+    Android 4.3 emulator and on my Android 4.2 tablet.  It seems that something 
+    is stomping on the global 'page' with an HTMLBodyElement.
+
+    OPEN:  See https://stackoverflow.com/questions/23177778/whats-clobbering-win
+    dow-page-on-my-galaxy-s3
+
+2014-04-19_002  Rennie deGraaf  <rennie.degraaf@gmail.com>
+    Clicking "Generate Album" then "Cancel" with no selected photos in
+    DyphalGenerator results in a cryptic error message.
+
+    OPEN:
 

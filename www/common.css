@@ -186,8 +186,7 @@ div.centerBlock>*:first-child {
   border-bottom: 0;
 }
 
-@media (max-width: 600px), (max-height: 600px)
-{
+@media (max-width: 600px), (max-height: 600px) {
   #titlePanel {
     margin-left: 0;
     margin-right: 110px; /* indexPanel.width */
@@ -196,6 +195,7 @@ div.centerBlock>*:first-child {
 
   #titlePanel>h1 {
     max-width: 800px;
+    font-size: 16pt;
   }
 
   #footerPanel {
@@ -205,16 +205,21 @@ div.centerBlock>*:first-child {
   }
 
   #footerPanel>p {
+    width: 95%;
     max-width: 800px;
   }
 
   #indexPanel {
-    top: 17px;
+    top: 17px; /* (width - height - navigationPanel.height) / 3 */
     width: 110px;
     right: 0;
     max-width: none;
   }
 
+  #helpText, #readmeText {
+    margin-right: 1em;
+    margin-left: 1em;
+  }
 }
 
 @media (max-width: 600px) and (orientation: landscape), (max-height: 600px) and (orientation: landscape) {
@@ -236,10 +241,6 @@ div.centerBlock>*:first-child {
     -webkit-transform: rotate(-90deg) translate(-100%) translate(-110px);
     -ms-transform-origin: left top;
     -ms-transform: rotate(-90deg) translate(-100%) translate(-110px);
-  }
-
-  #titlePanel>h1 {
-    font-size: 16pt;
   }
 
   #indexPanel {

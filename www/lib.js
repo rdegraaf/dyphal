@@ -63,7 +63,10 @@ function pollUntil(interval, maxtries, test, action, error)
     if (test())
         action();
     else if (maxtries > 0)
-        setTimeout(function() { pollUntil(interval*2, maxtries-1, test, action, error); }, interval);
+    {
+        setTimeout(function() { pollUntil(interval*2, maxtries-1, test, action, error); }, 
+                   interval);
+    }
     else
         error();
 }
@@ -159,7 +162,8 @@ function getHBorder ( obj )
     var leftBorder = parseInt(getProperty(obj, "border-left-width").replace(/[^0-9\.]/gi, ""), 10);
     var leftPad = parseInt(getProperty(obj, "padding-left").replace(/[^0-9\.]/gi, ""), 10);
     var rightPad = parseInt(getProperty(obj, "padding-right").replace(/[^0-9\.]/gi, ""), 10);
-    var rightBorder = parseInt(getProperty(obj, "border-right-width").replace(/[^0-9\.]/gi, ""), 10);
+    var rightBorder = parseInt(getProperty(obj, "border-right-width").replace(/[^0-9\.]/gi, ""),
+                               10);
 
     // assign a sane value if the unit wasn't in pixels
     if (isNaN(leftBorder))
@@ -182,7 +186,8 @@ function getVBorder ( obj )
     var topBorder = parseInt(getProperty(obj, "border-top-width").replace(/[^0-9\.]/gi, ""), 10);
     var topPad = parseInt(getProperty(obj, "padding-top").replace(/[^0-9\.]/gi, ""), 10);
     var bottomPad = parseInt(getProperty(obj, "padding-bottom").replace(/[^0-9\.]/gi, ""), 10);
-    var bottomBorder = parseInt(getProperty(obj, "border-bottom-width").replace(/[^0-9\.]/gi, ""), 10);
+    var bottomBorder = parseInt(getProperty(obj, "border-bottom-width").replace(/[^0-9\.]/gi, ""), 
+                                10);
 
     // assign a sane value if the unit wasn't in pixels
     if (isNaN(topBorder))

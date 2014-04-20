@@ -2,6 +2,8 @@
 <html$if(lang)$ lang="$lang$"$endif$>
 <head>
   <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width">
   <link rel="stylesheet" href="common.css"/>
 $for(author-meta)$
   <meta name="author" content="$author-meta$">

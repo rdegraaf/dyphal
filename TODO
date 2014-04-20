@@ -1,13 +1,5 @@
 For version 3:
 
-    * Create an alternate CSS layout suitable for smartphone browsers.  See 
-      bug 2014-01-17_002) for more details.  Detect smartphones (by small 
-      screen size?), rotate the page to vertical if not already, and rotate 
-      horizontal photos wrt that.  Show properties in the overlay instead of a 
-      larger photo.
-      - handle horizontal photos and screen rotation
-      - update help text and readme
-
     * Find a way to push the version date into README, index.html, and 
       DyphalGenerator.py.  A git filter might be able to do the job, if I used 
       git.  Maybe add something to install.sh?
@@ -16,12 +8,7 @@ For version 3:
 
     * Double-check UI tooltips.
 
-    * Clean up line lengths in js files.
-
-    * Can the arithmetic in fitPhoto be simplified?  Use photoAspect instead of 
-      recalculating it all over the place.
-
-    * Move stuff about server headers from javascript.html to README.
+    * Different title font sizes for different screen sizes?
 
 
 For future versions:
@@ -92,8 +79,10 @@ For future versions:
     * Use the photo title instead of album title on in photo view if available.
 
     * Get rid of the auto-backup in gthtime.sh.
-    
+
     * Get rid of the eval in gthtime.sh.
 
     * Try using screen.lockOrientation() in small-screen mode, once something 
       supports it?
+
+    * Add a 'full' size option to the 'scale' combobox in DyphalGenerator.

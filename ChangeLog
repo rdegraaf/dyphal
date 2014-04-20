@@ -1,3 +1,24 @@
+    * www/common.css: Reduced the title font size for small screens regardless 
+      of orientation, rather than just for landscape.
+
+    * www/common.css: Reduced the width of footerContent to 95% so that it 
+      doesn't overflow on Android.
+
+    * www/common.css: Narrowed the margin of helpText and readmeText on small 
+      screens.
+
+    * www/photo.css: Extended the small-screen layout to support photo view.  
+      Closed bug 2014-01-17_002.
+
+    * www/javascript.html, misc/html5.pandoc: Added meta headers to better 
+      support mobile browsers and IE.
+
+    * www/dyphal.js, www/lib.js: Cleanup.
+
+    * README: Added information on generating and serving albums.
+
+    * www/javascript.html: Moved information on server headers to README.
+
 2014-04-19  Rennie deGraaf  <rennie.degraaf@gmail.com>
 
     * tools/gthtime.sh: New file containing a script to fix the timestamps 

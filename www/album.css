@@ -68,8 +68,7 @@ li.thumbnail {
   max-width: 800px;
 }
 
-@media (max-width: 600px), (max-height: 600px)
-{
+@media (max-width: 600px), (max-height: 600px) {
   #contentPanel {
     margin-left: 0;
     margin-right: 0;
