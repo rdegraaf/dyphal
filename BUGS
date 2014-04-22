@@ -144,9 +144,3 @@
     OPEN:  See https://stackoverflow.com/questions/23177778/whats-clobbering-win
     dow-page-on-my-galaxy-s3
 
-2014-04-19_002  Rennie deGraaf  <rennie.degraaf@gmail.com>
-    Clicking "Generate Album" then "Cancel" with no selected photos in
-    DyphalGenerator results in a cryptic error message.
-
-    OPEN:
-

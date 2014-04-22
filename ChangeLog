@@ -1,3 +1,14 @@
+2014-04-21  Rennie deGraaf  <rennie.degraaf@gmail.com>
+
+    * tools/DyphalGenerator.py (DyphalUI._generateAlbum): Added a check for the 
+      file dialog being cancelled to resolve bug 2014-04-19_002.  I think that 
+      cancellation is handled for all file dialogs now.
+
+    * www/dyphal.js, www/lib.js: Rearranged and re-bracketed to make 
+      www.jslint.com complain less.
+
+2014-04-19  Rennie deGraaf  <rennie.degraaf@gmail.com>
+
     * www/common.css: Reduced the title font size for small screens regardless 
       of orientation, rather than just for landscape.
 

@@ -596,105 +596,108 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
         """Save an album.  Prompt the user for a file name, then spawn 
         background tasks to generate album and photo JSON, thumbnails, 
         and down-scaled photos.  """
-        album = self._saveUIData()
-        album["albumVersion"] = Config.FILE_FORMAT_VERSION
-        album["metadataDir"] = urllib.parse.quote(Config.METADATA_DIR + "/")
-        album["title"] = self.titleText.toPlainText()
-        album["description"] = self.descriptionText.toPlainText()
-        album["photos"] = \
-            [self.photosList.item(i).getAlbumJSON() for i in range(0, self.photosList.count())]
-
         # Get the output file name
         album_file_name = QtGui.QFileDialog.getSaveFileName(self, "Album File", 
                                                             self._config.outputDir, 
                                                             self.FILTER_ALBUMS)
-        album_dir_name = os.path.dirname(album_file_name)
+        if "" != album_file_name:
+            album_dir_name = os.path.dirname(album_file_name)
 
-        # To prevent the output directory from being changed while generating files, we do the 
-        # following:
-        #  1. Create a secure temporary directory.
-        #  2. Open the output directory.  Get its file descriptor.
-        #  3. Construct the /proc/<pid>/fd/<fd> path to the directory using the file descriptor.
-        #  4. Create a symlink from the temporary directory to the /proc path.  The link's name is 
-        #     unique but predictable; that's ok because the directory is secure.
-        #  5. Use the symlink as the path when creating files.
+            album = self._saveUIData()
+            album["albumVersion"] = Config.FILE_FORMAT_VERSION
+            album["metadataDir"] = urllib.parse.quote(Config.METADATA_DIR + "/")
+            album["title"] = self.titleText.toPlainText()
+            album["description"] = self.descriptionText.toPlainText()
+            album["photos"] = \
+                [self.photosList.item(i).getAlbumJSON() for i in range(0, self.photosList.count())]
 
-        self._backgroundInit(3 * self.photosList.count() + 5)
-        tasks = []
+            # To prevent the output directory from being changed while generating files, we do the 
+            # following:
+            #  1. Create a secure temporary directory.
+            #  2. Open the output directory.  Get its file descriptor.
+            #  3. Construct the /proc/<pid>/fd/<fd> path to the directory using the file 
+            #     descriptor. 
+            #  4. Create a symlink from the temporary directory to the /proc path.  The link's name 
+            #     is  unique but predictable; that's ok because the directory is secure.
+            #  5. Use the symlink as the path when creating files.
 
-        # Create the output directories.
-        # We read and write self._directories from different threads, but there's no race because 
-        # the read task is blocked until after the write tasks complete.
-        assert(0 == len(self._directories))
-        album_dir_path = os.path.join(self._config.tempDir.name, "album")
-        album_dir_task = self._threads.submit(self._bgCreateOutputDirectory, album_dir_name, 
-                                              album_dir_path)
-        tasks.append(album_dir_task)
-        metadata_dir_path = os.path.join(self._config.tempDir.name, Config.METADATA_DIR)
-        metadata_dir_task = None
-        if 0 != len(Config.METADATA_DIR):
-            metadata_dir_task = self._threads.submit(self._bgCreateOutputDirectory, 
-                                                     os.path.join(album_dir_name, 
-                                                                  Config.METADATA_DIR), 
-                                                     metadata_dir_path)
-            tasks.append(metadata_dir_task)
-        photo_dir_path = os.path.join(self._config.tempDir.name, Config.PHOTO_DIR)
-        photo_dir_task = None
-        if 0 != len(Config.PHOTO_DIR):
-            photo_dir_task = self._threads.submit(self._bgCreateOutputDirectory, 
-                                                  os.path.join(album_dir_name, 
-                                                               Config.PHOTO_DIR), 
-                                                  photo_dir_path)
-            tasks.append(photo_dir_task)
-        thumbnail_dir_path = os.path.join(self._config.tempDir.name, Config.THUMBNAIL_DIR)
-        thumbnail_dir_task = None
-        if 0 != len(Config.THUMBNAIL_DIR):
-            thumbnail_dir_task = self._threads.submit(self._bgCreateOutputDirectory, 
+            self._backgroundInit(3 * self.photosList.count() + 5)
+            tasks = []
+
+            # Create the output directories.
+            # We read and write self._directories from different threads, but there's no race 
+            # because the read task is blocked until after the write tasks complete.
+            assert(0 == len(self._directories))
+            album_dir_path = os.path.join(self._config.tempDir.name, "album")
+            album_dir_task = self._threads.submit(self._bgCreateOutputDirectory, album_dir_name, 
+                                                  album_dir_path)
+            tasks.append(album_dir_task)
+            metadata_dir_path = os.path.join(self._config.tempDir.name, Config.METADATA_DIR)
+            metadata_dir_task = None
+            if 0 != len(Config.METADATA_DIR):
+                metadata_dir_task = self._threads.submit(self._bgCreateOutputDirectory, 
+                                                         os.path.join(album_dir_name, 
+                                                                      Config.METADATA_DIR), 
+                                                         metadata_dir_path)
+                tasks.append(metadata_dir_task)
+            photo_dir_path = os.path.join(self._config.tempDir.name, Config.PHOTO_DIR)
+            photo_dir_task = None
+            if 0 != len(Config.PHOTO_DIR):
+                photo_dir_task = self._threads.submit(self._bgCreateOutputDirectory, 
                                                       os.path.join(album_dir_name, 
-                                                                   Config.THUMBNAIL_DIR),
-                                                      thumbnail_dir_path)
-            tasks.append(thumbnail_dir_task)
+                                                                   Config.PHOTO_DIR), 
+                                                      photo_dir_path)
+                tasks.append(photo_dir_task)
+            thumbnail_dir_path = os.path.join(self._config.tempDir.name, Config.THUMBNAIL_DIR)
+            thumbnail_dir_task = None
+            if 0 != len(Config.THUMBNAIL_DIR):
+                thumbnail_dir_task = self._threads.submit(self._bgCreateOutputDirectory, 
+                                                          os.path.join(album_dir_name, 
+                                                                       Config.THUMBNAIL_DIR),
+                                                          thumbnail_dir_path)
+                tasks.append(thumbnail_dir_task)
 
-        # Create the album JSON file
-        tasks.append(self._threads.submit(self._bgGenerateAlbum, album, os.path.join(
+            # Create the album JSON file
+            tasks.append(self._threads.submit(self._bgGenerateAlbum, album, os.path.join(
                                 album_dir_path, os.path.basename(album_file_name)), album_dir_task))
 
-        # Create the metadata, thumbnail, and image for each photo.
-        count = self.photosList.count()
-        if 0 < count:
-            captions = album["captionFields"]
-            properties = album["propertyFields"]
-            for i in range(0, count):
-                photo = self.photosList.item(i)
-                # In Python 3.4, I might be able to use functools.partialmethod to create a generic 
-                # wrapper that calls self._incProgressSignal.emit() after an arbitrary method call, 
-                # rather than needing to write wrappers for every method call.
-                task = self._threads.submit(self._bgGeneratePhotoJSON, photo, metadata_dir_path, 
-                                            album["photoResolution"][0], 
-                                            album["photoResolution"][1], captions, properties, 
-                                            metadata_dir_task)
-                photo.addRef()
-                task.photoName = photo.getPath()
-                tasks.append(task)
-                task = self._threads.submit(self._bgGeneratePhoto, photo, photo_dir_path, 
-                                            album["photoResolution"][0], 
-                                            album["photoResolution"][1], self._config.photoQuality, 
-                                            photo_dir_task)
-                photo.addRef()
-                task.photoName = photo.getPath()
-                tasks.append(task)
-                task = self._threads.submit(self._bgGenerateThumbnail, photo, thumbnail_dir_path, 
-                                            Config.THUMB_WIDTH, Config.THUMB_HEIGHT, 
-                                            Config.THUMB_QUALITY, thumbnail_dir_task)
-                photo.addRef()
-                task.photoName = photo.getPath()
-                tasks.append(task)
+            # Create the metadata, thumbnail, and image for each photo.
+            count = self.photosList.count()
+            if 0 < count:
+                captions = album["captionFields"]
+                properties = album["propertyFields"]
+                for i in range(0, count):
+                    photo = self.photosList.item(i)
+                    # In Python 3.4, I might be able to use functools.partialmethod to create a 
+                    # generic wrapper that calls self._incProgressSignal.emit() after an arbitrary 
+                    # method call, rather than needing to write wrappers for every method call.
+                    task = self._threads.submit(self._bgGeneratePhotoJSON, photo, 
+                                                metadata_dir_path, album["photoResolution"][0], 
+                                                album["photoResolution"][1], captions, properties, 
+                                                metadata_dir_task)
+                    photo.addRef()
+                    task.photoName = photo.getPath()
+                    tasks.append(task)
+                    task = self._threads.submit(self._bgGeneratePhoto, photo, photo_dir_path, 
+                                                album["photoResolution"][0], 
+                                                album["photoResolution"][1], 
+                                                self._config.photoQuality, photo_dir_task)
+                    photo.addRef()
+                    task.photoName = photo.getPath()
+                    tasks.append(task)
+                    task = self._threads.submit(self._bgGenerateThumbnail, photo, 
+                                                thumbnail_dir_path, Config.THUMB_WIDTH, 
+                                                Config.THUMB_HEIGHT, Config.THUMB_QUALITY, 
+                                                thumbnail_dir_task)
+                    photo.addRef()
+                    task.photoName = photo.getPath()
+                    tasks.append(task)
 
-        self._threads.submit(functools.partial(handle_exceptions, self._bgTasksComplete), tasks, 
-                             "generating the album")
-        self._backgroundStart(tasks)
+            self._threads.submit(functools.partial(handle_exceptions, self._bgTasksComplete), 
+                                 tasks, "generating the album")
+            self._backgroundStart(tasks)
 
-        self._config.outputDir = album_dir_name
+            self._config.outputDir = album_dir_name
 
     def _bgCreateOutputDirectory(self, dir_path, link_path):
         """Background task to create a directory and link to it from 

@@ -10,6 +10,12 @@ For version 3:
 
     * Different title font sizes for different screen sizes?
 
+    * Strict mode?
+
+    * Do I still need getObjWidth, getVBorder, etc?
+
+    * Find a way to avoid eval in IE8.
+
 
 For future versions:
 
