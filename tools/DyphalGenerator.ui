@@ -14,7 +14,9 @@
    <string>Dyphal Generator</string>
   </property>
   <property name="windowIcon">
-   <iconset theme="insert-image"/>
+   <iconset theme="insert-image">
+    <normaloff/>
+   </iconset>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout_9" stretch="1,0">
@@ -65,6 +67,9 @@
               <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="0,1,0">
                <item>
                 <widget class="QPushButton" name="addPhotosButton">
+                 <property name="toolTip">
+                  <string>Add photos or gThumb catalogs to the album.</string>
+                 </property>
                  <property name="text">
                   <string>Add Photos...</string>
                  </property>
@@ -144,6 +149,9 @@
                </colorrole>
               </disabled>
              </palette>
+            </property>
+            <property name="toolTip">
+             <string>The selected photo's metadata.</string>
             </property>
             <property name="tabChangesFocus">
              <bool>true</bool>
@@ -393,6 +401,9 @@
           <layout class="QVBoxLayout" name="verticalLayout_2">
            <item>
             <widget class="QPlainTextEdit" name="descriptionText">
+             <property name="toolTip">
+              <string>The album description.</string>
+             </property>
              <property name="tabChangesFocus">
               <bool>true</bool>
              </property>
@@ -464,7 +475,7 @@
       <item>
        <widget class="QComboBox" name="photoSizeButton">
         <property name="toolTip">
-         <string>Set the resolution for photos in the album.</string>
+         <string>Set the dimensions for photos in the album.</string>
         </property>
         <property name="currentIndex">
          <number>2</number>
@@ -511,6 +522,9 @@
       </item>
       <item>
        <widget class="QPushButton" name="installTemplateButton">
+        <property name="toolTip">
+         <string>Copy the Dyphal template files to an album directory.</string>
+        </property>
         <property name="text">
          <string>Install Album Template...</string>
         </property>

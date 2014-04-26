@@ -506,12 +506,14 @@ function fitPhoto() {
             // Set the dimensions of the photo.
             if (photoAspect >= panelAspect) {
                 // Constrained by width.
-                var photoWidth = Math.min(photoPanel.clientWidth, photoData.width);
+                var photoWidth = Math.min(photoPanel.clientWidth, photoData.width) - 
+                    (photo.offsetWidth - photo.clientWidth);
                 photo.style["width"] = photoWidth + "px";
                 photo.style["height"] = (photoWidth / photoAspect) + "px";
             } else {
                 // Constrained by height.
-                var photoHeight = Math.min(photoPanel.clientHeight, photoData.height);
+                var photoHeight = Math.min(photoPanel.clientHeight, photoData.height) - 
+                    (photo.offsetHeight - photo.clientHeight);
                 photo.style["height"] = photoHeight + "px";
                 photo.style["width"] = (photoHeight * photoAspect) + "px";
             }
@@ -519,12 +521,14 @@ function fitPhoto() {
             // Set the dimensions of the overlay
             if (photoAspect >= windowAspect) {
                 // Constrained by width.
-                var overlayWidth = Math.min(windowWidth, photoData.width);
+                var overlayWidth = Math.min(windowWidth, photoData.width) - 
+                    (photo.offsetWidth - photo.clientWidth);;
                 photoOverlay.style["width"] =  overlayWidth + "px";
                 photoOverlay.style["height"] = (overlayWidth / photoAspect) + "px";
             } else {
                 // Constrained by height.
-                var overlayHeight = Math.min(windowHeight, photoData.height);
+                var overlayHeight = Math.min(windowHeight, photoData.height) - 
+                    (photo.offsetHeight - photo.clientHeight);;
                 photoOverlay.style["height"] = overlayHeight + "px";
                 photoOverlay.style["width"] = (overlayHeight * photoAspect) + "px";
             }

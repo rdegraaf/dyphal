@@ -38,8 +38,8 @@ Dyphal was designed to satisfy the following goals:
     Firefox, Internet Explorer, and Android.  There should be no major problems 
     in minor browsers such as Opera and on old but still common browsers such 
     as Internet Explorer 8.  
-7.  All content must be in HTML or be inserted at run-time.  All styles must be 
-    in CSS or inserted at run-time.
+7.  All content must be in HTML or be inserted at run-time.  All styling must 
+    be in CSS or inserted at run-time.
 8.  Album styles should be changeable without needing to change scripts.
 
 

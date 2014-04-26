@@ -6,10 +6,12 @@
     and Chromium, and I don't want to get in the business of requesting 
     specific fonts by name.
 
+
 2014-01-06_001  Rennie deGraaf  <rennie.degraaf@gmail.com>
     Old page contents remain visible when a hash change results in a load error.
 
     WONTFIX.  Only occurs in error paths, and not worth the effort of fixing.
+
 
 2014-01-06_002  Rennie deGraaf  <rennie.degraaf@gmail.com>
     Backspace doesn't work for navigation in IE8, Konqueror or Opera.
@@ -18,6 +20,7 @@
     and Opera is not necessary.  It appears that backspace is tied to "back" in 
     those browsers and cannot be handled in Javascript.
 
+
 2014-01-08_001  Rennie deGraaf  <rennie.degraaf@gmail.com>
     The full-screen photo overlay doesn't work properly in Opera when the 
     window is small.
@@ -25,11 +28,13 @@
     WONTFIX.  This is not a core feature and 100% support for Opera is not 
     necessary.
 
+
 2014-01-10_001  Rennie deGraaf  <rennie.degraaf@gmail.com>
     The error event doesn't fire if the debug stylesheet fails to load in Opera.
 
     WONTFIX.  This is not a core feature and 100% support for Opera is not 
     necessary.  Bug reported to Opera (DSK-387854).
+
 
 2014-01-12_001  Rennie deGraaf  <rennie.degraaf@gmail.com>
     CSS properties loaded through obj.style[prop] need to be camelCase.  The 
@@ -43,6 +48,7 @@
     camelCasing property names as needed seems to work on all supported 
     platforms.
 
+
 2014-01-17_001  Rennie deGraaf  <rennie.degraaf@gmail.com>
     The first photo doesn't load and debug mode doesn't work on Android 4.3
     and and earlier (4.4.2 works).  Apparently, they don't support the load 
@@ -51,6 +57,7 @@
     WORKAROUND: I can't find any way to feature-detect browsers with this bug, 
     so I check for a version of Android earlier than 4.4 and start a poll loop
     with an exponential backoff until the stylesheet is present. 
+
 
 2014-01-18_001  Rennie deGraaf  <rennie.degraaf@gmail.com>
     Despite photos being cached, browsers still check the server for new 
@@ -61,6 +68,7 @@
     POSTPONED: The overhead of checking with the server for new versions should 
     not be a big deal, and I need to stop adding unnecessary features if I'm 
     ever going to get this to a useful state.
+
 
 2014-02-04_001  Rennie deGraaf  <rennie.degraaf@gmail.com>
     Everything gets really spread-out on large wide windows.  It would look 
@@ -85,6 +93,7 @@
     without the layout automatically adjusting when the window is resized if 
     necessary.
 
+
 2014-04-05_001  Rennie deGraaf  <rennie.degraaf@gmail.com>
     The configuration file parser for DyphalGenerator doesn't handle improperly 
     formatted settings.  For instance, setting "threads" to a string will 
@@ -97,6 +106,7 @@
     then s/he should be able to figure out how to fix it.  Simply deleting the 
     config file will get things working again.
 
+
 2014-04-07_001  Rennie deGraaf  <rennie.degraaf@gmail.com>
     Album JSON files store photo paths relative to the user's home directory 
     and don't state the user name.  This limits their ability to be shared 
@@ -106,6 +116,7 @@
     home directories are only readable by their owner.  There's no clear need 
     for users on the same system to be able to import each other's album files. 
     Also, addressing this issue would aggrevate bug 2014-04-07_002.
+
 
 2014-04-07_002  Rennie deGraaf  <rennie.degraaf@gmail.com>
     Album JSON files contain paths to the original photos and are shared to the 
@@ -117,6 +128,7 @@
     fix this, I'll need to either create separate save files or encrypt the 
     paths.
 
+
 2014-04-09_002  Rennie deGraaf  <rennie.degraaf@gmail.com>
     DyphalGenerator doesn't load far enough to get to the error message under 
     Python 2.x.  It fails to load urllib.parse.  If I remove that, it fails to 
@@ -125,6 +137,7 @@
     WONTFIX: This looks like it will be a pain to fix and it's not worth the 
     trouble.  The version check should still be useful if someone tries to load 
     DyphalGenerator under a pre-3.3 version of Python 3.
+
 
 2014-04-12_001  Rennie deGraaf  <rennie.degraaf@gmail.com>
     DyphalGenerator won't load files whose names contain double-quotes when 
@@ -135,11 +148,13 @@
     when using some other file dialog.  Files whose names contain double-quotes 
     can be loaded from existing albums.
 
+
 2014-04-25_001  Rennie deGraaf  <rennie.degraaf@gmail.com>
     Small-screen mode doesn't work on IE 8.
 
     WONTFIX: This is not a core feature and 100% support for IE 8 is not 
     necessary.
+
 
 2014-01-08_001  Rennie deGraaf  <rennie.degraaf@gmail.com>
     The full-screen photo overlay in IE 8 gets cropped to the display size 

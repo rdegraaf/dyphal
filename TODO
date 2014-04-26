@@ -6,10 +6,6 @@ For version 3:
 
     * Script to update gthumb comments.
 
-    * Double-check UI tooltips.
-
-    * Different title font sizes for different screen sizes?
-
 
 For future versions:
 
@@ -86,3 +82,6 @@ For future versions:
       supports it?
 
     * Add a 'full' size option to the 'scale' combobox in DyphalGenerator.
+
+    * Center photos vertically, at least in small-screen mode.
+

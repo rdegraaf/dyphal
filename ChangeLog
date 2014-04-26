@@ -1,5 +1,16 @@
 2014-04-26  Rennie deGraaf  <rennie.degraaf@gmail.com>
 
+    * tools/DyphalGenerator.ui: Added tooltips to some controls that were 
+      missing them.
+
+    * test/album.json: Made the title longer so that it'll wrap on small 
+      screens.
+
+    * www/dyphal.js, www/photo.css: Fixed some photo sizing issues that caused 
+      the window to show a scrollbar in some situations.
+
+2014-04-26  Rennie deGraaf  <rennie.degraaf@gmail.com>
+
     * www/dyphal.js (fitPhoto, showPhotoOverlay): Got rid of all calls to 
       getObjHeight, getObjWidth, getHBorder, and getVBorder, since the 
       clientHeight, clientWidth, offsetHeight, and offsetWidth properties work 

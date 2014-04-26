@@ -99,6 +99,7 @@ img.vnavigation {
 #photo {
   border: 3px solid black;
   visibility: hidden;
+  vertical-align: middle;
 }
 
 #index, #captionPanel {
