@@ -88,8 +88,8 @@ class Config(object):
     THUMB_QUALITY = 50
     BG_TIMEOUT = 5
     TEMPLATE_FILE_NAMES = ["album.css", "back.png", "common.css", "debug.css", "dyphal.js", 
-                           "help.png", "ie8compat.js", "index.html", "javascript.html", "lib.js", 
-                           "next.png", "photo.css", "placeholder.png", "prev.png", "README.html"]
+                           "help.png", "ie8compat.js", "index.html", "javascript.html", "next.png", 
+                           "photo.css", "placeholder.png", "prev.png", "README.html"]
 
     DEFAULT_PHOTO_DIR = os.path.expanduser("~")
     DEFAULT_GTHUMB3_DIR = os.path.expanduser("~/.local/share/gthumb/catalogs")

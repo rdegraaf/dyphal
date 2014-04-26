@@ -41,7 +41,7 @@ a:active {
   color: #4b4b4b; /* html.background-color */
 }
 
-h1 {
+#titlePanel>h1, h1 {
   margin: 0;
   font-size: 24pt;
   font-family: sans-serif;
@@ -75,17 +75,18 @@ h1 {
 /* Centering styles from http://css-tricks.com/centering-in-the-unknown/ */
 div.centerBlock {
   text-align: center;
+  font-size: 0pt;
 }
 div.centerBlock:before {
   content: '';
   display: inline-block;
   height: 100%; 
   vertical-align: middle;
-  margin-right: -0.25em; /* Adjusts for spacing */
 }
 div.centerBlock>*:first-child {
   display: inline-block;
   vertical-align: middle;
+  font-size: 10pt;
 }
 
 #indexPanel {
@@ -194,7 +195,6 @@ div.centerBlock>*:first-child {
   }
 
   #titlePanel>h1 {
-    max-width: 800px;
     font-size: 16pt;
   }
 
@@ -204,8 +204,8 @@ div.centerBlock>*:first-child {
     right: 0;
   }
 
-  #footerPanel>p {
-    width: 95%;
+  #titlePanel>h1, #footerPanel>p {
+    width: 98%; /* compensate for an Android glitch */
     max-width: 800px;
   }
 

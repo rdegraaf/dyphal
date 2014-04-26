@@ -135,12 +135,16 @@
     when using some other file dialog.  Files whose names contain double-quotes 
     can be loaded from existing albums.
 
-2014-04-19_001  Rennie deGraaf <rennie.degraaf@gmail.com>
-    Photos don't always load or rotate properly and swipe navigation doesn't 
-    work on my Samsung Galaxy S3 cell phone (Android 4.3).  It does work in the 
-    Android 4.3 emulator and on my Android 4.2 tablet.  It seems that something 
-    is stomping on the global 'page' with an HTMLBodyElement.
+2014-04-25_001  Rennie deGraaf  <rennie.degraaf@gmail.com>
+    Small-screen mode doesn't work on IE 8.
 
-    OPEN:  See https://stackoverflow.com/questions/23177778/whats-clobbering-win
-    dow-page-on-my-galaxy-s3
+    WONTFIX: This is not a core feature and 100% support for IE 8 is not 
+    necessary.
+
+2014-01-08_001  Rennie deGraaf  <rennie.degraaf@gmail.com>
+    The full-screen photo overlay in IE 8 gets cropped to the display size 
+    rather than being resized.
+
+    WONTFIX: This is not a core feature and 100% support for IE 8 is not 
+    necessary.
 

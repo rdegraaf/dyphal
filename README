@@ -46,15 +46,15 @@ Dyphal was designed to satisfy the following goals:
 Generating Dyphal albums
 ------------------------
 
-Dyphal albums are created using DyphalGenerator.  
+Dyphal albums are created using DyphalGenerator: 
 
-1.  Use the **Add Photos** button to import photo files or gThumb 3 catalogs.  
+1.  Use the **Add Photos** button to import photo files or gThumb 3 catalogs. 
     Photos can be re-ordered by dragging.
 2.  Choose the caption and property fields to display for each photo.  The 
     fields available depend on what metadata tags are stored in the selected 
     photos.  By default, only the fields available in *all* selected photos are 
     listed; check the **Show all** box to list all fields that are available in 
-    *any* selected photo.
+    *any* selected photo.  Fields can be re-ordered by dragging.
 3.  Set a title, description and footer for the album.  The title and footer 
     will appear on photo pages as well as the album page.  No HTML markup is 
     allowed.
@@ -95,8 +95,8 @@ name of the JSON file that describes the album with the file name suffix
 omitted.  If your directory structure looks like this:
 
         album.css
-        album.js
         common.css
+        dyphal.js
         index.html
         photo.css
         vacation.json
@@ -145,15 +145,12 @@ which suppresses some of the styling, outlines various document elements in
 various colours, and logs some information to the browser console.
 
 Everything is implemented in as standards-conformant a manner as possible.  IE 
-8 has some significant issues and is handled using some wrapper logic in lib.js 
-and some IE-specific shims in ie8compat.js.  Everything should be 
-CSP-compatible in browsers that support CSP; there are a few `eval` statements 
-in lib.js, but those code paths should only ever be taken on old browsers that 
-don't support CSP.  Browser-specific logic was implemented using feature 
-detection rather than browser detection where possible; browser detection is 
-only used to work around the lack of functioning load events on link elements 
-in Android browsers (prior to version 4.4) because no way to fix this using 
-feature detection could be found.
+8 has some significant issues and is handled using some IE-specific shims in 
+ie8compat.js.  Everything should be CSP-compatible.  Browser-specific logic was 
+implemented using feature detection rather than browser detection where 
+possible; browser detection is only used to work around the lack of functioning 
+load events on link elements in Android browsers (prior to version 4.4) because 
+no way to fix this using feature detection could be found.
 
 If my JavaScript has idiosyncrasies, it's probably because I'm a C++ programmer 
 who taught himself JavaScript by trial and error.

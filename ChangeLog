@@ -1,3 +1,32 @@
+2014-04-26  Rennie deGraaf  <rennie.degraaf@gmail.com>
+
+    * www/dyphal.js (fitPhoto, showPhotoOverlay): Got rid of all calls to 
+      getObjHeight, getObjWidth, getHBorder, and getVBorder, since the 
+      clientHeight, clientWidth, offsetHeight, and offsetWidth properties work 
+      in every browser that I support.
+
+    * www/lib.js, www/dyphal.js: Moved all remaining functions from lib.js to 
+      dyphal.js.  Removed lib.js.
+
+    * tools/DyphalGenerator.py, www/index.html, README: Removed references to 
+      lib.js.
+
+    * www/dyphal.js (fitPhoto): Fixed the aspect dimension calculations for 
+      the overlay photo.
+
+    * www/dyphal.js (fitPhoto, showPhotoOverlay): Decide whether to show the 
+      overlay in showPhotoOverlay rather than special-casing photos that are 
+      already displayed at full size in fitPhoto.
+
+    * www/dyphal.js: Wrapped everything in a closure to avoid having a global 
+      "page" that was getting inexplicably stomped on by the Android 4.3 
+      browsers on Samsung devices.  Closed bug 2014-04-19_001.
+
+    * www/index.html: Removed the copyright tag from the help text because it's 
+      covered in README.
+
+    * www/common.css: Fixed some rendering issues in small-screen mode.
+
 2014-04-21  Rennie deGraaf  <rennie.degraaf@gmail.com>
 
     * tools/DyphalGenerator.py (DyphalUI._generateAlbum): Added a check for the 

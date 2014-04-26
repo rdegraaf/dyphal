@@ -15,9 +15,15 @@
   You should have received a copy of the GNU General Public License
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+
+/*jslint browser: true, passfail: false, plusplus: true, sub: true, vars: true, 
+ white: true, indent: 4, maxerr: 100, maxlen: 100 */
+
+(function () {
 "use strict";
 
 var debug = false;
+var logall = false;
 var albumName = null; // name of the current album
 var albumPath = null; // relative path to the album JSON file.  Begins with "." and ends with '/'.
 var album = null; // object describing the current album
@@ -26,7 +32,6 @@ var pages = []; // objects describing all pages that have been retrieved.  Based
 var overlayVisible = false;
 var helpVisible = false;
 var smallScreen = false;
-var logall = false;
 
 
 // Display an error message in the warning panel
@@ -72,6 +77,63 @@ function generatePhotoURL(index, suppressDebug) {
     }
     return link;
 }
+
+
+// Retrieves and parses a JSON object, then makes a callback with the result 
+// and any supplied arguments.  Catches any exceptions thrown by the callback, 
+// which can be treated as fatal errors or as warnings.
+function getJSON(object, callback, fatalErrors, args) {
+    var req = new XMLHttpRequest();
+    req.open("GET", object, true);
+    req.onreadystatechange = function () {
+        try {
+            if (4 === req.readyState) {
+                if (200 !== req.status) {
+                    callback(req.status, null, args);
+                } else {
+                    var response;
+                    if (req.response) {
+                        // W3C
+                        response = req.response;
+                    } else {
+                        // MSIE
+                        response = req.responseText;
+                    }
+                    callback(req.status, JSON.parse(response), args);
+                }
+            }
+        } catch (e) {
+            if (fatalErrors) {
+                error(e.name + ": " + e.message);
+                throw e;
+            } else {
+                warning(e.name + ": " + e.message);
+            }
+        }
+    };
+    req.send();
+}
+
+
+// Poll 'test' with an exponential backoff starting with 'interval' milliseconds between attempts. 
+// When it returns true, call 'action'.  If it fails 'maxtries' times, call 'error'.
+function pollUntil(interval, maxtries, test, action, error) {
+    if (test()) {
+        action();
+    } else if (maxtries > 0) {
+        setTimeout(function () { pollUntil(interval * 2, maxtries - 1, test, action, error); }, 
+                   interval);
+    } else {
+        error();
+    }
+}
+
+
+// Add a suffix-match method to String.
+String.prototype.endsWith = function (suffix) {
+    var lastIndex = this.lastIndexOf(suffix);
+    return (-1 !== lastIndex) && (this.length === lastIndex + suffix.length);
+};
 
 
 // Check for a small screen and make layout changes if necessary.
@@ -141,12 +203,13 @@ function showPhotoOverlay() {
     try {
         overlayVisible = true;
         if (smallScreen) {
+            // On a small screen, show the photo caption and properties.
             var captionPanel = document.getElementById("captionPanel");
             var propertyPanel = document.getElementById("propertyPanel");
 
             // Make the caption and property panels have the same height.
-            var captionHeight = getObjHeight(captionPanel);
-            var propertyHeight = getObjHeight(propertyPanel);
+            var captionHeight = captionPanel.clientHeight;
+            var propertyHeight = propertyPanel.clientHeight;
             if (captionHeight > propertyHeight) {
                 propertyPanel.style["height"] = captionHeight + "px";
             } else {
@@ -165,10 +228,14 @@ function showPhotoOverlay() {
             captionPanel.addEventListener("click", hidePhotoOverlay, false);
             propertyPanel.addEventListener("click", hidePhotoOverlay, false);
         } else {
-            // On a non-small screen, show the photo at its full size.
-            var overlay = document.getElementById("overlay");
-            overlay.style["display"] = "block";
-            overlay.addEventListener("click", hidePhotoOverlay, false);
+            // On a normal screen, show the photo at its full size if it isn't already.
+            var photoData = pages[page - 1];
+            var photo = document.getElementById("photo");
+            if ((photo.width != photoData.width) || (photo.height != photoData.height)) {
+                var overlay = document.getElementById("overlay");
+                overlay.style["display"] = "block";
+                overlay.addEventListener("click", hidePhotoOverlay, false);
+            }
         }
     } catch (e) {
         error(e.name + ": " + e.message);
@@ -425,55 +492,43 @@ function fitPhoto() {
 
         if (0 < page) {
             var photoData = pages[page - 1];
-            var photo;          // the photo to be modified
-            var photoAspect;    // the width/height aspect ratio of photo
-            var photoPanel;     // the panel to hold the photo
-            var panelWidth;     // the current width of photoPanel, in pixels
-            var panelHeight;    // the current height of photoPanel, in pixels
-            var panelAspect;    // the current aspect ratio of photoPanel
-            var windowWidth;    // the width of the window
-            var windowHeight;   // the height of the window
-            var photoOverlay;   // the overlay photo
 
-            photo = document.getElementById("photo");
-            photoOverlay = document.getElementById("photoOverlay");
-            photoAspect = photoData.width / photoData.height;
-            photoPanel = document.getElementById("contentPanel");
+            var photo = document.getElementById("photo");
+            var photoOverlay = document.getElementById("photoOverlay");
+            var photoAspect = photoData.width / photoData.height;
+            var photoPanel = document.getElementById("contentPanel");
+            var panelAspect = photoPanel.clientWidth / photoPanel.clientHeight;
 
-            panelWidth = getObjWidth(photoPanel) - getHBorder(photo);
-            panelHeight = getObjHeight(photoPanel) - getVBorder(photo);
-            panelAspect = panelWidth / panelHeight;
+            var windowWidth = document.documentElement.clientWidth - 10;
+            var windowHeight = document.documentElement.clientHeight - 10;
+            var windowAspect = windowWidth / windowHeight;
 
-            windowWidth = (window.innerWidth || document.documentElement.clientWidth) - 10;
-            windowHeight = (window.innerHeight || document.documentElement.clientHeight) - 10;
+            // Set the dimensions of the photo.
+            if (photoAspect >= panelAspect) {
+                // Constrained by width.
+                var photoWidth = Math.min(photoPanel.clientWidth, photoData.width);
+                photo.style["width"] = photoWidth + "px";
+                photo.style["height"] = (photoWidth / photoAspect) + "px";
+            } else {
+                // Constrained by height.
+                var photoHeight = Math.min(photoPanel.clientHeight, photoData.height);
+                photo.style["height"] = photoHeight + "px";
+                photo.style["width"] = (photoHeight * photoAspect) + "px";
+            }
 
-            // set the width and height of the photo
-            if ((panelWidth >= photoData.width) && (panelHeight >= photoData.height)) {
-                // unconstrained
-                photo.style["width"] = photoData.width + "px";
-                photo.style["height"] = photoData.height + "px";
-                if (!smallScreen) {
-                    photo.removeEventListener("click", showPhotoOverlay, false);
-                } else {
-                    photo.addEventListener("click", showPhotoOverlay, false);
-                }
-            } else if (photoAspect >= panelAspect) {
-                // constrained by width
-                photo.style["width"] = panelWidth + "px";
-                photo.style["height"] = (panelWidth / photoAspect) + "px";
+            // Set the dimensions of the overlay
+            if (photoAspect >= windowAspect) {
+                // Constrained by width.
                 var overlayWidth = Math.min(windowWidth, photoData.width);
                 photoOverlay.style["width"] =  overlayWidth + "px";
                 photoOverlay.style["height"] = (overlayWidth / photoAspect) + "px";
-                photo.addEventListener("click", showPhotoOverlay, false);
             } else {
-                // constrained by height
-                photo.style["height"] = panelHeight + "px";
-                photo.style["width"] = (panelHeight * photoAspect) + "px";
+                // Constrained by height.
                 var overlayHeight = Math.min(windowHeight, photoData.height);
                 photoOverlay.style["height"] = overlayHeight + "px";
                 photoOverlay.style["width"] = (overlayHeight * photoAspect) + "px";
-                photo.addEventListener("click", showPhotoOverlay, false);
             }
+            photo.addEventListener("click", showPhotoOverlay, false);
 
             photo.style["visibility"] = "visible";
             log("fitphoto: " + photo.style["height"] + " " + photo.style["width"]);
@@ -923,3 +978,4 @@ log(navigator.appName);
 log(navigator.userAgent);
 log(window.innerWidth + "x" + window.innerHeight);
 
+})();
