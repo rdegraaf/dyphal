@@ -27,9 +27,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 __author__ = "Rennie deGraaf <rennie.degraaf@gmail.com>"
-__version__ = "3.0"
+__version__ = "3.0-beta1"
 __credits__ = "Rennie deGraaf"
-__date__ = "2014-04-12"
+__date__ = "2014-04-26"
 
 #__all__ = "" # Uncomment to limit the amount of data tha pydoc spews out.
 

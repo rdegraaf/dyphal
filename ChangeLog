@@ -1,5 +1,13 @@
 2014-04-26  Rennie deGraaf  <rennie.degraaf@gmail.com>
 
+    * bumpversion.sh: New script to set the date and version tags in README, 
+      www/index.html, and tools/DyphalGenerator.py, and to optionally create 
+      a new tag in git
+
+    * Version 3.0-beta1
+
+2014-04-26  Rennie deGraaf  <rennie.degraaf@gmail.com>
+
     * tools/DyphalGenerator.ui: Added tooltips to some controls that were 
       missing them.
 

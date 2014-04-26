@@ -1,9 +1,5 @@
 For version 3:
 
-    * Find a way to push the version date into README, index.html, and 
-      DyphalGenerator.py.  A git filter might be able to do the job, if I used 
-      git.  Maybe add something to install.sh?
-
     * Script to update gthumb comments.
 
 
