@@ -10,8 +10,7 @@ then
     version=$(git describe --long)
 elif [ $# -eq 1 ]
 then
-    git tag -s "$1" || exit 1
-    version=$(git describe)
+    version="$1"
 else
     echo "Usage: $0 [<version>]"
     exit 1
@@ -28,3 +27,8 @@ sed -i -re "s/^([ ]*<p>Version ).*(<\/p>)$/\1$version, $date\2/" www/index.html
 # Update the version and date in README
 sed -i -re "s/^(Version )[^ ]+, [[:digit:]]{4}-[[:digit:]]{2}-[[:digit:]]{2}$/\1$version, $date/" README
 
+if [ $# -eq 1 ]
+then
+    git commit -a
+    git tag -s "$1" -m "Dyphal $version"
+fi

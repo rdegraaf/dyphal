@@ -187,6 +187,22 @@ div.centerBlock>*:first-child {
   border-bottom: 0;
 }
 
+#titlePanel>h1, #footerPanel>p {
+  width: 98%; /* compensate for an Android glitch */
+}
+
+@media (max-width: 1000px) {
+  #titlePanel>h1 {
+    font-size: 21pt;
+  }
+}
+
+@media (max-width: 800px) {
+  #titlePanel>h1 {
+    font-size: 18pt;
+  }
+}
+
 @media (max-width: 600px), (max-height: 600px) {
   #titlePanel {
     margin-left: 0;
@@ -205,7 +221,6 @@ div.centerBlock>*:first-child {
   }
 
   #titlePanel>h1, #footerPanel>p {
-    width: 98%; /* compensate for an Android glitch */
     max-width: 800px;
   }
 
@@ -263,3 +278,10 @@ div.centerBlock>*:first-child {
     -ms-transform: rotate(-90deg);
   }
 }
+
+@media (max-width: 500px), (max-height: 500px) {
+  #titlePanel>h1 {
+    font-size: 14pt;
+  }
+}
+

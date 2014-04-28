@@ -156,10 +156,16 @@
     necessary.
 
 
-2014-01-08_001  Rennie deGraaf  <rennie.degraaf@gmail.com>
+2014-04-25_002  Rennie deGraaf  <rennie.degraaf@gmail.com>
     The full-screen photo overlay in IE 8 gets cropped to the display size 
     rather than being resized.
 
     WONTFIX: This is not a core feature and 100% support for IE 8 is not 
     necessary.
+
+
+2014-04-27_001  Rennie deGraaf  <rennie.degraaf@gmail.com>
+    Touch nagivation doesn't work on Jun's Nexus 7" tablet.
+
+    OPEN:
 

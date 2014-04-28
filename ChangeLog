@@ -1,8 +1,21 @@
+    * bumpversion.sh: Commit before creating the tag so that the modified dates 
+      and versions are in the tag.
+
+    * www/common.css: Added title font overrides for some other screen sizes.
+
+    * www/common.css: Made the width adjustment for title and footer text apply 
+      to normal mode as well as small mode.
+
+    * www/dyphal.js: Fixed the small screen detection logic; it should match 
+      the CSS media selectors now.
+
 2014-04-26  Rennie deGraaf  <rennie.degraaf@gmail.com>
 
     * bumpversion.sh: New script to set the date and version tags in README, 
       www/index.html, and tools/DyphalGenerator.py, and to optionally create 
-      a new tag in git
+      a new tag in git.
+
+    * install.sh, install-www.sh: Set execute permission.
 
     * Version 3.0-beta1
 

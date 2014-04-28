@@ -81,3 +81,8 @@ For future versions:
 
     * Center photos vertically, at least in small-screen mode.
 
+    * Python's xml.etree.ElementTree is documented as being unsafe for handling 
+      untrusted XML.  Use something else (defusedxml?) instead.
+
+    * Replace setStreenSize() with a window.matchMedia query.
+

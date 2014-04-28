@@ -143,12 +143,14 @@ function setScreenSize() {
     try {
         // Check for a small screen and load the overrides if so.
         var small = false;
-        if (window.innerWidth < 600 || window.innerHeight < 600) {
+        if ((document.documentElement.clientWidth <= 600) || 
+            (document.documentElement.clientHeight <= 600)) {
             small = true;
         }
         if (small) {
             if (document.documentElement.clientHeight <= document.documentElement.clientWidth) {
-                // landscape
+                // Landscape.  titlePanel is rotated and may be wider than the screen is tall; 
+                // fix its size.
                 document.getElementById("titlePanel").style.width = 
                                             (document.documentElement.clientHeight - 110) + "px";
             }
