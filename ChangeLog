@@ -1,3 +1,21 @@
+2014-04-28  Rennie deGraaf  <rennie.degraaf@gmail.com>
+
+    * www/dyphal.js:  Fixed the logic to remove the width override on 
+      titlePanel when in compressed layout.
+
+    * www/album.css, www/common.css, www/debug.css, www/dyphal.js, 
+      www/photo.css: Changed the threshold for compressed layout from 600 px to 
+      800 px.
+
+    * www/dyphal.js (touchStart, touchEnd): Added a maximum time over which a 
+      swipe may occur to be recognized.
+
+    * www/dyphal.js: Renamed "smallScreen" to "compressed".
+
+    * README, www/index.html: Documented the compressed layout.
+
+2014-04-27  Rennie deGraaf  <rennie.degraaf@gmail.com>
+
     * bumpversion.sh: Commit before creating the tag so that the modified dates 
       and versions are in the tag.
 

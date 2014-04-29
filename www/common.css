@@ -197,13 +197,7 @@ div.centerBlock>*:first-child {
   }
 }
 
-@media (max-width: 800px) {
-  #titlePanel>h1 {
-    font-size: 18pt;
-  }
-}
-
-@media (max-width: 600px), (max-height: 600px) {
+@media (max-width: 800px), (max-height: 800px) {
   #titlePanel {
     margin-left: 0;
     margin-right: 110px; /* indexPanel.width */
@@ -211,7 +205,7 @@ div.centerBlock>*:first-child {
   }
 
   #titlePanel>h1 {
-    font-size: 16pt;
+    font-size: 18pt;
   }
 
   #footerPanel {
@@ -237,7 +231,7 @@ div.centerBlock>*:first-child {
   }
 }
 
-@media (max-width: 600px) and (orientation: landscape), (max-height: 600px) and (orientation: landscape) {
+@media (max-width: 800px) and (orientation: landscape), (max-height: 800px) and (orientation: landscape) {
   body {
     margin-bottom: 0;
   }
@@ -276,6 +270,12 @@ div.centerBlock>*:first-child {
     transform: rotate(-90deg);
     -webkit-transform: rotate(-90deg);
     -ms-transform: rotate(-90deg);
+  }
+}
+
+@media (max-width: 600px), (max-height: 600px) {
+  #titlePanel>h1 {
+    font-size: 16pt;
   }
 }
 

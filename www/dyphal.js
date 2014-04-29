@@ -31,7 +31,7 @@ var page = null; // number of the current page, 0 for the album thumbnail view
 var pages = []; // objects describing all pages that have been retrieved.  Based on album.photos.
 var overlayVisible = false;
 var helpVisible = false;
-var smallScreen = false;
+var compressed = false;
 
 
 // Display an error message in the warning panel
@@ -136,29 +136,28 @@ String.prototype.endsWith = function (suffix) {
 };
 
 
-// Check for a small screen and make layout changes if necessary.
+// Check for compressed layout and make layout changes if necessary.
 function setScreenSize() {
     log("setScreenSize enter");
 
     try {
         // Check for a small screen and load the overrides if so.
         var small = false;
-        if ((document.documentElement.clientWidth <= 600) || 
-            (document.documentElement.clientHeight <= 600)) {
+        if ((document.documentElement.clientWidth <= 800) || 
+            (document.documentElement.clientHeight <= 800)) {
             small = true;
         }
-        if (small) {
-            if (document.documentElement.clientHeight <= document.documentElement.clientWidth) {
-                // Landscape.  titlePanel is rotated and may be wider than the screen is tall; 
-                // fix its size.
-                document.getElementById("titlePanel").style.width = 
+        if ((small) &&
+            (document.documentElement.clientHeight <= document.documentElement.clientWidth)) {
+            // Compressed view in landscape.  titlePanel is rotated and may be wider than the 
+            // screen is tall; fix its size.
+            document.getElementById("titlePanel").style.width = 
                                             (document.documentElement.clientHeight - 110) + "px";
-            }
-        } else if (smallScreen) {
+        } else if (compressed) {
             // Remove whatever overrides we may have applied.
             document.getElementById("titlePanel").style.width = "";
         }
-        smallScreen = small;
+        compressed = small;
     } catch (e) {
         error(e.name + ": " + e.message);
         throw e;
@@ -172,7 +171,7 @@ function setScreenSize() {
 function hidePhotoOverlay() {
     try {
         if (overlayVisible) {
-            if (smallScreen) {
+            if (compressed) {
                 var captionPanel = document.getElementById("captionPanel");
                 var propertyPanel = document.getElementById("propertyPanel");
 
@@ -204,7 +203,7 @@ function hidePhotoOverlay() {
 function showPhotoOverlay() {
     try {
         overlayVisible = true;
-        if (smallScreen) {
+        if (compressed) {
             // On a small screen, show the photo caption and properties.
             var captionPanel = document.getElementById("captionPanel");
             var propertyPanel = document.getElementById("propertyPanel");
@@ -930,12 +929,14 @@ function start() {
 
 
 // Record the start of a touch
-var currentX = null;
-var currentY = null;
+var startX = null;
+var startY = null;
+var startT = null;
 function touchStart(evt) {
     try {
-        currentX = parseInt(evt.touches[0].clientX, 10);
-        currentY = parseInt(evt.touches[0].clientY, 10);
+        startX = parseInt(evt.touches[0].clientX, 10);
+        startY = parseInt(evt.touches[0].clientY, 10);
+        startT = (new Date()).getTime();
     } catch (e) {
         error(e.name + ": " + e.message);
     }
@@ -948,12 +949,15 @@ function touchEnd(evt) {
     try {
         var thresholdY = 40;
         var thresholdX = 100;
+        var thresholdT = 300;
 
-        var motionX = parseInt(evt.changedTouches[0].clientX, 10) - currentX;
-        var motionY = parseInt(evt.changedTouches[0].clientY, 10) - currentY;
+        var deltaX = parseInt(evt.changedTouches[0].clientX, 10) - startX;
+        var deltaY = parseInt(evt.changedTouches[0].clientY, 10) - startY;
+        var deltaT = (new Date()).getTime() - startT;
 
-        if ((thresholdY > Math.abs(motionY)) && (thresholdX < Math.abs(motionX))) {
-            if (0 > motionX) {
+        if ((thresholdY > Math.abs(deltaY)) && (thresholdX < Math.abs(deltaX)) && 
+            (thresholdT > deltaT)) {
+            if (0 > deltaX) {
                 if (0 < page && album.photos.length !== page) {
                     document.location.href = generatePhotoURL(page + 1);
                 }
