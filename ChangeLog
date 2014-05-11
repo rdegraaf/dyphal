@@ -1,3 +1,26 @@
+2014-05-10  Rennie deGraaf  <rennie.degraaf@gmail.com>
+
+    * tools/gthumb-comment-update.py: Added support for writing metadata back 
+      out, docstrings, and misc. cleanup and bug fixes.  It seems to work now. 
+
+    * tools/gthtime.sh: Removed, as its functionality has been replaced by 
+      tools/gthumb-comment-update.py.
+
+    * install.sh: Install gthumb-comment-update.
+
+    * bumpversion.sh: Set version and date strings in gthumb-comment-update.py.
+
+2014-05-10  Rennie deGraaf  <rennie.degraaf@gmail.com>
+
+    * tools/gthumb-comment-update.py: New file, containing a tool to set time 
+      zones on timestamps in photo metadata, and to convert the various comment 
+      formats used by different gersions of gThumb to the format expected by 
+      DyphalGenerator.  Not yet complete.
+
+    * test/*: Moved to test/album/.
+
+    * test/comments/*: New files to test gthumb-comment-update.py.
+
 2014-04-28  Rennie deGraaf  <rennie.degraaf@gmail.com>
 
     * www/dyphal.js:  Fixed the logic to remove the width override on 

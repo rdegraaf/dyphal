@@ -1,6 +1,7 @@
 For version 3:
 
-    * Script to update gthumb comments.
+    * Tool to rename photos to encode the camera name instead of the generic 
+      "img".  And get rid of execute permissions on a lot of photos.
 
 
 For future versions:
@@ -63,16 +64,13 @@ For future versions:
 
     * On-line help in DyphalGenerator.
 
-    * Reduce the spacing on items in the Add Caption and Add Property menus.
-      I tried to change the padding with a QMenu::item stylesheet, but this 
-      removed the hover effect.  I can't figure out how to get both.  It's 
-      probably not important unless the user is using a fairly small screen.
+    * Reduce the spacing on items in the Add Caption and Add Property menus in 
+      DyphalGenerator.  I tried to change the padding with a QMenu::item 
+      stylesheet, but this removed the hover effect.  I can't figure out how to 
+      get both.  It's probably not important unless the user is using a fairly 
+      small screen.
 
     * Use the photo title instead of album title on in photo view if available.
-
-    * Get rid of the auto-backup in gthtime.sh.
-
-    * Get rid of the eval in gthtime.sh.
 
     * Try using screen.lockOrientation() in small-screen mode, once something 
       supports it?
@@ -84,5 +82,13 @@ For future versions:
     * Python's xml.etree.ElementTree is documented as being unsafe for handling 
       untrusted XML.  Use something else (defusedxml?) instead.
 
-    * Replace setStreenSize() with a window.matchMedia query.
+    * Replace setScreenSize() with a window.matchMedia query.
+
+    * Add a way to set/edit photo comments, since gThumb's comment support and 
+      UI seem to be getting worse over time rather than better.  (gThumb 3.2 
+      treats EXIF:DateTimeOriginal as authoritative even in the presence of 
+      other timestamps, overwrites EXIF:DateTimeOriginal when changing the 
+      timestamp through its UI, and doesn't display the timestamp or location 
+      in its comment panel.  gThumb3 is apparently making its UI more Gnome-
+      specific.)
 

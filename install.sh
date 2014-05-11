@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # Installation script for Dyphal.
 
 # Edit these paths to suit your local environment
@@ -27,4 +27,7 @@ chmod +x "$BIN_PATH"/DyphalGenerator
 mkdir -p "$DATA_PATH"
 cp www/* "$DATA_PATH"/
 pandoc README -t html5 -s -S --template=misc/html5.pandoc >"$DATA_PATH"/README.html
+
+cp tools/gthumb-comment-update.py "$BIN_PATH"/gthumb-comment-update
+chmod +x "$BIN_PATH"/gthumb-comment-update
 

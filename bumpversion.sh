@@ -18,8 +18,9 @@ fi
 
 date=$(date -I)
 
-# Update the version and date in DyphalGenerator.py
+# Update the version and date in DyphalGenerator.py and gthumb-comment-update.py
 sed -i -e "s/^__version__ = .*$/__version__ = \"$version\"/" -e "s/^__date__ = .*$/__date__ = \"$date\"/" tools/DyphalGenerator.py
+sed -i -e "s/^__version__ = .*$/__version__ = \"$version\"/" -e "s/^__date__ = .*$/__date__ = \"$date\"/" tools/gthumb-comment-update.py
 
 # Update the version and date in index.html
 sed -i -re "s/^([ ]*<p>Version ).*(<\/p>)$/\1$version, $date\2/" www/index.html
