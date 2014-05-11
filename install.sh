@@ -31,3 +31,6 @@ pandoc README -t html5 -s -S --template=misc/html5.pandoc >"$DATA_PATH"/README.h
 cp tools/gthumb-comment-update.py "$BIN_PATH"/gthumb-comment-update
 chmod +x "$BIN_PATH"/gthumb-comment-update
 
+cp tools/photorename.sh "$BIN_PATH"/photorename.sh
+chmod +x "$BIN_PATH"/photorename.sh
+

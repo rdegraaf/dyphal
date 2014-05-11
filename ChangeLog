@@ -1,5 +1,12 @@
 2014-05-10  Rennie deGraaf  <rennie.degraaf@gmail.com>
 
+    * tools/photorename.sh: New file, containing a script to encode a camera 
+      name into photo file names in place of meaningless strings like "IMG".
+
+    * install.sh: Install photorename.sh.
+
+2014-05-10  Rennie deGraaf  <rennie.degraaf@gmail.com>
+
     * tools/gthumb-comment-update.py: Added support for writing metadata back 
       out, docstrings, and misc. cleanup and bug fixes.  It seems to work now. 
 
