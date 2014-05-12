@@ -165,7 +165,17 @@
 
 
 2014-04-27_001  Rennie deGraaf  <rennie.degraaf@gmail.com>
-    Touch navigation doesn't work on Jun's Nexus 7" tablet.
+    Touch navigation doesn't work on Jun's Nexus 7" tablet and Ian's Surface.
 
-    OPEN:
+    OPEN: Apparently touchend is broken on some Android versions.  It 
+    supposedly works if you call evt.preventDefault() in the touchmove handler, 
+    but that breaks scrolling so it's not a good workaround.  More details: 
+    https://code.google.com/p/android/issues/detail?id=19827.
+
+
+2014-05-11_001  Rennie deGraaf  <rennie.degraaf@gmail.com>
+    Touch navigation doesn't work on Ian's Surface.
+
+    OPEN: Of course IE doesn't use the same touch event interface as everything 
+    else, because that might be compatible or something.  Typical.
 

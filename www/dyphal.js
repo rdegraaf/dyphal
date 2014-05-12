@@ -934,8 +934,14 @@ var startY = null;
 var startT = null;
 function touchStart(evt) {
     try {
-        startX = parseInt(evt.touches[0].clientX, 10);
-        startY = parseInt(evt.touches[0].clientY, 10);
+        if ("touches" in evt) {
+            startX = parseInt(evt.touches[0].clientX, 10);
+            startY = parseInt(evt.touches[0].clientY, 10);
+        } else if ("clientX" in evt) {
+            // IE 10, 11
+            startX = parseInt(evt.clientX, 10);
+            startY = parseInt(evt.clientY, 10);
+        }
         startT = (new Date()).getTime();
     } catch (e) {
         error(e.name + ": " + e.message);
@@ -951,8 +957,16 @@ function touchEnd(evt) {
         var thresholdX = 100;
         var thresholdT = 300;
 
-        var deltaX = parseInt(evt.changedTouches[0].clientX, 10) - startX;
-        var deltaY = parseInt(evt.changedTouches[0].clientY, 10) - startY;
+        var deltaX;
+        var deltaY;
+        if ("touches" in evt) {
+            deltaX = parseInt(evt.changedTouches[0].clientX, 10) - startX;
+            deltaY = parseInt(evt.changedTouches[0].clientY, 10) - startY;
+        } else if ("clientX" in evt) {
+            // IE 10, 11
+            deltaX = parseInt(evt.clientX, 10) - startX;
+            deltaY = parseInt(evt.clientY, 10) - startY;
+        }
         var deltaT = (new Date()).getTime() - startT;
 
         if ((thresholdY > Math.abs(deltaY)) && (thresholdX < Math.abs(deltaX)) && 
@@ -981,8 +995,18 @@ document.addEventListener("DOMContentLoaded", suppressWarning, false);
 document.addEventListener("DOMContentLoaded", setScreenSize, false);
 window.addEventListener("resize", setScreenSize, false);
 window.addEventListener("orientationchange", setScreenSize, false);
-window.addEventListener("touchstart", touchStart);
-window.addEventListener("touchend", touchEnd);
+if ("ontouchstart" in window) {
+    window.addEventListener("touchstart", touchStart);
+    window.addEventListener("touchend", touchEnd);
+} else if (window.navigator.pointerEnabled) {
+    // IE 11 touch events
+    window.addEventListener("pointerdown", touchStart);
+    window.addEventListener("pointerup", touchEnd);
+} else if (window.navigator.msPointerEnabled) {
+    // IE 10 touch events
+    window.addEventListener("MSPointerDown", touchStart);
+    window.addEventListener("MSPointerUp", touchEnd);
+}
 
 log(navigator.appName);
 log(navigator.userAgent);

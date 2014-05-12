@@ -1,3 +1,9 @@
+2014-05-11  Rennie deGraaf  <rennie.degraaf@gmail.com>
+
+    * www/dyphal.js: Added an attempt at a workaround for the failure of touch 
+      events to work on IE.  I have no idea if it works, because I don't have a 
+      Surface.
+
 2014-05-10  Rennie deGraaf  <rennie.degraaf@gmail.com>
 
     * tools/photorename.sh: New file, containing a script to encode a camera 
