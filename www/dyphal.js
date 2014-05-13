@@ -928,21 +928,81 @@ function start() {
 }
 
 
-// Record the start of a touch
-var startX = null;
-var startY = null;
-var startT = null;
+/*
+ * Swipe gestures for touch devices.
+ * Touch tracking is broken on Android 3.x, and 4.0, apparently fixed in 4.1, and regressed in 4.4. 
+ * It's reportedly broken on some 4.2 and 4.3 builds as well.  The suggested "workaround" is to 
+ * use event.disableDefault(), which breaks scrolling.  This variation on the workaround calls 
+ * event.disableDefault() only if the first touchmove event appeared to be a side swipe; vertical 
+ * scrolling should work as normal and horizontal scrolling can be achieved by first scrolling 
+ * vertically.  This is based on Giovanni Di Gregorio's suggestion from 
+ * https://stackoverflow.com/questions/20412982/javascript-any-workarounds-for-getting-chrome-for-
+ * android-to-fire-off-touchmove/23145727#23145727
+ */
+var startPos = {x: null, y: null};
+var startTime = null;
+
+// Get the delta between the current touch position and the start position.
+function getTouchDelta(evt) {
+    var delta = {x: null, y: null};
+    if ("touches" in evt) {
+        delta.x = parseInt(evt.changedTouches[0].clientX, 10) - startPos.x;
+        delta.y = parseInt(evt.changedTouches[0].clientY, 10) - startPos.y;
+    } else if ("clientX" in evt) {
+        // IE 10, 11
+        delta.x = parseInt(evt.clientX, 10) - startPos.x;
+        delta.y = parseInt(evt.clientY, 10) - startPos.y;
+    }
+    return delta;
+}
+
+
+// Android-specific workarounds for touch event bugs.
+function stopTracking(e) {
+    document.removeEventListener("touchmove", prevent, false);
+}
+function prevent(e){
+    e.preventDefault();
+}
+function touchMove(evt) {
+    try {
+        var swipeRatio = 5.0;
+        var delta = getTouchDelta(evt);
+        if(!swipeDetected) {
+            if (Math.abs(delta.x / delta.y) >= swipeRatio) {
+                swipeDetected = true;
+            } else {
+                stopTracking(evt);
+            }
+        }
+    } catch (e) {
+        error(e.name + ": " + e.message);
+    }
+}
+if (/Android/.test(navigator.userAgent)) {
+    var swipeDetected;
+    window.addEventListener("touchmove", touchMove, true);
+    window.addEventListener("touchleave", stopTracking, true);
+    window.addEventListener("touchcancel", stopTracking, true);
+}
+
+
+// Record the start of a touch.
 function touchStart(evt) {
     try {
+        if (/Android/.test(navigator.userAgent)) {
+            swipeDetected = false;
+            document.addEventListener("touchmove", prevent, false);
+        }
         if ("touches" in evt) {
-            startX = parseInt(evt.touches[0].clientX, 10);
-            startY = parseInt(evt.touches[0].clientY, 10);
+            startPos.x = parseInt(evt.touches[0].clientX, 10);
+            startPos.y = parseInt(evt.touches[0].clientY, 10);
         } else if ("clientX" in evt) {
             // IE 10, 11
-            startX = parseInt(evt.clientX, 10);
-            startY = parseInt(evt.clientY, 10);
+            startPos.x = parseInt(evt.clientX, 10);
+            startPos.y = parseInt(evt.clientY, 10);
         }
-        startT = (new Date()).getTime();
+        startTime = (new Date()).getTime();
     } catch (e) {
         error(e.name + ": " + e.message);
     }
@@ -953,25 +1013,19 @@ function touchStart(evt) {
 // change the photo being displayed.
 function touchEnd(evt) {
     try {
+        if (/Android/.test(navigator.userAgent)) {
+            stop(evt);
+        }
         var thresholdY = 40;
         var thresholdX = 100;
         var thresholdT = 300;
 
-        var deltaX;
-        var deltaY;
-        if ("touches" in evt) {
-            deltaX = parseInt(evt.changedTouches[0].clientX, 10) - startX;
-            deltaY = parseInt(evt.changedTouches[0].clientY, 10) - startY;
-        } else if ("clientX" in evt) {
-            // IE 10, 11
-            deltaX = parseInt(evt.clientX, 10) - startX;
-            deltaY = parseInt(evt.clientY, 10) - startY;
-        }
-        var deltaT = (new Date()).getTime() - startT;
+        var deltaPos = getTouchDelta(evt);
+        var deltaTime = (new Date()).getTime() - startTime;
 
-        if ((thresholdY > Math.abs(deltaY)) && (thresholdX < Math.abs(deltaX)) && 
-            (thresholdT > deltaT)) {
-            if (0 > deltaX) {
+        if ((thresholdY > Math.abs(deltaPos.y)) && (thresholdX < Math.abs(deltaPos.x)) && 
+            (thresholdT > deltaTime)) {
+            if (0 > deltaPos.x) {
                 if (0 < page && album.photos.length !== page) {
                     document.location.href = generatePhotoURL(page + 1);
                 }
@@ -996,8 +1050,8 @@ document.addEventListener("DOMContentLoaded", setScreenSize, false);
 window.addEventListener("resize", setScreenSize, false);
 window.addEventListener("orientationchange", setScreenSize, false);
 if ("ontouchstart" in window) {
-    window.addEventListener("touchstart", touchStart);
-    window.addEventListener("touchend", touchEnd);
+    window.addEventListener("touchstart", touchStart, true);
+    window.addEventListener("touchend", touchEnd, true);
 } else if (window.navigator.pointerEnabled) {
     // IE 11 touch events
     window.addEventListener("pointerdown", touchStart);
