@@ -226,7 +226,7 @@ def update_photo_props(props, embedded_props, xml_props, photo_path, xml_path):
             xml_props.find("time").set("value", time_str)
     exiftool_cmd.append("-XMP:XMPToolkit=")
     exiftool_cmd.append(photo_path)
-    
+
     # Write the revised embedded properties and XML file.
     subprocess.check_call(exiftool_cmd, timeout=BG_TIMEOUT, stderr=subprocess.STDOUT)
     if None is not xml_props:
@@ -266,20 +266,20 @@ def main():
                 # These need to exist even if an exception is thrown so that we can clean up.
                 photo_fd = None
                 xml_fd = None
-                
+
                 # Open the photo file and extract any metadata present.
                 photo_fd = os.open(file_name, os.O_RDONLY)
                 # exiftool creates a temporary file in the same directory as the original file when 
                 # writing properties.  So we need to link the file to a writable directory.
                 photo_path = os.path.join(temp_dir.name, os.path.basename(file_name))
                 os.symlink("/proc/%d/fd/%d" % (os.getpid(), photo_fd), photo_path)
-                
+
                 properties_text = subprocess.check_output(
                                             ["exiftool", "-json", "-a", "-G", "-All", photo_path], 
                                             timeout=BG_TIMEOUT, universal_newlines=True, 
                                             stderr=subprocess.STDOUT)
                 embedded_props = json.loads(properties_text)[0]
-                
+
                 # Try to read the XML comment file.  
                 # It's not an error for it to be missing or unparsable.
                 (xml_props, xml_path, xml_fd) = open_xml_comments(file_name)

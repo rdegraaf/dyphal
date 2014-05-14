@@ -547,176 +547,172 @@ function fitPhoto() {
 }
 
 
-// Display a photo
-function loadPhotoAfterStylesheet() {
-    log("loadPhotoAfterStylesheet enter");
+// Display a photo and its metadata.
+function loadPhotoContent() {
+    log("loadPhotoContent enter");
 
     try {
-        if (0 < page) {
-            // Load the photo.  Run "fitPhoto()" when it's ready.
-            var photoData = pages[page - 1];
-            var photoElement = document.getElementById("photo");
-            // Remove the event listeners before we change anything so that we don't get fitPhoto 
-            // storms in IE8
-            photoElement.removeEventListener("load", fitPhoto, false);
-            window.removeEventListener("resize", fitPhoto, false);
-            window.removeEventListener("orientationchange", fitPhoto, false);
-            // Webkit doesn't fire a load event if the src doesn't change.  So let's make sure it 
-            // changes.
-            photoElement.setAttribute("src", "");
-            photoElement.style["width"] = photoData.width + "px";
-            photoElement.style["height"] = photoData.height + "px";
-            photoElement.addEventListener("load", fitPhoto, false);
-            // Make sure that the event listener is in place before we set the photo
-            photoElement.setAttribute("src", albumPath + photoData.photo);
-            window.addEventListener("resize", fitPhoto, false);
-            window.addEventListener("orientationchange", fitPhoto, false);
+        document.getElementById("stylesheet").removeEventListener("load", loadPhotoContent);
+        document.getElementById("photo").style["visibility"] = "hidden";
+        document.body.style["display"] = "";
 
-            document.getElementById("photoOverlay").style["backgroundImage"] = "url(" + albumPath 
-                                                                        + photoData.photo + ")";
+        var photoData = pages[page - 1];
+
+        // Load the photo.  Run "fitPhoto()" when it's ready.
+        var photoElement = document.getElementById("photo");
+        // Remove the event listeners before we change anything so that we don't get fitPhoto 
+        // storms in IE8.
+        photoElement.removeEventListener("load", fitPhoto, false);
+        window.removeEventListener("resize", fitPhoto, false);
+        window.removeEventListener("orientationchange", fitPhoto, false);
+        // Webkit doesn't fire a load event if the src doesn't change.  So let's make sure it 
+        // changes.
+        photoElement.setAttribute("src", "");
+        photoElement.style["width"] = photoData.width + "px";
+        photoElement.style["height"] = photoData.height + "px";
+        photoElement.addEventListener("load", fitPhoto, false);
+        // Make sure that the event listener is in place before we set the photo
+        photoElement.setAttribute("src", albumPath + photoData.photo);
+        window.addEventListener("resize", fitPhoto, false);
+        window.addEventListener("orientationchange", fitPhoto, false);
+
+        document.getElementById("photoOverlay").style["backgroundImage"] = "url(" + albumPath 
+                                                                    + photoData.photo + ")";
+        // Set the title
+        document.title = album.title + " (" + page + "/" + album.photos.length + ")";
+        document.getElementById("titleContent").textContent = album.title;
+        document.getElementById("footerContent").textContent = album.footer;
+
+        // Set the photo index
+        document.getElementById("index").textContent = page + "/" + album.photos.length;
+
+        // Load photo caption
+        var captionPanel = document.getElementById("captionPanel");
+        while (null !== captionPanel.firstChild) {
+            captionPanel.removeChild(captionPanel.firstChild);
         }
+        var idx, captionElement;
+        for (idx in photoData.caption) {
+            if (photoData.caption.hasOwnProperty(idx)) {
+                captionElement = document.createElement("p");
+                captionElement.setAttribute("class", "captionItem");
+                captionElement.textContent = photoData.caption[idx];
+                captionPanel.appendChild(captionElement);
+            }
+        }
+
+        // Load photo properties
+        var propertyTable = document.getElementById("propertyTable");
+        var rows = propertyTable.getElementsByTagName("tr");
+        while (0 !== rows.length) {
+            propertyTable.removeChild(rows[0]);
+        }
+        var idx, rowElement, cellElement;
+        for (idx in photoData.properties) {
+            if (photoData.properties.hasOwnProperty(idx)) {
+                rowElement = document.createElement("tr");
+                cellElement = document.createElement("td");
+                cellElement.textContent = photoData.properties[idx][0];
+                rowElement.appendChild(cellElement);
+
+                cellElement = document.createElement("td");
+                cellElement.textContent = photoData.properties[idx][1];
+                rowElement.appendChild(cellElement);
+
+                propertyTable.appendChild(rowElement);
+            }
+        }
+
+        document.getElementById("prevThumbPanel").style["visibility"] = "hidden";
+        if (1 === page) {
+            // No previous photo
+            document.getElementById("prevImage").style["visibility"] = "hidden";
+        } else {
+            // Set the previous photo thumbnail
+            var prevLinkElement = document.getElementById("prevThumbLink");
+            prevLinkElement.setAttribute("href", generatePhotoURL(page - 1));
+            prevLinkElement.setAttribute("data-target", page - 1);
+            var prevThumbElement = document.getElementById("prevThumbImage");
+            prevThumbElement.setAttribute("src", albumPath + album.photos[page - 1 - 1].thumbnail);
+            if ("vertical" === album.photos[page - 1 - 1].orientation) {
+                prevThumbElement.setAttribute("class", "vnavigation");
+            } else {
+                prevThumbElement.setAttribute("class", "hnavigation");
+            }
+            document.getElementById("prevThumbPanel").style["visibility"] = "";
+
+            // Set the previous photo link
+            prevLinkElement = document.getElementById("prevLink");
+            prevLinkElement.setAttribute("href", generatePhotoURL(page - 1));
+            prevLinkElement.setAttribute("data-target", page - 1);
+            document.getElementById("prevImage").style["visibility"] = "";
+        }
+
+        document.getElementById("nextThumbPanel").style["visibility"] = "hidden";
+        if (page === album.photos.length) {
+            // No next photo
+            document.getElementById("nextImage").style["visibility"] = "hidden";
+        } else {
+            // Set the next photo thumbnail
+            var nextLinkElement = document.getElementById("nextThumbLink");
+            nextLinkElement.setAttribute("href", generatePhotoURL(page + 1));
+            nextLinkElement.setAttribute("data-target", page + 1);
+            var nextThumbElement = document.getElementById("nextThumbImage");
+            nextThumbElement.setAttribute("src", albumPath + album.photos[page - 1 + 1].thumbnail);
+            if ("vertical" === album.photos[page - 1 + 1].orientation) {
+                nextThumbElement.setAttribute("class", "vnavigation");
+            } else {
+                nextThumbElement.setAttribute("class", "hnavigation");
+            }
+            document.getElementById("nextThumbPanel").style["visibility"] = "";
+
+            // Set the next photo link
+            nextLinkElement = document.getElementById("nextLink");
+            nextLinkElement.setAttribute("href", generatePhotoURL(page + 1));
+            nextLinkElement.setAttribute("data-target", page + 1);
+            document.getElementById("nextImage").style["visibility"] = "";
+        }
+
+        document.getElementById("indexLink").setAttribute("href", generatePhotoURL(0));
+        if (debug) {
+            document.getElementById("debugLink").setAttribute("href", generatePhotoURL(page, true));
+        }
+
+        cacheNext();
     } catch (e) {
         error(e.name + ": " + e.message);
         throw e;
     }
 
-    log("loadPhotoAfterStylesheet exit");
+    log("loadPhotoContent exit");
 }
 
 
-// Display a photo and its description
-function loadPhotoContent() {
-    log("loadPhotoContent enter");
+// Make sure that a particular stylesheet is loaded, then make a callback when it is ready.
+function ensureStylesheet(stylesheet, afterLoadCB) {
+    log("ensureStylesheet enter");
 
-    var photoData = pages[page - 1];
-
-    document.getElementById("photo").style["visibility"] = "hidden";
-
-    // If we're not already using the photo stylesheet, the photo won't re-size 
-    // properly unless we load the stylesheet first.  Chrome doesn't fire a 
-    // load event when the target of a link element changes, so we need to 
-    // create a new link element.
     var cssElement = document.getElementById("stylesheet");
-    if ("photo.css" !== cssElement.getAttribute("href")) {
+    if (stylesheet !== cssElement.getAttribute("href")) {
+        document.body.style["display"] = "none";
+
         var cssElementNew = cssElement.cloneNode();
-        cssElementNew.addEventListener("load", loadPhotoAfterStylesheet, false);
-        cssElementNew.setAttribute("href", "photo.css");
+        cssElementNew.addEventListener("load", afterLoadCB, false);
+        cssElementNew.setAttribute("href", stylesheet);
         cssElement.parentNode.replaceChild(cssElementNew, cssElement);
 
         // Some browsers don't call load events on link objects.  So we need to 
         // poll until the stylesheet is present.
         if (brokenLoadEventOnLink()) {
             pollUntil(50, 6, function () { return (document.styleSheets.length >= 2)
-                                        && document.styleSheets[1].href.endsWith("/photo.css"); },
-                      loadPhotoAfterStylesheet, function () { error("Error loading stylesheet"); });
+                                    && document.styleSheets[1].href.endsWith("/" + stylesheet); },
+                      afterLoadCB, function () { error("Error loading stylesheet"); });
         }
     } else {
-        loadPhotoAfterStylesheet();
+        afterLoadCB();
     }
 
-    // Set the title
-    document.title = album.title + " (" + page + "/" + album.photos.length + ")";
-    document.getElementById("titleContent").textContent = album.title;
-    document.getElementById("footerContent").textContent = album.footer;
-
-    // Set the photo index
-    document.getElementById("index").textContent = page + "/" + album.photos.length;
-
-    // Load photo caption
-    var captionPanel = document.getElementById("captionPanel");
-    while (null !== captionPanel.firstChild) {
-        captionPanel.removeChild(captionPanel.firstChild);
-    }
-    var idx, captionElement;
-    for (idx in photoData.caption) {
-        if (photoData.caption.hasOwnProperty(idx)) {
-            captionElement = document.createElement("p");
-            captionElement.setAttribute("class", "captionItem");
-            captionElement.textContent = photoData.caption[idx];
-            captionPanel.appendChild(captionElement);
-        }
-    }
-
-    // Load photo properties
-    var propertyTable = document.getElementById("propertyTable");
-    var rows = propertyTable.getElementsByTagName("tr");
-    while (0 !== rows.length) {
-        propertyTable.removeChild(rows[0]);
-    }
-    var idx, rowElement, cellElement;
-    for (idx in photoData.properties) {
-        if (photoData.properties.hasOwnProperty(idx)) {
-            rowElement = document.createElement("tr");
-            cellElement = document.createElement("td");
-            cellElement.textContent = photoData.properties[idx][0];
-            rowElement.appendChild(cellElement);
-
-            cellElement = document.createElement("td");
-            cellElement.textContent = photoData.properties[idx][1];
-            rowElement.appendChild(cellElement);
-
-            propertyTable.appendChild(rowElement);
-        }
-    }
-
-    if (1 === page) {
-        // No previous photo
-        document.getElementById("prevThumbPanel").style["visibility"] = "hidden";
-        document.getElementById("prevImage").style["visibility"] = "hidden";
-    } else {
-        // Set the previous photo thumbnail
-        var prevLinkElement = document.getElementById("prevThumbLink");
-        prevLinkElement.setAttribute("href", generatePhotoURL(page - 1));
-        prevLinkElement.setAttribute("data-target", page - 1);
-        var prevThumbElement = document.getElementById("prevThumbImage");
-        prevThumbElement.setAttribute("src", albumPath + album.photos[page - 1 - 1].thumbnail);
-        if ("vertical" === album.photos[page - 1 - 1].orientation) {
-            prevThumbElement.setAttribute("class", "vnavigation");
-        } else {
-            prevThumbElement.setAttribute("class", "hnavigation");
-        }
-        document.getElementById("prevThumbPanel").style["visibility"] = "visible";
-
-        // Set the previous photo link
-        prevLinkElement = document.getElementById("prevLink");
-        prevLinkElement.setAttribute("href", generatePhotoURL(page - 1));
-        prevLinkElement.setAttribute("data-target", page - 1);
-        document.getElementById("prevImage").style["visibility"] = "visible";
-    }
-
-    if (page === album.photos.length) {
-        // No next photo
-        document.getElementById("nextThumbPanel").style["visibility"] = "hidden";
-        document.getElementById("nextImage").style["visibility"] = "hidden";
-    } else {
-        // Set the next photo thumbnail
-        var nextLinkElement = document.getElementById("nextThumbLink");
-        nextLinkElement.setAttribute("href", generatePhotoURL(page + 1));
-        nextLinkElement.setAttribute("data-target", page + 1);
-        var nextThumbElement = document.getElementById("nextThumbImage");
-        nextThumbElement.setAttribute("src", albumPath + album.photos[page - 1 + 1].thumbnail);
-        if ("vertical" === album.photos[page - 1 + 1].orientation) {
-            nextThumbElement.setAttribute("class", "vnavigation");
-        } else {
-            nextThumbElement.setAttribute("class", "hnavigation");
-        }
-        document.getElementById("nextThumbPanel").style["visibility"] = "visible";
-
-        // Set the next photo link
-        nextLinkElement = document.getElementById("nextLink");
-        nextLinkElement.setAttribute("href", generatePhotoURL(page + 1));
-        nextLinkElement.setAttribute("data-target", page + 1);
-        document.getElementById("nextImage").style["visibility"] = "visible";
-    }
-
-    document.getElementById("indexLink").setAttribute("href", generatePhotoURL(0));
-    if (debug) {
-        document.getElementById("debugLink").setAttribute("href", generatePhotoURL(page, true));
-    }
-
-    cacheNext();
-
-    log("loadPhotoContent exit");
+    log("ensureStylesheet exit");
 }
 
 
@@ -730,7 +726,7 @@ function loadPhoto(status, photoData, args) {
         if (page === args.page) {
             verifyPhoto(photoData);
             pages[page - 1] = photoData;
-            loadPhotoContent();
+            ensureStylesheet("photo.css", loadPhotoContent);
         }
     }
 
@@ -738,54 +734,61 @@ function loadPhoto(status, photoData, args) {
 }
 
 
-// Display the album contents
+// Display the album contents.
 function loadAlbumContent() {
     log("loadAlbumContent enter");
 
-    document.getElementById("stylesheet").setAttribute("href", "album.css");
+    try {
+        document.getElementById("stylesheet").removeEventListener("load", loadAlbumContent);
+        document.body.style["display"] = "";
 
-    // Set the title
-    document.title = album.title;
-    document.getElementById("titleContent").textContent = album.title;
-    document.getElementById("footerContent").textContent = album.footer;
-    document.getElementById("description").textContent = album.description;
+        // Set the title
+        document.title = album.title;
+        document.getElementById("titleContent").textContent = album.title;
+        document.getElementById("footerContent").textContent = album.footer;
+        document.getElementById("description").textContent = album.description;
 
-    var listElement = document.getElementById("thumbnailList");
-    while (null !== listElement.firstChild) {
-        listElement.removeChild(listElement.firstChild);
-    }
-
-    // Insert thumbnails as clones of a template
-    var templateElement = document.createElement("li");
-    templateElement.setAttribute("class", "thumbnail");
-    var templateLinkElement = document.createElement("a");
-    var templatePhotoElement = document.createElement("img");
-    templatePhotoElement.setAttribute("alt", "Photo thumbnail");
-    templateLinkElement.appendChild(templatePhotoElement);
-    templateElement.appendChild(templateLinkElement);
-    var i, itemElement, linkElement, photoElement;
-    for (i = 0; i < album.photos.length; ++i) {
-        itemElement = templateElement.cloneNode(true);
-        linkElement = itemElement.getElementsByTagName("a")[0];
-        photoElement = itemElement.getElementsByTagName("img")[0];
-        linkElement.setAttribute("href", generatePhotoURL(i + 1));
-        linkElement.setAttribute("class", "navigationlink");
-        linkElement.setAttribute("data-target", i + 1);
-        photoElement.setAttribute("src", albumPath + album.photos[i].thumbnail);
-        if ("vertical" === album.photos[i].orientation) {
-            photoElement.setAttribute("class", "vthumbnail");
-        } else {
-            photoElement.setAttribute("class", "hthumbnail");
+        var listElement = document.getElementById("thumbnailList");
+        while (null !== listElement.firstChild) {
+            listElement.removeChild(listElement.firstChild);
         }
-        listElement.appendChild(itemElement);
-    }
 
-    document.getElementById("indexLink").setAttribute("href", ".");
-    if (debug) {
-        document.getElementById("debugLink").setAttribute("href", generatePhotoURL(0, true));
-    }
+        // Insert thumbnails as clones of a template
+        var templateElement = document.createElement("li");
+        templateElement.setAttribute("class", "thumbnail");
+        var templateLinkElement = document.createElement("a");
+        var templatePhotoElement = document.createElement("img");
+        templatePhotoElement.setAttribute("alt", "Photo thumbnail");
+        templateLinkElement.appendChild(templatePhotoElement);
+        templateElement.appendChild(templateLinkElement);
+        var i, itemElement, linkElement, photoElement;
+        for (i = 0; i < album.photos.length; ++i) {
+            itemElement = templateElement.cloneNode(true);
+            linkElement = itemElement.getElementsByTagName("a")[0];
+            photoElement = itemElement.getElementsByTagName("img")[0];
+            linkElement.setAttribute("href", generatePhotoURL(i + 1));
+            linkElement.setAttribute("class", "navigationlink");
+            linkElement.setAttribute("data-target", i + 1);
+            photoElement.setAttribute("src", albumPath + album.photos[i].thumbnail);
+            if ("vertical" === album.photos[i].orientation) {
+                photoElement.setAttribute("class", "vthumbnail");
+            } else {
+                photoElement.setAttribute("class", "hthumbnail");
+            }
+            listElement.appendChild(itemElement);
+        }
 
-    cacheNext();
+        document.getElementById("indexLink").setAttribute("href", ".");
+        if (debug) {
+            document.getElementById("debugLink").setAttribute("href", generatePhotoURL(0, true));
+        }
+
+        cacheNext();
+
+    } catch (e) {
+        error(e.name + ": " + e.message);
+        throw e;
+    }
 
     log("loadAlbumContent exit");
 }
@@ -825,14 +828,14 @@ function loadAlbum(status, albumData, args) {
         // Now that we have the album loaded, set the keystroke handler
         document.addEventListener("keypress", keyHandler, false);
         if (0 === page) {
-            loadAlbumContent();
+            ensureStylesheet("album.css", loadAlbumContent);
         } else if (page > album.photos.length) {
             throw new Error("Photo number out of range");
         } else if (undefined === pages[page - 1]) {
             getJSON(albumPath + album.metadataDir + album.photos[page - 1].name + ".json", 
                     loadPhoto, true, {"page" : page});
         } else {
-            loadPhotoContent();
+            ensureStylesheet("photo.css", loadPhotoContent);
         }
     }
 
@@ -909,14 +912,14 @@ function start() {
             if (null === album) {
                 getJSON("./" + albumName + ".json", loadAlbum, true, null);
             } else if (0 === page) {
-                loadAlbumContent();
+                ensureStylesheet("album.css", loadAlbumContent);
             } else if (page > album.photos.length) {
                 error("Photo number out of range");
             } else if (undefined === pages[page - 1]) {
                 getJSON(albumPath + album.metadataDir + album.photos[page - 1].name + ".json", 
                         loadPhoto, true, {"page" : page});
             } else {
-                loadPhotoContent();
+                ensureStylesheet("photo.css", loadPhotoContent);
             }
         }
     } catch (e) {

@@ -1,3 +1,16 @@
+2014-05-13  Rennie deGraaf  <rennie.degraaf@gmail.com>
+
+    * www/dyphal.js: Ensure that photo and album stylesheets are loaded before 
+      loading any content.  Hide all content while swapping stylesheets.  This 
+      should prevent things from flickering in the wrong places while loading. 
+
+    * www/common.css: Removed an unnecessary property.
+
+    * tools/gthumb-comment-update.py, tools/photorename.sh: Cleaned up some 
+      blank lines.
+
+    * tools/photorename.sh: Header text.
+
 2014-05-12  Rennie deGraaf  <rennie.degraaf@gmail.com>
 
     * www/dyphal.js: Wrote a work-around for Android's broken touchend events. 

@@ -1,13 +1,26 @@
 #!/bin/sh
 
 # photorename.sh
-# Copyright Rennie deGraaf, 2009.  All rights reserved.
+# Copyright (c) Rennie deGraaf, 2010-2014.
 #
 # Rename photos to encode a camera name into the file names rather than a 
-# meaningless string like "IMG".  Use a ".jpeg" suffix on the resulting names.
-# If any gThumb XML comment files are found for the photos being renamed, 
-# rename them too.
+# meaningless string like "IMG".  Use a ".jpeg" suffix on the resulting 
+# names.  If any gThumb XML comment files are found for the photos being 
+# renamed, rename them too.
 #
+# This program is free software; you can redistribute it and/or modify it 
+# under the terms of the GNU General Public License as published by the 
+# Free Software Foundation; either version 2 of the License, or (at your 
+# option) version 3.
+#
+# This program is distributed in the hope that it will be useful, but 
+# WITHOUT ANY WARRANTY; without even the implied warranty of 
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 # Usage: photorename.sh <camera name> <photos...>
 # For example, "$ photorename sh SX10 2014/*.JPG" will rename all ".JPG" files 
 # in "2014/" to names like "SX10_0023.jpeg".
@@ -27,12 +40,12 @@ for file in "$@"
 do
     dir_name=$(dirname "$file")
     file_name=$(basename "$file")
-    
+
     # Make sure we're dealing with a file name pattern that we can handle.
     echo "$file_name" | egrep -i '^[^_]+_([0-9]{4})\.jpe?g$' > /dev/null
     if [ $? -ne 0 ]
     then
-        echo "Unrecognized file pattern '" "$file" "'"
+        echo "Unrecognized file name pattern '" "$file" "'"
         continue
     fi
 
@@ -50,7 +63,7 @@ do
         mv -n "$file" "$new_name"
         chmod -x "$new_name"
     fi
-    
+
     # If there's a gThumb XML comment file, rename it too.
     gthxml_name=$(echo "$dir_name"/.comments/"$file_name".xml)
     if [ -e "$gthxml_name" ]
