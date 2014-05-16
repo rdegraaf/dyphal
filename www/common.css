@@ -73,17 +73,17 @@ a:active {
 }
 
 /* Centering styles from http://css-tricks.com/centering-in-the-unknown/ */
-div.centerBlock {
+.centerBlock {
   text-align: center;
   font-size: 0pt;
 }
-div.centerBlock:before {
+.centerBlock:before {
   content: '';
   display: inline-block;
   height: 100%; 
   vertical-align: middle;
 }
-div.centerBlock>*:first-child {
+.centerBlock>*:first-child {
   display: inline-block;
   vertical-align: middle;
   font-size: 10pt;
@@ -141,8 +141,12 @@ div.centerBlock>*:first-child {
   background-color: rgba(0, 0, 0, 0.6);
 }
 
-#helpTextPanel {
+#helpTextPanel, input {
   display: none;
+}
+
+#helpCheckbox:checked ~ #helpTextPanel {
+  display: block;
 }
 
 #helpText, #readmeText{

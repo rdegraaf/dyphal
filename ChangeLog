@@ -1,3 +1,19 @@
+2014-05-15  Rennie deGraaf  <rennie.degraaf@gmail.com>
+
+    * www/common.css, www/dyphal.js, www/index.html, www/photo.css: Use HTML + 
+      CSS to show/hide the overlay and help text rather than JavaScript.  This 
+      removes most of the layout-related JavaScript code.
+
+    * www/dyphal.js (fitPhoto): More tweaks to the photo sizing code:  the 
+      photo wasn't displayed at its full size even when the window was big 
+      enough.
+
+    * www/dyphal.js (fitPhoto): More tweaks to the photo sizing code:  when the 
+      photo was bigger than the window, the window size used when scaling the 
+      overlay included scrollbars on some Chrome and IE.
+
+    * www/dyphal.js: jslint cleanup.
+
 2014-05-13  Rennie deGraaf  <rennie.degraaf@gmail.com>
 
     * www/dyphal.js: Ensure that photo and album stylesheets are loaded before 

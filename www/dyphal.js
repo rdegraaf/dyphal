@@ -16,8 +16,7 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-/*jslint browser: true, passfail: false, plusplus: true, sub: true, vars: true, 
- white: true, indent: 4, maxerr: 100, maxlen: 100 */
+/*jslint browser: true, passfail: false, plusplus: true, sub: true, vars: true, white: true, indent: 4, maxerr: 100, maxlen: 100 */
 
 (function () {
 "use strict";
@@ -29,8 +28,6 @@ var albumPath = null; // relative path to the album JSON file.  Begins with "." 
 var album = null; // object describing the current album
 var page = null; // number of the current page, 0 for the album thumbnail view
 var pages = []; // objects describing all pages that have been retrieved.  Based on album.photos.
-var overlayVisible = false;
-var helpVisible = false;
 var compressed = false;
 
 
@@ -147,7 +144,7 @@ function setScreenSize() {
             (document.documentElement.clientHeight <= 800)) {
             small = true;
         }
-        if ((small) &&
+        if (small &&
             (document.documentElement.clientHeight <= document.documentElement.clientWidth)) {
             // Compressed view in landscape.  titlePanel is rotated and may be wider than the 
             // screen is tall; fix its size.
@@ -164,112 +161,6 @@ function setScreenSize() {
     }
 
     log("setScreenSize exit");
-}
-
-
-// Hide the full-screen photo overlay
-function hidePhotoOverlay() {
-    try {
-        if (overlayVisible) {
-            if (compressed) {
-                var captionPanel = document.getElementById("captionPanel");
-                var propertyPanel = document.getElementById("propertyPanel");
-
-                // Remove event listeners.
-                var photo = document.getElementById("photo");
-                propertyPanel.removeEventListener("click", hidePhotoOverlay, false);
-                captionPanel.removeEventListener("click", hidePhotoOverlay, false);
-                photo.removeEventListener("click", hidePhotoOverlay, false);
-                photo.addEventListener("click", showPhotoOverlay, false);
-
-                // Remove the style overrides that we applied.
-                document.getElementById("footerPanel").style["visibility"] = "";
-                propertyPanel.style["visibility"] = "";
-                captionPanel.style["visibility"] = "";
-                propertyPanel.style["height"] = "";
-                captionPanel.style["height"] = "";
-            } else {
-                document.getElementById("overlay").style["display"] = "none";
-            }
-            overlayVisible = false;
-        }
-    } catch (e) {
-        error(e.name + ": " + e.message);
-    }
-}
-
-
-// Show the full-screen photo overlay
-function showPhotoOverlay() {
-    try {
-        overlayVisible = true;
-        if (compressed) {
-            // On a small screen, show the photo caption and properties.
-            var captionPanel = document.getElementById("captionPanel");
-            var propertyPanel = document.getElementById("propertyPanel");
-
-            // Make the caption and property panels have the same height.
-            var captionHeight = captionPanel.clientHeight;
-            var propertyHeight = propertyPanel.clientHeight;
-            if (captionHeight > propertyHeight) {
-                propertyPanel.style["height"] = captionHeight + "px";
-            } else {
-                captionPanel.style["height"] = propertyHeight + "px";
-            }
-
-            // Show the footer and photo metadata
-            captionPanel.style["visibility"] = "visible";
-            propertyPanel.style["visibility"] = "visible";
-            document.getElementById("footerPanel").style["visibility"] = "visible";
-
-            // Set event handlers to hide this stuff.
-            var photo = document.getElementById("photo");
-            photo.removeEventListener("click", showPhotoOverlay, false);
-            photo.addEventListener("click", hidePhotoOverlay, false);
-            captionPanel.addEventListener("click", hidePhotoOverlay, false);
-            propertyPanel.addEventListener("click", hidePhotoOverlay, false);
-        } else {
-            // On a normal screen, show the photo at its full size if it isn't already.
-            var photoData = pages[page - 1];
-            var photo = document.getElementById("photo");
-            if ((photo.width != photoData.width) || (photo.height != photoData.height)) {
-                var overlay = document.getElementById("overlay");
-                overlay.style["display"] = "block";
-                overlay.addEventListener("click", hidePhotoOverlay, false);
-            }
-        }
-    } catch (e) {
-        error(e.name + ": " + e.message);
-    }
-}
-
-
-// Hide the full-screen help overlay
-function hideHelp() {
-    try {
-        if (helpVisible) {
-            document.getElementById("helpTextPanel").style["display"] = "none";
-            helpVisible = false;
-        }
-    } catch (e) {
-        error(e.name + ": " + e.message);
-    }
-}
-
-
-// Show the full-screen help overlay
-function showHelp() {
-    try {
-        var help = document.getElementById("helpTextPanel");
-        help.style["display"] = "block";
-        help.addEventListener("click", hideHelp, false);
-
-        // Displaying the help text may resize the window.  Delay setting helpVisible to ensure 
-        // that the call to fitPhoto() on the initial resize doesn't immediately suppress help.
-        setTimeout(function () { helpVisible = true; }, 50);
-    } catch (e) {
-        error(e.name + ": " + e.message);
-    }
 }
 
 
@@ -396,21 +287,24 @@ function loadDebug() {
 // Handle keystroke events
 function keyHandler(evt) {
     try {
-        if (helpVisible && (27 /*escape*/ === evt.keyCode)) {
-            hideHelp();
+        var helpCheckbox = document.getElementById("helpCheckbox");
+        var overlayCheckbox = document.getElementById("overlayCheckbox");
+        if (helpCheckbox.checked && (27 /*escape*/ === evt.keyCode)) {
+            helpCheckbox.checked = false;
             evt.preventDefault();
         } else if (0 < page) {
             // On a photo page
-            if (overlayVisible && (27 /*escape*/ === evt.keyCode)) {
-                hidePhotoOverlay();
+            if (overlayCheckbox.checked && (27 /*escape*/ === evt.keyCode)) {
+                overlayCheckbox.checked = false;
                 evt.preventDefault();
             } else if (13 /*enter*/ === evt.keyCode) {
-                if (overlayVisible) {
-                    hidePhotoOverlay();
-                } else if (!helpVisible) {
+                if (overlayCheckbox.checked) {
+                    overlayCheckbox.checked = false;
+                    evt.preventDefault();
+                } else if (!helpCheckbox.checked) {
                     document.getElementById("photo").click();
+                    evt.preventDefault();
                 }
-                evt.preventDefault();
             } else if ((34 /*page down*/ === evt.keyCode) || (32 /*space*/ === evt.keyCode)) {
                 if (album.photos.length !== page) {
                     document.location.href = generatePhotoURL(page + 1);
@@ -427,7 +321,7 @@ function keyHandler(evt) {
             }
         } else if (0 === page) {
             // On an album page
-            if (!helpVisible && (13 /*enter*/ === evt.keyCode)) {
+            if (!helpCheckbox.checked && (13 /*enter*/ === evt.keyCode)) {
                 document.location.href = generatePhotoURL(1);
                 evt.preventDefault();
             }
@@ -488,8 +382,8 @@ function fitPhoto() {
     log("fitPhoto enter");
 
     try {
-        hidePhotoOverlay();
-        hideHelp();
+        document.getElementById("helpCheckbox").checked = false;
+        document.getElementById("overlayCheckbox").checked = false;
 
         if (0 < page) {
             var photoData = pages[page - 1];
@@ -500,40 +394,43 @@ function fitPhoto() {
             var photoPanel = document.getElementById("contentPanel");
             var panelAspect = photoPanel.clientWidth / photoPanel.clientHeight;
 
-            var windowWidth = document.documentElement.clientWidth - 10;
-            var windowHeight = document.documentElement.clientHeight - 10;
-            var windowAspect = windowWidth / windowHeight;
-
             // Set the dimensions of the photo.
             if (photoAspect >= panelAspect) {
                 // Constrained by width.
-                var photoWidth = Math.min(photoPanel.clientWidth, photoData.width) - 
-                    (photo.offsetWidth - photo.clientWidth);
+                var photoWidth = Math.min(photoPanel.clientWidth - (photo.offsetWidth - 
+                                                            photo.clientWidth), photoData.width);
                 photo.style["width"] = photoWidth + "px";
                 photo.style["height"] = (photoWidth / photoAspect) + "px";
             } else {
                 // Constrained by height.
-                var photoHeight = Math.min(photoPanel.clientHeight, photoData.height) - 
-                    (photo.offsetHeight - photo.clientHeight);
+                var photoHeight = Math.min(photoPanel.clientHeight - (photo.offsetHeight - 
+                                                            photo.clientHeight), photoData.height);
                 photo.style["height"] = photoHeight + "px";
                 photo.style["width"] = (photoHeight * photoAspect) + "px";
             }
 
             // Set the dimensions of the overlay
-            if (photoAspect >= windowAspect) {
-                // Constrained by width.
-                var overlayWidth = Math.min(windowWidth, photoData.width) - 
-                    (photo.offsetWidth - photo.clientWidth);;
-                photoOverlay.style["width"] =  overlayWidth + "px";
-                photoOverlay.style["height"] = (overlayWidth / photoAspect) + "px";
+            if ((photo.width !== parseInt(photoData.width)) || 
+                (photo.height !== parseInt(photoData.height))) {
+                var windowWidth = window.innerWidth;
+                var windowHeight = window.innerWidth;
+                var windowAspect = windowWidth / windowHeight;
+
+                if (photoAspect >= windowAspect) {
+                    // Constrained by width.
+                    var overlayWidth = Math.min(windowWidth - 6, photoData.width);
+                    photoOverlay.style["width"] =  overlayWidth + "px";
+                    photoOverlay.style["height"] = (overlayWidth / photoAspect) + "px";
+                } else {
+                    // Constrained by height.
+                    var overlayHeight = Math.min(windowHeight - 6, photoData.height);
+                    photoOverlay.style["height"] = overlayHeight + "px";
+                    photoOverlay.style["width"] = (overlayHeight * photoAspect) + "px";
+                }
+                document.getElementById("overlay").style["display"] = "";
             } else {
-                // Constrained by height.
-                var overlayHeight = Math.min(windowHeight, photoData.height) - 
-                    (photo.offsetHeight - photo.clientHeight);;
-                photoOverlay.style["height"] = overlayHeight + "px";
-                photoOverlay.style["width"] = (overlayHeight * photoAspect) + "px";
+                document.getElementById("overlay").style["display"] = "none";
             }
-            photo.addEventListener("click", showPhotoOverlay, false);
 
             photo.style["visibility"] = "visible";
             log("fitphoto: " + photo.style["height"] + " " + photo.style["width"]);
@@ -607,7 +504,7 @@ function loadPhotoContent() {
         while (0 !== rows.length) {
             propertyTable.removeChild(rows[0]);
         }
-        var idx, rowElement, cellElement;
+        var rowElement, cellElement;
         for (idx in photoData.properties) {
             if (photoData.properties.hasOwnProperty(idx)) {
                 rowElement = document.createElement("tr");
@@ -843,6 +740,29 @@ function loadAlbum(status, albumData, args) {
 }
 
 
+// Force the caption and property panels to have the same height in the compressed layout.
+function forceHeights() {
+    try {
+        if (compressed && document.getElementById("overlayCheckbox").checked) {
+            // On a small screen, show the photo caption and properties.
+            var captionPanel = document.getElementById("captionPanel");
+            var propertyPanel = document.getElementById("propertyPanel");
+
+            // Make the caption and property panels have the same height.
+            var captionHeight = captionPanel.clientHeight;
+            var propertyHeight = propertyPanel.clientHeight;
+            if (captionHeight > propertyHeight) {
+                propertyPanel.style["height"] = captionHeight + "px";
+            } else {
+                captionPanel.style["height"] = propertyHeight + "px";
+            }
+        }
+    } catch (e) {
+        error(e.name + ": " + e.message);
+    }
+}
+
+
 // Called when the document loads.  Display the requested page.
 function start() {
     log("start enter");
@@ -852,10 +772,9 @@ function start() {
         // So let's make sure it's hidden.
         suppressWarning();
 
-        hidePhotoOverlay();
-        hideHelp();
-
-        document.getElementById("helpLink").addEventListener("click", showHelp, false);
+        document.getElementById("helpCheckbox").checked = false;
+        document.getElementById("overlayCheckbox").checked = false;
+        document.getElementById("overlayCheckbox").addEventListener("change", forceHeights);
 
         // Parse the page arguments
         var albumNameNew = null;
@@ -948,10 +867,10 @@ var startTime = null;
 // Get the delta between the current touch position and the start position.
 function getTouchDelta(evt) {
     var delta = {x: null, y: null};
-    if ("touches" in evt) {
+    if (undefined !== evt.touches) {
         delta.x = parseInt(evt.changedTouches[0].clientX, 10) - startPos.x;
         delta.y = parseInt(evt.changedTouches[0].clientY, 10) - startPos.y;
-    } else if ("clientX" in evt) {
+    } else if (undefined !== evt.clientX) {
         // IE 10, 11
         delta.x = parseInt(evt.clientX, 10) - startPos.x;
         delta.y = parseInt(evt.clientY, 10) - startPos.y;
@@ -961,11 +880,12 @@ function getTouchDelta(evt) {
 
 
 // Android-specific workarounds for touch event bugs.
-function stopTracking(e) {
-    document.removeEventListener("touchmove", prevent, false);
+var swipeDetected;
+function prevent(evt){
+    evt.preventDefault();
 }
-function prevent(e){
-    e.preventDefault();
+function stopTracking(evt) {
+    document.removeEventListener("touchmove", prevent, false);
 }
 function touchMove(evt) {
     try {
@@ -983,7 +903,6 @@ function touchMove(evt) {
     }
 }
 if (/Android/.test(navigator.userAgent)) {
-    var swipeDetected;
     window.addEventListener("touchmove", touchMove, true);
     window.addEventListener("touchleave", stopTracking, true);
     window.addEventListener("touchcancel", stopTracking, true);
@@ -997,10 +916,10 @@ function touchStart(evt) {
             swipeDetected = false;
             document.addEventListener("touchmove", prevent, false);
         }
-        if ("touches" in evt) {
+        if (undefined !== evt.touches) {
             startPos.x = parseInt(evt.touches[0].clientX, 10);
             startPos.y = parseInt(evt.touches[0].clientY, 10);
-        } else if ("clientX" in evt) {
+        } else if (undefined !== evt.clientX) {
             // IE 10, 11
             startPos.x = parseInt(evt.clientX, 10);
             startPos.y = parseInt(evt.clientY, 10);
@@ -1017,7 +936,7 @@ function touchStart(evt) {
 function touchEnd(evt) {
     try {
         if (/Android/.test(navigator.userAgent)) {
-            stop(evt);
+            stopTracking(evt);
         }
         var thresholdY = 40;
         var thresholdX = 100;
@@ -1043,7 +962,6 @@ function touchEnd(evt) {
     }
 }
 
-
 // Set up event listeners
 window.addEventListener("load", start, false);
 window.addEventListener("hashchange", start, false);
@@ -1052,7 +970,7 @@ document.addEventListener("DOMContentLoaded", suppressWarning, false);
 document.addEventListener("DOMContentLoaded", setScreenSize, false);
 window.addEventListener("resize", setScreenSize, false);
 window.addEventListener("orientationchange", setScreenSize, false);
-if ("ontouchstart" in window) {
+if (undefined !== window.ontouchstart) {
     window.addEventListener("touchstart", touchStart, true);
     window.addEventListener("touchend", touchEnd, true);
 } else if (window.navigator.pointerEnabled) {
@@ -1069,4 +987,4 @@ log(navigator.appName);
 log(navigator.userAgent);
 log(window.innerWidth + "x" + window.innerHeight);
 
-})();
+}());

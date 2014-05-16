@@ -34,6 +34,9 @@
 
   <body>
 
+    <input type="checkbox" value="help" name="helpCheckbox" id="helpCheckbox"/>
+    <input type="checkbox" value="overlay" name="overlayCheckbox" id="overlayCheckbox"/>
+
     <div id="titlePanel" class="centerBlock">
       <h1 id="titleContent"></h1>
     </div>
@@ -75,30 +78,32 @@
       <ul id="thumbnailList">
         <!-- Photo thumbnails -->
       </ul>
-      <img id="photo" src="placeholder.png" alt="Photo"/>
+      <label for="overlayCheckbox">
+        <img id="photo" src="placeholder.png" alt="Photo"/>
+      </label>
     </div>
 
-    <div id="captionPanel">
+    <label id="captionPanel" for="overlayCheckbox">
       <!-- Photo caption -->
-    </div>
+    </label>
 
-    <div id="propertyPanel">
+    <label id="propertyPanel" for="overlayCheckbox">
       <table id="propertyTable">
         <!-- Photo properties -->
       </table>
-    </div>
+    </label>
 
-    <div id="footerPanel" class="centerBlock">
+    <label id="footerPanel" class="centerBlock" for="overlayCheckbox">
       <p id="footerContent"></p> <!-- IE8 doesn't support <footer> -->
-    </div>
+    </label>
 
-    <div id="overlay" class="centerBlock">
+    <label id="overlay" class="centerBlock" for="overlayCheckbox">
       <div id="photoOverlay"></div>
-    </div>
+    </label>
 
-    <div id="helpLink"></div>
+    <label id="helpLink" for="helpCheckbox"></label>
 
-    <div id="helpTextPanel" class="centerBlock">
+    <label id="helpTextPanel" class="centerBlock" for="helpCheckbox">
       <div id="helpText">
         <h2>Dyphal Help</h2>
         <p>Dyphal, the Dynamic Photo Album, is designed to show photos at their optimum size for 

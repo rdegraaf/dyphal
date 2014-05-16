@@ -1,5 +1,10 @@
 For version 3:
 
+    * Re-test Opera, IE, Android
+
+    * Swipe thresholds.
+
+    * Double-check help text after the latest changes.
 
 For future versions:
 
@@ -89,5 +94,6 @@ For future versions:
       in its comment panel.  gThumb3 is apparently making its UI more Gnome-
       specific.)
 
-    * Remove stylesheet-specific code relating to overlays from dyphal.js.
+    * Remove stylesheet-specific code relating to the compact layout from 
+      dyphal.js.
 

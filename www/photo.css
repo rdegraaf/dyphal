@@ -164,8 +164,16 @@ p.captionItem {
   background-repeat: no-repeat;
 }
 
+label {
+  display: block;
+}
+
+#overlayCheckbox:checked ~ #overlay {
+  display: block;
+}
+
 @media (max-width: 800px), (max-height: 800px) {
-  #prevThumbPanel, #nextThumbPanel {
+  #prevThumbPanel, #nextThumbPanel, #overlayCheckbox:checked ~ #overlay {
     display: none;
   }
 
@@ -228,6 +236,10 @@ p.captionItem {
   #captionPanel, #propertyPanel, #footerPanel {
     background-color: rgba(71, 71, 71, 0.8); /* body.background-color */
     visibility: hidden;
+  }
+
+  #overlayCheckbox:checked ~ #captionPanel, #overlayCheckbox:checked ~ #propertyPanel, #overlayCheckbox:checked ~ #footerPanel {
+    visibility: visible;
   }
 }
 
