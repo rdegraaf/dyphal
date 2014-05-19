@@ -168,7 +168,7 @@
     Touch navigation doesn't work on Jun's Nexus 7" tablet and in the Android 
     4.4.2 simulator.
 
-    EXTERNAL: The touchend event is broken in Android 3.x and 4.0, fixed in 
+    WORKAROUND: The touchend event is broken in Android 3.x and 4.0, fixed in 
     4.1, and regressed in 4.4.  There are reports of it being broken in some 
     4.2 and 4.3 builds as well.  See https://code.google.com/p/android/issues/
     detail?id=19827.  The touchend event works if you call evt.preventDefault() 

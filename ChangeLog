@@ -1,3 +1,23 @@
+2014-05-18  Rennie deGraaf  <rennie.degraaf@gmail.com>
+
+    * tools/DyphalGenerator.py, tools/util.py: DyphalGenerator failed if a user 
+      attempted to install the template while an album was being generated, 
+      because the template installer tried to create a symlink that already 
+      existed.  Fixed it by removing the symlinks to directories, using the 
+      /proc paths for output, and having tasks call a lambda to get their 
+      output paths on demand rather than generating them up front.
+
+    * tools/DyphalGenerator.py: Set the umask to 022 so that generated files 
+      are world-readable.
+
+    * tools/photorename.sh: Rotate photos to the top-left orientation.
+
+    * www/dyphal.js: Renamed the album list from "album-list.html" to 
+      "albums.html".
+
+    * www/index.html: Removed the reference to thumbnails from the tooltip for 
+      the index button.
+
 2014-05-15  Rennie deGraaf  <rennie.degraaf@gmail.com>
 
     * www/common.css, www/dyphal.js, www/index.html, www/photo.css: Use HTML + 

@@ -62,6 +62,7 @@ do
     else
         mv -n "$file" "$new_name"
         chmod -x "$new_name"
+        jhead -autorot "$new_name"
     fi
 
     # If there's a gThumb XML comment file, rename it too.

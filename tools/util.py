@@ -80,6 +80,35 @@ class RefCounted(object):
         raise NotImplementedError()
 
 
+class DirectoryHandleList(object):
+    """Thread-safe name to file descriptor mapping."""
+
+    def __init__(self, *args, **kwargs):
+        """Initialize a DirectoryHandleList."""
+        self._directories = {}
+        self._lock = threading.Lock()
+
+    def add(self, name, fd):
+        """Map a name to a file descriptor."""
+        with self._lock:
+            self._directories[name] = fd
+
+    def getPath(self, name):
+        """Retrieve a path to the file descriptor."""
+        with self._lock:
+            return "/proc/%d/fd/%d" % (os.getpid(), self._directories[name])
+
+    def closeAll(self):
+        """Close all file descriptors and remove their mappings."""
+        with self._lock:
+            for fd in self._directories.values():
+                try:
+                    os.close(fd)
+                except OSError:
+                    pass
+            self._directories = {}
+
+
 def handle_exceptions(func, *args, **kwargs):
     """Call a function and log any exceptions that it throws.  Pass 
     'functools.partial(handle_exceptions, func)' to something that 

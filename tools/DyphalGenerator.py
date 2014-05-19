@@ -39,7 +39,6 @@ import os
 import os.path
 import xml.etree.ElementTree
 import concurrent.futures
-import threading
 import subprocess
 import json
 import tempfile
@@ -79,6 +78,7 @@ class Config(object):
         tempDir (tempfile.TemporaryDirectory): A secure temporary 
                 directory to hold links to photos and generated files.
         _file (file): A handle to the configuration file.
+        _umask (int): Saved umask.
     """
 
     PROGRAM_NAME = "Dyphal Generator"
@@ -109,11 +109,12 @@ class Config(object):
         # Load the configuration file.  Keep the handle so that we can save to the same file.
         self._file = None
         data = {}
+        self._umask = os.umask(0o22)
         try:
             ensure_directory(os.path.dirname(CONFIG_FILE))
             # Python's 'r+' mode doesn't create files if they don't already exist.
             self._file = open(CONFIG_FILE, "r+", 
-                              opener=lambda path, flags : os.open(path, flags|os.O_CREAT, 0o666))
+                              opener=lambda path, flags: os.open(path, flags|os.O_CREAT, 0o666))
             data = json.load(self._file)
         except (FileNotFoundError, ValueError):
             # open() can fail with FileNotFoundError if a directory in the path doesn't exist.
@@ -167,6 +168,7 @@ class Config(object):
         self.tempDir = None
         self._file.close()
         self._file = None
+        os.umask(self._umask)
 
     def __enter__(self):
         return self
@@ -204,10 +206,6 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
                 (*not* tasks) that are pending.
         _backgroundTasks (list of concurrent.futures.Future): Pending 
                 background tasks.
-        _directories (list of (int, str)): Directory file descriptors 
-                and link names in use by current background tasks.
-        _directoriesLock (threading.Lock): Lock to control access to 
-                _directories.
     """
 
     FILTER_IMAGES = "Images (*.jpeg *.jpg *.png *.tiff *.tif)"
@@ -230,8 +228,6 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
         self._threads = concurrent.futures.ThreadPoolExecutor(self._config.maxWorkers)
         self._backgroundCount = 0
         self._backgroundTasks = None
-        self._directories = []
-        self._directoriesLock = threading.Lock()
 
         self.setupUi(self)
         if None is not self._config.dimensions:
@@ -623,43 +619,42 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
 
             self._backgroundInit(3 * self.photosList.count() + 5)
             tasks = []
+            directories = DirectoryHandleList()
 
             # Create the output directories.
-            # We read and write self._directories from different threads, but there's no race 
-            # because the read task is blocked until after the write tasks complete.
-            assert(0 == len(self._directories))
-            album_dir_path = os.path.join(self._config.tempDir.name, "album")
+            # We read and write directories from different threads, but there's no race 
+            # because the read tasks are blocked until after the write task completes.
             album_dir_task = self._threads.submit(self._bgCreateOutputDirectory, album_dir_name, 
-                                                  album_dir_path)
+                                                  directories, "album")
             tasks.append(album_dir_task)
-            metadata_dir_path = os.path.join(self._config.tempDir.name, Config.METADATA_DIR)
             metadata_dir_task = None
             if 0 != len(Config.METADATA_DIR):
                 metadata_dir_task = self._threads.submit(self._bgCreateOutputDirectory, 
                                                          os.path.join(album_dir_name, 
                                                                       Config.METADATA_DIR), 
-                                                         metadata_dir_path)
+                                                         directories, "metadata")
                 tasks.append(metadata_dir_task)
-            photo_dir_path = os.path.join(self._config.tempDir.name, Config.PHOTO_DIR)
             photo_dir_task = None
             if 0 != len(Config.PHOTO_DIR):
                 photo_dir_task = self._threads.submit(self._bgCreateOutputDirectory, 
                                                       os.path.join(album_dir_name, 
                                                                    Config.PHOTO_DIR), 
-                                                      photo_dir_path)
+                                                      directories, "photos")
                 tasks.append(photo_dir_task)
-            thumbnail_dir_path = os.path.join(self._config.tempDir.name, Config.THUMBNAIL_DIR)
             thumbnail_dir_task = None
             if 0 != len(Config.THUMBNAIL_DIR):
                 thumbnail_dir_task = self._threads.submit(self._bgCreateOutputDirectory, 
                                                           os.path.join(album_dir_name, 
                                                                        Config.THUMBNAIL_DIR),
-                                                          thumbnail_dir_path)
+                                                          directories, "thumbnails")
                 tasks.append(thumbnail_dir_task)
 
             # Create the album JSON file
-            tasks.append(self._threads.submit(self._bgGenerateAlbum, album, os.path.join(
-                                album_dir_path, os.path.basename(album_file_name)), album_dir_task))
+            tasks.append(self._threads.submit(self._bgGenerateAlbum, album, 
+                                              lambda: os.path.join(
+                                                            directories.getPath("album"), 
+                                                            os.path.basename(album_file_name)), 
+                                              album_dir_task))
 
             # Create the metadata, thumbnail, and image for each photo.
             count = self.photosList.count()
@@ -672,13 +667,15 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
                     # generic wrapper that calls self._incProgressSignal.emit() after an arbitrary 
                     # method call, rather than needing to write wrappers for every method call.
                     task = self._threads.submit(self._bgGeneratePhotoJSON, photo, 
-                                                metadata_dir_path, album["photoResolution"][0], 
+                                                lambda: directories.getPath("metadata"),
+                                                album["photoResolution"][0], 
                                                 album["photoResolution"][1], captions, properties, 
                                                 metadata_dir_task)
                     photo.addRef()
                     task.photoName = photo.getPath()
                     tasks.append(task)
-                    task = self._threads.submit(self._bgGeneratePhoto, photo, photo_dir_path, 
+                    task = self._threads.submit(self._bgGeneratePhoto, photo, 
+                                                lambda: directories.getPath("photos"), 
                                                 album["photoResolution"][0], 
                                                 album["photoResolution"][1], 
                                                 self._config.photoQuality, photo_dir_task)
@@ -686,38 +683,36 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
                     task.photoName = photo.getPath()
                     tasks.append(task)
                     task = self._threads.submit(self._bgGenerateThumbnail, photo, 
-                                                thumbnail_dir_path, Config.THUMB_WIDTH, 
-                                                Config.THUMB_HEIGHT, Config.THUMB_QUALITY, 
-                                                thumbnail_dir_task)
+                                                lambda: directories.getPath("thumbnails"), 
+                                                Config.THUMB_WIDTH, Config.THUMB_HEIGHT, 
+                                                Config.THUMB_QUALITY, thumbnail_dir_task)
                     photo.addRef()
                     task.photoName = photo.getPath()
                     tasks.append(task)
 
             self._threads.submit(functools.partial(handle_exceptions, self._bgTasksComplete), 
-                                 tasks, "generating the album")
+                                 tasks, directories, "generating the album")
             self._backgroundStart(tasks)
 
             self._config.outputDir = album_dir_name
 
-    def _bgCreateOutputDirectory(self, dir_path, link_path):
+    def _bgCreateOutputDirectory(self, dir_path, directories, name):
         """Background task to create a directory and link to it from 
         the temporary directory."""
         ensure_directory(dir_path)
         dir_fd = os.open(dir_path, os.O_RDONLY)
-        with self._directoriesLock:
-            self._directories.append((dir_fd, link_path))
-        os.symlink("/proc/%d/fd/%d" % (os.getpid(), dir_fd), link_path)
+        directories.add(name, dir_fd)
         self._incProgressSignal.emit()
 
-    def _bgGenerateAlbum(self, album, album_file_name, dir_creation_task):
+    def _bgGenerateAlbum(self, album, get_album_file_name, dir_creation_task):
         """Background task to generate an album JSON file."""
         if None is not dir_creation_task:
             concurrent.futures.wait([dir_creation_task])
-        with open(album_file_name, "w") as album_file:
+        with open(get_album_file_name(), "w") as album_file:
             json.dump(album, album_file)
         self._incProgressSignal.emit()
 
-    def _bgTasksComplete(self, tasks, message):
+    def _bgTasksComplete(self, tasks, directories, message):
         """Background task to display any errors encountered while 
         executing background tasks and clean up any file descriptors 
         and links that were needed by the background tasks."""
@@ -725,18 +720,8 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
         (done, not_done) = concurrent.futures.wait(tasks)
         assert(0 == len(not_done))
 
-        # Close any file descriptors and remove any symlinks.  Ignore errors.
-        with self._directoriesLock:
-            for (fd, link) in self._directories:
-                try:
-                    os.unlink(link)
-                except OSError:
-                    pass
-                try:
-                    os.close(fd)
-                except OSError:
-                    pass
-            self._directories = []
+        # Close any file descriptors.  Ignore errors.
+        directories.closeAll()
 
         # Display any error messages
         errors = []
@@ -759,31 +744,32 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
         # Dismiss the cancellation UI
         self._backgroundCompleteSignal.emit()
 
-    def _bgGeneratePhotoJSON(self, photo, out_dir_name, width, height, captions, properties, 
+    def _bgGeneratePhotoJSON(self, photo, get_out_dir_name, width, height, captions, properties, 
                              dir_creation_task):
         """Background task to generate a photo JSON file."""
         # Wait for the directory to be created, then generate the photo JSON
         if None is not dir_creation_task:
             concurrent.futures.wait([dir_creation_task])
-        photo.generateJSON(out_dir_name, width, height, captions, properties)
+        photo.generateJSON(get_out_dir_name(), width, height, captions, properties)
         photo.release()
         self._incProgressSignal.emit()
 
-    def _bgGeneratePhoto(self, photo, out_dir_name, width, height, quality, dir_creation_task):
+    def _bgGeneratePhoto(self, photo, get_out_dir_name, width, height, quality, dir_creation_task):
         """Background task to generate a down-scaled photo."""
         # Wait for the directory to be created, then generate the photo
         if None is not dir_creation_task:
             concurrent.futures.wait([dir_creation_task])
-        photo.generatePhoto(out_dir_name, width, height, quality)
+        photo.generatePhoto(get_out_dir_name(), width, height, quality)
         photo.release()
         self._incProgressSignal.emit()
 
-    def _bgGenerateThumbnail(self, photo, out_dir_name, width, height, quality, dir_creation_task):
+    def _bgGenerateThumbnail(self, photo, get_out_dir_name, width, height, quality, 
+                             dir_creation_task):
         """Background task to generate a photo thumbnail."""
         # Wait for the directory to be created, then generate the thumbnail
         if None is not dir_creation_task:
             concurrent.futures.wait([dir_creation_task])
-        photo.generateThumbnail(out_dir_name, width, height, quality)
+        photo.generateThumbnail(get_out_dir_name(), width, height, quality)
         photo.release()
         self._incProgressSignal.emit()
 
@@ -849,29 +835,31 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
         if "" != out_dir:
             self._backgroundInit(len(Config.TEMPLATE_FILE_NAMES) + 1)
             tasks = []
+            directories = DirectoryHandleList()
 
-            # Open the output directory so that it can't change under us.
-            assert(0 == len(self._directories))
-            album_dir_path = os.path.join(self._config.tempDir.name, "album")
+            # Create the directory.
             album_dir_task = self._threads.submit(self._bgCreateOutputDirectory, out_dir, 
-                                                  album_dir_path)
+                                                  directories, "album")
             tasks.append(album_dir_task)
 
             # Spawn background tasks to do the copying.
             for f in Config.TEMPLATE_FILE_NAMES:
                 tasks.append(self._threads.submit(self._bgCopyFile, os.path.join(DATA_PATH, f), 
-                                                  os.path.join(album_dir_path, f), album_dir_task))
+                                                  lambda filename=f: os.path.join(
+                                                                      directories.getPath("album"), 
+                                                                      filename), 
+                                                  album_dir_task))
 
             self._threads.submit(functools.partial(handle_exceptions, self._bgTasksComplete, tasks, 
-                                                   "installing the template"))
+                                                   directories, "installing the template"))
             self._backgroundStart(tasks)
 
-    def _bgCopyFile(self, source, destination, dir_creation_task):
+    def _bgCopyFile(self, source, get_destination, dir_creation_task):
         """Background task to copy a file."""
         # Wait for the directory to be created, then copy the file
         if None is not dir_creation_task:
             concurrent.futures.wait([dir_creation_task])
-        shutil.copyfile(source, destination)
+        shutil.copyfile(source, get_destination())
         self._incProgressSignal.emit()
 
     def _cancelBackgroundTasks(self):
@@ -947,9 +935,9 @@ def main():
     try:
         subprocess.check_call(["convert", "--version"], stdout=subprocess.DEVNULL, timeout=1)
     except (subprocess.CalledProcessError, subprocess.TimeoutExpired):
-        QtGui.QMessageBox.critical(None, Config.PROGRAM_NAME, "This program requires that 'convert' " \
-                                   "from the 'ImageMagick' package be available in your PATH.", 
-                                   QtGui.QMessageBox.Ok, QtGui.QMessageBox.Ok)
+        QtGui.QMessageBox.critical(None, Config.PROGRAM_NAME, "This program requires that " \
+                                   "'convert' from the 'ImageMagick' package be available in " \
+                                   "your PATH.", QtGui.QMessageBox.Ok, QtGui.QMessageBox.Ok)
         sys.exit(1)
 
     with Config() as config:

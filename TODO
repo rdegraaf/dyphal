@@ -97,3 +97,5 @@ For future versions:
     * Remove stylesheet-specific code relating to the compact layout from 
       dyphal.js.
 
+    * Handle photo orientations other than top-left in DyphalGenerator.
+

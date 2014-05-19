@@ -783,7 +783,7 @@ function start() {
         var args = window.location.hash.split("/");
         if ((1 === args.length) && ("" === args[0])) {
             // Kludge to support the current lack of an index view
-            window.location = "album-list.html";
+            window.location = "albums.html";
             return;
         }
         if ((2 > args.length) || ("" === args[1]) || ("#" !== args[0])) {
