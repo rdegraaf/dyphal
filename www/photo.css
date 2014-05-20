@@ -229,12 +229,13 @@ label {
   #captionPanel, #propertyPanel {
     top: auto;
     bottom: 80px;
-    border-top: 3px solid black; /* photo.border */
     border-bottom: 3px solid black; /* photo.border */
   }
 
   #captionPanel, #propertyPanel, #footerPanel {
+    border-top: 3px solid black; /* photo.border */
     background-color: rgba(71, 71, 71, 0.8); /* body.background-color */
+    pointer-events: none;
     visibility: hidden;
   }
 

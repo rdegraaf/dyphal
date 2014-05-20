@@ -291,15 +291,18 @@ function keyHandler(evt) {
         var overlayCheckbox = document.getElementById("overlayCheckbox");
         if (helpCheckbox.checked && (27 /*escape*/ === evt.keyCode)) {
             helpCheckbox.checked = false;
+            updateOverlays(); // Needed because of Android bug.
             evt.preventDefault();
         } else if (0 < page) {
             // On a photo page
             if (overlayCheckbox.checked && (27 /*escape*/ === evt.keyCode)) {
                 overlayCheckbox.checked = false;
+                updateOverlays(); // Needed because of Android bug.
                 evt.preventDefault();
             } else if (13 /*enter*/ === evt.keyCode) {
                 if (overlayCheckbox.checked) {
                     overlayCheckbox.checked = false;
+                    updateOverlays(); // Needed because of Android bug.
                     evt.preventDefault();
                 } else if (!helpCheckbox.checked) {
                     document.getElementById("photo").click();
@@ -384,6 +387,7 @@ function fitPhoto() {
     try {
         document.getElementById("helpCheckbox").checked = false;
         document.getElementById("overlayCheckbox").checked = false;
+        updateOverlays(); // Needed because of Android bug.
 
         if (0 < page) {
             var photoData = pages[page - 1];
@@ -723,7 +727,7 @@ function loadAlbum(status, albumData, args) {
         verifyAlbum(albumData);
         album = albumData;
         // Now that we have the album loaded, set the keystroke handler
-        document.addEventListener("keypress", keyHandler, false);
+        document.addEventListener("keydown", keyHandler, false);
         if (0 === page) {
             ensureStylesheet("album.css", loadAlbumContent);
         } else if (page > album.photos.length) {
@@ -740,22 +744,49 @@ function loadAlbum(status, albumData, args) {
 }
 
 
-// Force the caption and property panels to have the same height in the compressed layout.
-function forceHeights() {
+// Force the caption and property panels to have the same height in the compressed layout.  Also 
+// touch some layout-related property on everything that's style should change to work around an 
+// Android bug.
+function updateOverlays() {
     try {
-        if (compressed && document.getElementById("overlayCheckbox").checked) {
-            // On a small screen, show the photo caption and properties.
-            var captionPanel = document.getElementById("captionPanel");
-            var propertyPanel = document.getElementById("propertyPanel");
-
-            // Make the caption and property panels have the same height.
-            var captionHeight = captionPanel.clientHeight;
-            var propertyHeight = propertyPanel.clientHeight;
-            if (captionHeight > propertyHeight) {
-                propertyPanel.style["height"] = captionHeight + "px";
+        // Android versions prior to 4.4 seem to have a bug causing the caption, property, and 
+        // footer panels not to be re-painted when their styles change due to the checkbox being 
+        // changed.  Touching some layout-related property seems to force a re-paint.
+        if (compressed) {
+            if (document.getElementById("overlayCheckbox").checked) {
+                // In compressed layout, force the caption and property panels to have the same 
+                // height.
+                var captionPanel = document.getElementById("captionPanel");
+                var propertyPanel = document.getElementById("propertyPanel");
+                var captionHeight = captionPanel.clientHeight;
+                var propertyHeight = propertyPanel.clientHeight;
+                if (captionHeight > propertyHeight) {
+                    propertyPanel.style["height"] = captionHeight + "px";
+                    captionPanel.style["float"] = "none";
+                    document.getElementById("footerPanel").style["float"] = "none";
+                } else {
+                    captionPanel.style["height"] = propertyHeight + "px";
+                    propertyPanel.style["float"] = "none";
+                    document.getElementById("footerPanel").style["float"] = "none";
+                }
             } else {
-                captionPanel.style["height"] = propertyHeight + "px";
+                document.getElementById("captionPanel").style["height"] = "";
+                document.getElementById("propertyPanel").style["height"] = "";
+                document.getElementById("captionPanel").style["float"] = "";
+                document.getElementById("propertyPanel").style["float"] = "";
+                document.getElementById("footerPanel").style["float"] = "";
             }
+        } else {
+            if (document.getElementById("overlayCheckbox").checked) {
+                document.getElementById("overlay").style["float"] = "none";
+            } else {
+                document.getElementById("overlay").style["float"] = "";
+            }
+        }
+        if (document.getElementById("helpCheckbox").checked) {
+            document.getElementById("helpTextPanel").style["float"] = "none";
+        } else {
+            document.getElementById("helpTextPanel").style["float"] = "";
         }
     } catch (e) {
         error(e.name + ": " + e.message);
@@ -774,7 +805,9 @@ function start() {
 
         document.getElementById("helpCheckbox").checked = false;
         document.getElementById("overlayCheckbox").checked = false;
-        document.getElementById("overlayCheckbox").addEventListener("change", forceHeights);
+        updateOverlays(); // Needed because of Android bug.
+        document.getElementById("overlayCheckbox").addEventListener("change", updateOverlays);
+        document.getElementById("helpCheckbox").addEventListener("change", updateOverlays);
 
         // Parse the page arguments
         var albumNameNew = null;
@@ -852,7 +885,7 @@ function start() {
 
 /*
  * Swipe gestures for touch devices.
- * Touch tracking is broken on Android 3.x, and 4.0, apparently fixed in 4.1, and regressed in 4.4. 
+ * Touch tracking is broken on Android 3.x and 4.0, apparently fixed in 4.1, and regressed in 4.4.  
  * It's reportedly broken on some 4.2 and 4.3 builds as well.  The suggested "workaround" is to 
  * use event.disableDefault(), which breaks scrolling.  This variation on the workaround calls 
  * event.disableDefault() only if the first touchmove event appeared to be a side swipe; vertical 

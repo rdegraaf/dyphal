@@ -1,3 +1,16 @@
+    * www/photo.css: Added a top border to footerPanel in compact layout, to 
+      match captionPanel and propertyPanel.
+
+    * www/dyphal.js: Use the "keydown" event rather than the "keypress" event 
+      in order to support browsers other than Firefox.
+
+    * www/dyphal.js, www/photo.css: Overlays were not appearing properly on 
+      Android <4.4.  It seems to not repaint elements whose styles change due 
+      to a checkbox changing state.  Worked around it by always touching some 
+      layout-related property when an overlay needs to appear or disappear.
+
+    * www/index.html: Fixed an improperly closed tag.
+
 2014-05-18  Rennie deGraaf  <rennie.degraaf@gmail.com>
 
     * tools/DyphalGenerator.py, tools/util.py: DyphalGenerator failed if a user 

@@ -21,7 +21,8 @@ For future versions:
       footer, main, details, nav elements?
 
     * Revisit whether Android <4.4 support is still needed.  If not, get rid of 
-      the poll loop.  See bug 2014-01-17_001 for more details.
+      the poll loop and overlay touching.  See bugs 2014-01-17_001 and 
+      2014-05-16_001 for more details.
 
     * Reference CSS properties in a consistent and standards-compatible way.  
       See bug 2014-01-12_001 for more details.
@@ -98,4 +99,9 @@ For future versions:
       dyphal.js.
 
     * Handle photo orientations other than top-left in DyphalGenerator.
+
+    * calc() might make some of the CSS simpler.
+
+    * Putting <div> and other block elements inside a <label> violates the HTML 
+      standard.
 

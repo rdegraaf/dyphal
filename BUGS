@@ -186,3 +186,13 @@
     OPEN: Of course IE 10 and 11 don't use the same touch event interface as 
     everything else, because that might be compatible or something.  Typical.
 
+
+2014-05-16_001  Rennie deGraaf  <rennie.degraaf@gmail.com>
+    On Android <4.4, the help, properties, and footer overlays don't work.  
+    However, the caption overlay does work and its height is set as expected.
+
+    WORKAROUND: The visibility of all of those items is changed by a CSS rule 
+    when a checkbox state changes.  However, it seems that Android doesn't 
+    re-draw these elements when their visibility changes.  Touching a layout-
+    related property with JavaScript seems to force a re-draw.
+
