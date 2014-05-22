@@ -173,6 +173,7 @@ a:active {
   border: 1px solid #AAAAAA;
   padding: 1ex;
   width: 50%;
+  text-align: left;
 }
 
 #helpText td:first-child, #helpText th:first-child {
@@ -189,6 +190,10 @@ a:active {
 }
 #helpText tr:last-child>td {
   border-bottom: 0;
+}
+
+#readmeText li {
+  text-align: left;
 }
 
 #titlePanel>h1, #footerPanel>p {

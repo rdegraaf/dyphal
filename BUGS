@@ -21,14 +21,6 @@
     those browsers and cannot be handled in Javascript.
 
 
-2014-01-08_001  Rennie deGraaf  <rennie.degraaf@gmail.com>
-    The full-screen photo overlay doesn't work properly in Opera when the 
-    window is small.
-
-    WONTFIX.  This is not a core feature and 100% support for Opera is not 
-    necessary.
-
-
 2014-01-10_001  Rennie deGraaf  <rennie.degraaf@gmail.com>
     The error event doesn't fire if the debug stylesheet fails to load in Opera.
 
@@ -150,15 +142,7 @@
 
 
 2014-04-25_001  Rennie deGraaf  <rennie.degraaf@gmail.com>
-    Small-screen mode doesn't work on IE 8.
-
-    WONTFIX: This is not a core feature and 100% support for IE 8 is not 
-    necessary.
-
-
-2014-04-25_002  Rennie deGraaf  <rennie.degraaf@gmail.com>
-    The full-screen photo overlay in IE 8 gets cropped to the display size 
-    rather than being resized.
+    Compact layout doesn't work on IE 8.
 
     WONTFIX: This is not a core feature and 100% support for IE 8 is not 
     necessary.
@@ -195,4 +179,20 @@
     when a checkbox state changes.  However, it seems that Android doesn't 
     re-draw these elements when their visibility changes.  Touching a layout-
     related property with JavaScript seems to force a re-draw.
+
+
+2014-05-21_001  Rennie deGraaf  <rennie.degraaf@gmail.com>
+    PageUp, PageDown, and Escape don't work for navigation in Android.
+
+    WONTFIX.  It appears that these keys are intercepted by the browser and 
+    cannot be handled in Javascript.  Most Android devices don't have keyboards 
+    anyway.
+
+
+2014-05-21_002  Rennie deGraaf  <rennie.degraaf@gmail.com>
+    Overlays (full-screen photo and help; caption/properties is inaccessible 
+    due to bug 2014-04-25_001) don't work in IE 8.
+
+    WONTFIX: This is not a core feature and 100% support for IE 8 is not 
+    necessary.
 

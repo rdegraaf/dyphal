@@ -305,7 +305,15 @@ function keyHandler(evt) {
                     updateOverlays(); // Needed because of Android bug.
                     evt.preventDefault();
                 } else if (!helpCheckbox.checked) {
-                    document.getElementById("photo").click();
+                    var photo = document.getElementById("photo");
+                    if (undefined !== photo.click) {
+                        photo.click();
+                    } else {
+                        // Android doesn't support obj.click()
+                        var click = document.createEvent("HTMLEvents");
+                        click.initEvent("click", true, true);
+                        photo.dispatchEvent(click);
+                    }
                     evt.preventDefault();
                 }
             } else if ((34 /*page down*/ === evt.keyCode) || (32 /*space*/ === evt.keyCode)) {
@@ -416,8 +424,8 @@ function fitPhoto() {
             // Set the dimensions of the overlay
             if ((photo.width !== parseInt(photoData.width)) || 
                 (photo.height !== parseInt(photoData.height))) {
-                var windowWidth = window.innerWidth;
-                var windowHeight = window.innerWidth;
+                var windowWidth = window.innerWidth || document.documentElement.clientWidth;
+                var windowHeight = window.innerHeight || document.documentElement.clientHeight;
                 var windowAspect = windowWidth / windowHeight;
 
                 if (photoAspect >= windowAspect) {
@@ -788,6 +796,12 @@ function updateOverlays() {
         } else {
             document.getElementById("helpTextPanel").style["float"] = "";
         }
+        
+        // If the help text is longer than the screen and the user scrolls down 
+        // before dismissing the help overlay, the browser should recognize 
+        // that the current position is off the bottom of the document and 
+        // return to the top.  Android doesn't do this reliably.
+        window.scroll(0,0);
     } catch (e) {
         error(e.name + ": " + e.message);
     }

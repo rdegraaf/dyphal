@@ -1,3 +1,21 @@
+2014-05-21  Rennie deGraaf  <rennie.degraaf@gmail.com>
+
+    * www/common.css: Left-aligned some text some text in the help and readme 
+      pages.
+
+    * www/dyphal.js: Android doesn't reliably return to page content when the 
+      help overlay is suppressed, sometimes leaving the user staring at a blank 
+      white screen.  Force a return to the top of the document when an overlay 
+      is suppressed.
+
+    * www/dyphal.js: Android doesn't support obj.click().  In order to handle 
+      Android devices with keyboards, fire a click event the old-fashioned way. 
+
+    * www/dyphal.js: IE 8 doesn't support window.innerWidth.  Fall back to 
+      document.documentElement.clientWidth if it's not present.
+
+2014-05-19  Rennie deGraaf  <rennie.degraaf@gmail.com>
+
     * www/photo.css: Added a top border to footerPanel in compact layout, to 
       match captionPanel and propertyPanel.
 

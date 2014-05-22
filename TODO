@@ -1,10 +1,8 @@
 For version 3:
 
-    * Re-test Opera, IE, Android
+    * Swipe thresholds?
 
-    * Swipe thresholds.
-
-    * Double-check help text after the latest changes.
+    * Test swipe navigation on Surface?
 
 For future versions:
 
