@@ -1,3 +1,9 @@
+2014-05-22  Rennie deGraaf  <rennie.degraaf@gmail.com>
+
+    * www/dyphal.js: Changed the swipe-detection logic to be based on an X/Y 
+      ratio rather than absolute thresholds, in order to improve swipe 
+      recognition.
+
 2014-05-21  Rennie deGraaf  <rennie.degraaf@gmail.com>
 
     * www/common.css: Left-aligned some text some text in the help and readme 

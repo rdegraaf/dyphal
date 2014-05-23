@@ -910,6 +910,9 @@ function start() {
  */
 var startPos = {x: null, y: null};
 var startTime = null;
+var swipeRatio = 4.0;
+var swipeThreshold = 100;
+var swipeTimeout = 333;
 
 // Get the delta between the current touch position and the start position.
 function getTouchDelta(evt) {
@@ -936,7 +939,6 @@ function stopTracking(evt) {
 }
 function touchMove(evt) {
     try {
-        var swipeRatio = 5.0;
         var delta = getTouchDelta(evt);
         if(!swipeDetected) {
             if (Math.abs(delta.x / delta.y) >= swipeRatio) {
@@ -985,15 +987,11 @@ function touchEnd(evt) {
         if (/Android/.test(navigator.userAgent)) {
             stopTracking(evt);
         }
-        var thresholdY = 40;
-        var thresholdX = 100;
-        var thresholdT = 300;
-
         var deltaPos = getTouchDelta(evt);
         var deltaTime = (new Date()).getTime() - startTime;
 
-        if ((thresholdY > Math.abs(deltaPos.y)) && (thresholdX < Math.abs(deltaPos.x)) && 
-            (thresholdT > deltaTime)) {
+        if ((swipeRatio < Math.abs(deltaPos.x/deltaPos.y)) && 
+            (swipeThreshold < Math.abs(deltaPos.x)) && (swipeTimeout > deltaTime)) {
             if (0 > deltaPos.x) {
                 if (0 < page && album.photos.length !== page) {
                     document.location.href = generatePhotoURL(page + 1);
