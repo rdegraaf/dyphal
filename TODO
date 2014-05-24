@@ -2,6 +2,8 @@ For version 3:
 
     * Test swipe navigation on Surface?
 
+    * Link to a demo page in README?
+
 For future versions:
 
     * Create an index view, populated from an index JSON that lists all albums. 
@@ -100,4 +102,8 @@ For future versions:
 
     * Putting <div> and other block elements inside a <label> violates the HTML 
       standard.
+
+    * Multi-thread gthumb-comment-update
+
+    * Better progress indication in gthumb-comment-update
 

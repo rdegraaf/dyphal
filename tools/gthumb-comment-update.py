@@ -200,11 +200,13 @@ def update_photo_props(props, embedded_props, xml_props, photo_path, xml_path):
     """Writes photo comments into the photo metadata.  If an XML 
     comment file was found, updates it as well."""
     # Build an exiftool command and update xml_props.
+    iptc=False
     exiftool_cmd = ["exiftool", "-P", "-overwrite_original_in_place"]
     if None is not props["description"]:
         exiftool_cmd.append("-XMP:Description=" + props["description"])
         if "IPTC:Caption-Abstract" in embedded_props:
             exiftool_cmd.append("-IPTC:Caption-Abstract=" + props["description"])
+            iptc=True
         if "EXIF:UserComment" in embedded_props:
             exiftool_cmd.append("-EXIF:UserComment=" + props["description"])
         if None is not xml_props:
@@ -213,6 +215,7 @@ def update_photo_props(props, embedded_props, xml_props, photo_path, xml_path):
         exiftool_cmd.append("-XMP:Location=" + props["location"])
         if "IPTC:ContentLocationName" in embedded_props:
             exiftool_cmd.append("-IPTC:ContentLocationName=" + props["location"])
+            iptc=True
         if None is not xml_props:
             xml_props.find("place").text = props["location"]
     if None is not props["time"]:
@@ -220,10 +223,14 @@ def update_photo_props(props, embedded_props, xml_props, photo_path, xml_path):
         exiftool_cmd.append("-XMP:DateTimeOriginal=" + time_str)
         if "IPTC:DateCreated" in embedded_props:
             exiftool_cmd.append("-IPTC:DateCreated=" + time_str.split(" ")[0])
+            iptc=True
         if "IPTC:TimeCreated" in embedded_props:
-            exiftool_cmd.append("-IPTC:DateCreated=" + time_str.split(" ")[1])
+            exiftool_cmd.append("-IPTC:TimeCreated=" + time_str.split(" ")[1])
+            iptc=True
         if None is not xml_props:
             xml_props.find("time").set("value", time_str)
+    if True == iptc:
+        exiftool_cmd.extend(["-charset", "iptc=UTF8", "-IPTC:CodedCharacterSet=UTF8"])
     exiftool_cmd.append("-XMP:XMPToolkit=")
     exiftool_cmd.append(photo_path)
 
@@ -274,10 +281,10 @@ def main():
                 photo_path = os.path.join(temp_dir.name, os.path.basename(file_name))
                 os.symlink("/proc/%d/fd/%d" % (os.getpid(), photo_fd), photo_path)
 
+                # gThumb stores IPTC strings as UTF-8, but does not set CodedCharacterSet
                 properties_text = subprocess.check_output(
-                                            ["exiftool", "-json", "-a", "-G", "-All", photo_path], 
-                                            timeout=BG_TIMEOUT, universal_newlines=True, 
-                                            stderr=subprocess.STDOUT)
+                    ["exiftool", "-charset", "iptc=UTF8", "-json", "-a", "-G", "-All", photo_path], 
+                    timeout=BG_TIMEOUT, universal_newlines=True, stderr=subprocess.STDOUT)
                 embedded_props = json.loads(properties_text)[0]
 
                 # Try to read the XML comment file.  

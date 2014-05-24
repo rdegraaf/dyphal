@@ -362,8 +362,9 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
                 # Files appear in arbitrary order in a gThumb 3 catalog file.  
                 # I assume that the display order is the names sorted alphabetically.
                 if "1.0" == tree.getroot().get("version"):
-                    filenames = sorted([QtCore.QUrl(elmt.attrib["uri"]).toLocalFile() 
-                                        for elmt in tree.getroot().iter("file")])
+                    filenames = sorted(
+                            [QtCore.QUrl(urllib.parse.unquote(elmt.attrib["uri"])).toLocalFile() 
+                             for elmt in tree.getroot().iter("file")])
                     self._addPhotoFiles([(name, os.path.basename(name)) for name in filenames])
                     self._config.gthumb3Dir = os.path.dirname(catalog_file_name)
                 else:

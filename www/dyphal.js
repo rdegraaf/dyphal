@@ -422,8 +422,8 @@ function fitPhoto() {
             }
 
             // Set the dimensions of the overlay
-            if ((photo.width !== parseInt(photoData.width)) || 
-                (photo.height !== parseInt(photoData.height))) {
+            if ((photo.width !== parseInt(photoData.width, 10)) || 
+                (photo.height !== parseInt(photoData.height, 10))) {
                 var windowWidth = window.innerWidth || document.documentElement.clientWidth;
                 var windowHeight = window.innerHeight || document.documentElement.clientHeight;
                 var windowAspect = windowWidth / windowHeight;

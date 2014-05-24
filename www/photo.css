@@ -47,6 +47,7 @@
   right: 20%;
   bottom: 80px; /* footerPanel.height */
   line-height: 0px;
+  overflow: hidden;
 }
 
 #captionPanel, #propertyPanel {

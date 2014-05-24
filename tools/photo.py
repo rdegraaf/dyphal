@@ -139,7 +139,7 @@ class PhotoFile(RefCounted, QtGui.QListWidgetItem):
         Property("Composite:LightValue", "Light value"),
         Property("Composite:ScaleFactor35efl", "Scale factor"),
         Property("Composite:ShootingMode", "Shooting mode"),
-        Property("Composite:ShutterSpeed", "Exposure", transform=lambda s : s+" sec."),
+        Property("Composite:ShutterSpeed", "Exposure", transform=lambda s : str(s)+" sec."),
         Property("EXIF:DateTimeOriginal", "Creation time", transform=transform_exif_time),
         Property("EXIF:ExposureCompensation", "Exposure compensation"),
         Property("EXIF:ExposureMode", "Exposure mode"),
@@ -185,10 +185,10 @@ class PhotoFile(RefCounted, QtGui.QListWidgetItem):
             linkPath = os.path.join(config.tempDir.name, self._fileName)
             os.symlink("/proc/%d/fd/%d" % (os.getpid(), self._fileDescriptor), linkPath)
             self._linkPath = linkPath
+            # gThumb stores IPTC strings as UTF-8, but does not set CodedCharacterSet
             properties_text = subprocess.check_output(
-                                        ["exiftool", "-json", "-a", "-G", "-All", self._linkPath], 
-                                        timeout=self._config.BG_TIMEOUT, universal_newlines=True, 
-                                        stderr=subprocess.STDOUT)
+                ["exiftool", "-charset", "iptc=UTF8", "-json", "-a", "-G", "-All", self._linkPath], 
+                timeout=self._config.BG_TIMEOUT, universal_newlines=True, stderr=subprocess.STDOUT)
             properties_obj = json.loads(properties_text)[0]
 
             # exiftool finds way too many properties to force the user to sift through, so we 

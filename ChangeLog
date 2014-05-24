@@ -1,3 +1,27 @@
+2014-05-24  Rennie deGraaf  <rennie.degraaf@gmail.com>
+
+    * www/dyphal.js: Fixed a jslint warning.
+
+    * tools/photo.py: Fixed a bug when parsing properties of photos with 
+      exposures longer than one second.
+
+    * www/index.html: Removed another reference to thumbnails from the tooltip 
+      for the index button.
+
+    * www/index.html, www/common.css: Added a tooltip for the help button.
+
+    * www/photo.css: Set contentPanel to clip overflow, so that browsers don't 
+      flash a scrollbar before fitPhoto() is called when the photo is too big 
+      to fit in the window.
+
+    * tools/DyphalGenerator.py: Un-encode the file URIs from gThumb collection 
+      files.
+
+    * tools/photo.py, tools/gthumb-comment-update.py: gThumb stores IPTC 
+      strings as UTF-8, but doesn't set the IPTC character set.  Override the 
+      default IPTC character set in exiftool, and set the IPTC character set 
+      when writing any IPTC tags.
+
 2014-05-22  Rennie deGraaf  <rennie.degraaf@gmail.com>
 
     * www/dyphal.js: Changed the swipe-detection logic to be based on an X/Y 
