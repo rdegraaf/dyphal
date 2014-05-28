@@ -173,7 +173,7 @@ label {
   display: block;
 }
 
-@media (max-width: 800px), (max-height: 800px) {
+@media (max-width: 750px), (max-height: 750px) {
   #prevThumbPanel, #nextThumbPanel, #overlayCheckbox:checked ~ #overlay {
     display: none;
   }
@@ -245,7 +245,7 @@ label {
   }
 }
 
-@media (max-width: 800px) and (orientation: landscape), (max-height: 800px) and (orientation: landscape) {
+@media (max-width: 750px) and (orientation: landscape), (max-height: 750px) and (orientation: landscape) {
   #contentPanel {
     top: 0;
     left: 110px

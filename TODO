@@ -98,7 +98,7 @@ For future versions:
 
     * Handle photo orientations other than top-left in DyphalGenerator.
 
-    * calc() might make some of the CSS simpler.
+    * calc() might make some of the CSS simpler.  Not supported by IE 8.
 
     * Putting <div> and other block elements inside a <label> violates the HTML 
       standard.

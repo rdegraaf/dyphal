@@ -140,8 +140,8 @@ function setScreenSize() {
     try {
         // Check for a small screen and load the overrides if so.
         var small = false;
-        if ((document.documentElement.clientWidth <= 800) || 
-            (document.documentElement.clientHeight <= 800)) {
+        if ((document.documentElement.clientWidth <= 750) || 
+            (document.documentElement.clientHeight <= 750)) {
             small = true;
         }
         if (small &&

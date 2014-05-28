@@ -61,7 +61,7 @@ do
         echo "\"$new_name\" already exists; skipping $file"
     else
         mv -n "$file" "$new_name"
-        chmod -x "$new_name"
+        chmod u-x,g-x,o-x "$new_name"
         jhead -autorot "$new_name"
     fi
 
@@ -75,7 +75,7 @@ do
             echo "\"$new_name\" already exists; skipping $file"
         else
             mv -n "$gthxml_name" "$new_name"
-            chmod -x "$new_name"
+            chmod u-x,g-x,o-x "$new_name"
         fi
     fi
 done

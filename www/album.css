@@ -68,7 +68,7 @@ li.thumbnail {
   max-width: 800px;
 }
 
-@media (max-width: 800px), (max-height: 800px) {
+@media (max-width: 750px), (max-height: 750px) {
   #contentPanel {
     margin-left: 0;
     margin-right: 0;
@@ -80,7 +80,7 @@ li.thumbnail {
   }
 }
 
-@media (max-width: 800px) and (orientation: landscape), (max-height: 800px) and (orientation: landscape) {
+@media (max-width: 750px) and (orientation: landscape), (max-height: 750px) and (orientation: landscape) {
   #contentPanel {
     margin-left: 110px;
   }

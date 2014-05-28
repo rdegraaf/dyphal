@@ -69,6 +69,59 @@ If you generated the album "Vacation" in a directory served as
 http://example.com/photos and installed the web template to the same directory, 
 you can view the album at http://example.com/photos/#/Vacation.
 
+DyphalGenerator does not currently have a metadata editor.  Instead, it pulls 
+metadata fields from embedded photo tags.  The following tags are recognized 
+as "properties" (using exiftool's naming scheme): 
+
+*   Composite:Aperture
+*   Composite:DigitalZoom
+*   Composite:DriveMode
+*   Composite:FlashType
+*   Composite:FOV
+*   Composite:FocalLength35efl
+*   Composite:HyperfocalDistance
+*   Composite:ImageSize
+*   Composite:Lens35efl
+*   Composite:LensID
+*   Composite:LightValue
+*   Composite:ScaleFactor35efl
+*   Composite:ShootingMode
+*   Composite:ShutterSpeed
+*   EXIF:DateTimeOriginal
+*   EXIF:ExposureCompensation
+*   EXIF:ExposureMode
+*   EXIF:Flash
+*   EXIF:FocalLength
+*   EXIF:ISO
+*   EXIF:Make
+*   EXIF:Model
+*   EXIF:Orientation
+*   File:FileSize
+*   File:FileType
+*   MakerNotes:MacroMode
+*   MakerNotes:Rotation
+
+Only three fields are recognized as "captions": Description, Location, and 
+Date.  They are synthesized from various tags that are commonly used to store 
+such information (again, using exiftool's naming scheme):
+
+*   Description
+    *   XMP:Description
+    *   IPTC:Caption-Abstract
+    *   EXIF:UserComment
+*   Location
+    *   XMP:Location
+    *   IPTC:ContentLocationName
+*   Date:
+    *   XMP:DateTimeOriginal
+    *   Composite:DateTimeCreated
+    *   EXIF:DateTimeOriginal
+
+Recent versions of gThumb use these fields for metadata; there are probably 
+other photo managers that do as well.  Older versions of gThumb stored metadata 
+only in external XML files; the tool "gthumb-comment-update" can be used to 
+import metadata from the XML files into embedded tags.
+
 
 Serving Dyphal albums
 ---------------------
@@ -246,7 +299,7 @@ version 3.  See LICENCE or <http://www.gnu.org/licenses/> for details.
 Contact information
 -------------------
 
-Rennie deGraaf <rennie.degraaf@gmail.com>
+Rennie deGraaf (rennie-dot-degraaf-at-gmail-dot-com)
 
 The latest version of Dyphal, including full source code, can be obtained at 
 <https://ciphertext.info/software/dyphal/>.

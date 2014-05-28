@@ -1,3 +1,19 @@
+2014-05-28  Rennie deGraaf  <rennie.degraaf@gmail.com>
+
+    * photorename.sh: Make sure to remove *all* execute permissions, not just 
+      the user's.
+
+    * album.css, common.css, debug.css, dyphal.js, photo.css: reduce the 
+      threshold for compact layout to 750 pixels, because some normal laptop
+      displays are smaller than 800 CSS-pixels.
+
+    * .gitignore: New file.
+
+    * README: Added lists of the property and caption fields supported by 
+      DyphalGenerator.
+
+    * README: Obfuscated my email address.
+
 2014-05-24  Rennie deGraaf  <rennie.degraaf@gmail.com>
 
     * www/dyphal.js: Fixed a jslint warning.
