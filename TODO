@@ -2,7 +2,7 @@ For version 3:
 
     * Test swipe navigation on Surface?
 
-    * Link to a demo page in README?
+    * Make the footer smaller in compact layout
 
 For future versions:
 
@@ -106,4 +106,10 @@ For future versions:
     * Multi-thread gthumb-comment-update
 
     * Better progress indication in gthumb-comment-update
+
+    * Command-line mode for DyphalGenerator to generate an album for an 
+      existing album file, and to install the template to a listed directory.
+
+    * Don't re-generate scaled photos if only album metadata has changed.
+
 

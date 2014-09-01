@@ -1,3 +1,17 @@
+2014-09-01  Rennie deGraaf  <rennie.degraaf@gmail.com>
+
+    * tools/photorename.sh: Ensure that photos are writable.
+
+    * tools/gthumb-comment-update.py: Handle missing fields in gthumb XML 
+      comment files.
+
+    * README: Added a design principle.
+
+    * README: Added a link to my demo album.
+
+    * README: Renamed the "compressed" layout to "compact" to match what I call 
+      it elsewhere.
+
 2014-05-28  Rennie deGraaf  <rennie.degraaf@gmail.com>
 
     * photorename.sh: Make sure to remove *all* execute permissions, not just 

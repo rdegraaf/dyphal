@@ -16,6 +16,8 @@ photographs and their metadata up front and stored on the server.  The album
 and its metadata files are designed to require minimal storage space and 
 minimal network traffic. 
 
+There is a demo album at <https://ciphertext.info/software/dyphal/#/demo>.
+
 
 Design principles
 -----------------
@@ -29,18 +31,21 @@ Dyphal was designed to satisfy the following goals:
 2.  Metadata is important.  Information about what is in a photo, where and 
     when it was taken, and photographic properties such as exposure and 
     aperture must be visible for each photo.
-3.  The album must work using a document server as the back end.
-4.  The album must be as small as possible with as many elements as possible 
+3.  The album must not break the web.  Browsers' Forward and Back buttons must 
+    work.  Bookmarks and saved links to photos and albums must work.  The URL 
+    in the address bar must represent the current album or photo. 
+4.  The album must work using a document server as the back end.
+5.  The album must be as small as possible with as many elements as possible 
     shared between pages.  
-5.  The album must use modern web standards with a minimum of cruft to support 
+6.  The album must use modern web standards with a minimum of cruft to support 
     old browsers.  It must follow security best practices and support CSP.
-6.  All features of the album must work properly on recent versions of Chrome, 
+7.  All features of the album must work properly on recent versions of Chrome, 
     Firefox, Internet Explorer, and Android.  There should be no major problems 
     in minor browsers such as Opera and on old but still common browsers such 
     as Internet Explorer 8.  
-7.  All content must be in HTML or be inserted at run-time.  All styling must 
+8.  All content must be in HTML or be inserted at run-time.  All styling must 
     be in CSS or inserted at run-time.
-8.  Album styles should be changeable without needing to change scripts.
+9.  Album styles should be changeable without needing to change scripts.
 
 
 Generating Dyphal albums
@@ -175,8 +180,8 @@ There is also a **help view** that can be opened from either album or photo
 view using the question mark icon.
 
 When loaded in a window smaller than 800 CSS-pixels wide or tall, the album 
-will use **compressed layout** that omits the metadata and footer from photo 
-view in order to show the photo at the largest size possible.  In compressed 
+will use **compact layout** that omits the metadata and footer from photo 
+view in order to show the photo at the largest size possible.  In compact 
 layout, overlay view shows the metadata and footer rather than another view of 
 the photo.
 

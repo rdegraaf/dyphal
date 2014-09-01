@@ -22,7 +22,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 # Usage: photorename.sh <camera name> <photos...>
-# For example, "$ photorename sh SX10 2014/*.JPG" will rename all ".JPG" files 
+# For example, "$ photorename.sh sx10 2014/*.JPG" will rename all ".JPG" files 
 # in "2014/" to names like "SX10_0023.jpeg".
 
 PATH=/bin:/usr/bin
@@ -61,7 +61,7 @@ do
         echo "\"$new_name\" already exists; skipping $file"
     else
         mv -n "$file" "$new_name"
-        chmod u-x,g-x,o-x "$new_name"
+        chmod u+w,u-x,g-x,o-x "$new_name"
         jhead -autorot "$new_name"
     fi
 

@@ -210,14 +210,20 @@ def update_photo_props(props, embedded_props, xml_props, photo_path, xml_path):
         if "EXIF:UserComment" in embedded_props:
             exiftool_cmd.append("-EXIF:UserComment=" + props["description"])
         if None is not xml_props:
-            xml_props.find("note").text = props["description"]
+            note_elmt = xml_props.find("note")
+            if None is note_elmt:
+                note_elmt = xml.etree.ElementTree.SubElement(xml_props, "note")
+            note_elmt.text = props["description"]
     if None is not props["location"]:
         exiftool_cmd.append("-XMP:Location=" + props["location"])
         if "IPTC:ContentLocationName" in embedded_props:
             exiftool_cmd.append("-IPTC:ContentLocationName=" + props["location"])
             iptc=True
         if None is not xml_props:
-            xml_props.find("place").text = props["location"]
+            place_elmt = xml_props.find("place")
+            if None is place_elmt:
+                place_elmt = xml.etree.ElementTree.SubElement(xml_props, "place")
+            place_elmt.text = props["location"]
     if None is not props["time"]:
         time_str = print_exif_time(props["time"])
         exiftool_cmd.append("-XMP:DateTimeOriginal=" + time_str)
@@ -228,7 +234,11 @@ def update_photo_props(props, embedded_props, xml_props, photo_path, xml_path):
             exiftool_cmd.append("-IPTC:TimeCreated=" + time_str.split(" ")[1])
             iptc=True
         if None is not xml_props:
-            xml_props.find("time").set("value", time_str)
+            time_elmt = xml_props.find("time")
+            if None is not time_elmt:
+                time_elmt.set("value", time_str)
+            else:
+                xml.etree.ElementTree.SubElement(xml_props, "time", {"value":time_str})
     if True == iptc:
         exiftool_cmd.extend(["-charset", "iptc=UTF8", "-IPTC:CodedCharacterSet=UTF8"])
     exiftool_cmd.append("-XMP:XMPToolkit=")

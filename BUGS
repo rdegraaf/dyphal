@@ -165,10 +165,15 @@
 
 
 2014-05-11_001  Rennie deGraaf  <rennie.degraaf@gmail.com>
-    Touch navigation doesn't work on Ian's Surface.
+    Touch navigation doesn't work on Windows Mobile.
 
-    OPEN: Of course IE 10 and 11 don't use the same touch event interface as 
-    everything else, because that might be compatible or something.  Typical.
+    POSTPONED: Of course IE 10 and 11 don't use the same touch event interface 
+    as everything else, because that might be compatible or something.  
+    Typical Microsoft.  I made some changes that seem to work when faking 
+    swipes with a mouse in IE 11, but they don't work on Chris' WinMo phone.  
+    Since I don't have a WinMo device to test on, I can't make much progress on 
+    this.  And WinMo is not a sufficiently important platform to put a lot of 
+    effort into supporting fully.
 
 
 2014-05-16_001  Rennie deGraaf  <rennie.degraaf@gmail.com>
@@ -195,4 +200,11 @@
 
     WONTFIX: This is not a core feature and 100% support for IE 8 is not 
     necessary.
+
+2014-08-31_001  Rennie deGraaf  <rennie.degraaf@gmail.com>
+    Photo view doesn't work in the Android 4.4.2 browser on my Galaxy S3.  
+    Opening photo view from index view results in a blank screen.  Swipe 
+    navigation works (yielding a proper photo view), even on a blank screen.  
+    Swiping back to the index or using the index button results in a blank 
+    screen.
 
