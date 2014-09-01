@@ -28,7 +28,7 @@ var albumPath = null; // relative path to the album JSON file.  Begins with "." 
 var album = null; // object describing the current album
 var page = null; // number of the current page, 0 for the album thumbnail view
 var pages = []; // objects describing all pages that have been retrieved.  Based on album.photos.
-var compressed = false;
+var compact = false;
 
 
 // Display an error message in the warning panel
@@ -133,7 +133,7 @@ String.prototype.endsWith = function (suffix) {
 };
 
 
-// Check for compressed layout and make layout changes if necessary.
+// Check for compact layout and make layout changes if necessary.
 function setScreenSize() {
     log("setScreenSize enter");
 
@@ -146,15 +146,15 @@ function setScreenSize() {
         }
         if (small &&
             (document.documentElement.clientHeight <= document.documentElement.clientWidth)) {
-            // Compressed view in landscape.  titlePanel is rotated and may be wider than the 
+            // Compact view in landscape.  titlePanel is rotated and may be wider than the 
             // screen is tall; fix its size.
             document.getElementById("titlePanel").style.width = 
                                             (document.documentElement.clientHeight - 110) + "px";
-        } else if (compressed) {
+        } else if (compact) {
             // Remove whatever overrides we may have applied.
             document.getElementById("titlePanel").style.width = "";
         }
-        compressed = small;
+        compact = small;
     } catch (e) {
         error(e.name + ": " + e.message);
         throw e;
@@ -170,11 +170,13 @@ function unloadDebug() {
 
     // Unload the debug stylesheet
     var cssElement = document.getElementById("debugStylesheet");
-    cssElement.parentNode.removeChild(cssElement);
+    if (null != cssElement)
+        cssElement.parentNode.removeChild(cssElement);
 
     // Remove the debug panel
     var debugPanel = document.getElementById("debugPanel");
-    debugPanel.parentNode.removeChild(debugPanel);
+    if (null != debugPanel)
+        debugPanel.parentNode.removeChild(debugPanel);
 
     // Remove the debug keyword from navivation links
     var links = document.querySelectorAll("a.navigationlink");
@@ -247,11 +249,16 @@ function loadDebugAfterStylesheet() {
 
 // Check if the browser is known to not fire load events on link elements.
 function brokenLoadEventOnLink() {
-    // Load events on link elements are broken on Android versions prior to 4.4
+    // Load events on link elements are broken on Android.  I haven't been able 
+    // to find any way practical to detect this problem by feature testing, so 
+    // version detection it is.  This was apparently fixed in 4.4, but still 
+    // doesn't work in the Android 4.4.2 browser on my Samsung Galaxy S3.  
     var regex = /Android ([0-9]+)\.([0-9]+)(?:[^0-9]|$)/i;
     var match = regex.exec(navigator.userAgent);
     if (null !== match && 3 === match.length) {
-        return (match[1] < 4 || match[2] < 4);
+        return true;
+        // Use this instead if some Android version reliably fixes this bug
+        //return (match[1] < 4 || match[2] < 4);
     }
 
     return false;
@@ -752,7 +759,7 @@ function loadAlbum(status, albumData, args) {
 }
 
 
-// Force the caption and property panels to have the same height in the compressed layout.  Also 
+// Force the caption and property panels to have the same height in the compact layout.  Also 
 // touch some layout-related property on everything that's style should change to work around an 
 // Android bug.
 function updateOverlays() {
@@ -760,23 +767,28 @@ function updateOverlays() {
         // Android versions prior to 4.4 seem to have a bug causing the caption, property, and 
         // footer panels not to be re-painted when their styles change due to the checkbox being 
         // changed.  Touching some layout-related property seems to force a re-paint.
-        if (compressed) {
+        if (compact) {
             if (document.getElementById("overlayCheckbox").checked) {
-                // In compressed layout, force the caption and property panels to have the same 
+                // In compact layout, force the caption and property panels to have the same 
                 // height.
                 var captionPanel = document.getElementById("captionPanel");
                 var propertyPanel = document.getElementById("propertyPanel");
                 var captionHeight = captionPanel.clientHeight;
                 var propertyHeight = propertyPanel.clientHeight;
-                if (captionHeight > propertyHeight) {
+                var footerHeight = document.getElementById("footerPanel").clientHeight;
+                var windowHeight = document.documentElement.clientHeight;
+                if ((captionHeight + footerHeight > windowHeight) ||
+                    (propertyHeight + footerHeight > windowHeight)) {
+                    propertyPanel.style["height"] = (windowHeight - footerHeight) + "px";
+                    captionPanel.style["height"] = (windowHeight - footerHeight) + "px";
+                } else if (captionHeight > propertyHeight) {
                     propertyPanel.style["height"] = captionHeight + "px";
                     captionPanel.style["float"] = "none";
-                    document.getElementById("footerPanel").style["float"] = "none";
                 } else {
                     captionPanel.style["height"] = propertyHeight + "px";
                     propertyPanel.style["float"] = "none";
-                    document.getElementById("footerPanel").style["float"] = "none";
                 }
+                document.getElementById("footerPanel").style["float"] = "none";
             } else {
                 document.getElementById("captionPanel").style["height"] = "";
                 document.getElementById("propertyPanel").style["height"] = "";

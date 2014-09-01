@@ -2,8 +2,6 @@ For version 3:
 
     * Test swipe navigation on Surface?
 
-    * Make the footer smaller in compact layout
-
 For future versions:
 
     * Create an index view, populated from an index JSON that lists all albums. 

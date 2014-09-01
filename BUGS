@@ -42,13 +42,15 @@
 
 
 2014-01-17_001  Rennie deGraaf  <rennie.degraaf@gmail.com>
-    The first photo doesn't load and debug mode doesn't work on Android 4.3
-    and and earlier (4.4.2 works).  Apparently, they don't support the load 
-    event for link elements.  
+    The first photo doesn't load and debug mode doesn't work on Android 
+    browsers. Evidently, they don't support the load event for link elements.  
+    This issue was supposedly fixed in Android 4.4 (it works in the Android 
+    4.4.2 simulator), but is still broken in the Android 4.4.2 browser on my 
+    Galaxy S3. 
 
     WORKAROUND: I can't find any way to feature-detect browsers with this bug, 
-    so I check for a version of Android earlier than 4.4 and start a poll loop
-    with an exponential backoff until the stylesheet is present. 
+    so I check for an Android browser and start a poll loop with an exponential 
+    backoff until the stylesheet is present. 
 
 
 2014-01-18_001  Rennie deGraaf  <rennie.degraaf@gmail.com>
@@ -200,11 +202,4 @@
 
     WONTFIX: This is not a core feature and 100% support for IE 8 is not 
     necessary.
-
-2014-08-31_001  Rennie deGraaf  <rennie.degraaf@gmail.com>
-    Photo view doesn't work in the Android 4.4.2 browser on my Galaxy S3.  
-    Opening photo view from index view results in a blank screen.  Swipe 
-    navigation works (yielding a proper photo view), even on a blank screen.  
-    Swiping back to the index or using the index button results in a blank 
-    screen.
 

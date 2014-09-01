@@ -262,4 +262,11 @@ label {
     -ms-transform-origin: left top;
     -ms-transform: rotate(-90deg) translate(-110px);
   }
+  
+  #captionPanel, #propertyPanel {
+    bottom: 40px;
+  }
+  #footerPanel {
+    height: 40px;
+  }
 }

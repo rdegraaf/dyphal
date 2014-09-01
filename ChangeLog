@@ -1,5 +1,25 @@
 2014-09-01  Rennie deGraaf  <rennie.degraaf@gmail.com>
 
+    * www/dyphal.js: The Android 4.4.2 browser on my Galaxy S3 was calling 
+      unloadDebug() when not in a debug state, resulting in null parentNode 
+      dereferences.
+
+    * www/dyphal.js: The Android 4.4.2 browser on my Galaxy S3 still doesn't 
+      support load events on link elements, despite this bug supposedly having 
+      been fixed in 4.4.  Use the workaround on all Android browsers for now. 
+
+    * www/dyphal.js, www/index.html: Renamed "compressed" layout to "compact" 
+      to match what I call it elsewhere.  I think that I got all of them this 
+      time.
+
+    * www/photo.css: Make the footer panel shorter in landscape compact layout. 
+
+    * www/dyphal.js: In compact layout, limit the height of the caption and 
+      property panels to the height of the screen less the height of the 
+      footer. 
+
+2014-09-01  Rennie deGraaf  <rennie.degraaf@gmail.com>
+
     * tools/photorename.sh: Ensure that photos are writable.
 
     * tools/gthumb-comment-update.py: Handle missing fields in gthumb XML 
