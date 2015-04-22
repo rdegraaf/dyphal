@@ -203,3 +203,12 @@
     WONTFIX: This is not a core feature and 100% support for IE 8 is not 
     necessary.
 
+
+2014-12-31_001  Rennie deGraaf  <rennie.degraaf@gmail.com>
+    Photos don't display in IE 11.0.9879.0 (the Windows 10 preview build).  
+    
+    EXTERNAL: IE refuses to apply photo.css, instead leaving album.css in 
+    place.  It claims that this constitutes in-line CSS, which violates the 
+    CSP.  Removing the CSP, or allowing 'unsafe-inline' for style-src, allows 
+    pages to load properly.  However, this is not an acceptable workaround as 
+    it removes CSP protections.

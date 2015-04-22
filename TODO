@@ -2,6 +2,9 @@ For version 3:
 
     * Test swipe navigation on Surface?
 
+    * Pre-populate the file name in the Generate Album dialog if the album has 
+      already been saved and a name is known.
+
 For future versions:
 
     * Create an index view, populated from an index JSON that lists all albums. 
@@ -110,4 +113,5 @@ For future versions:
 
     * Don't re-generate scaled photos if only album metadata has changed.
 
+    * Stylesheet for printing
 

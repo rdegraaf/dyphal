@@ -1,3 +1,7 @@
+2015-04-21  Rennie deGraaf  <rennie.degraaf@gmail.com>
+
+    * tools/DyphalGenerator.py: Typo correction.
+
 2014-09-01  Rennie deGraaf  <rennie.degraaf@gmail.com>
 
     * www/dyphal.js: The Android 4.4.2 browser on my Galaxy S3 was calling 

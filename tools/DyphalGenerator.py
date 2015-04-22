@@ -31,7 +31,7 @@ __version__ = "3.0-beta1-11-g5772e9d"
 __credits__ = "Rennie deGraaf"
 __date__ = "2014-05-18"
 
-#__all__ = "" # Uncomment to limit the amount of data tha pydoc spews out.
+#__all__ = "" # Uncomment to limit the amount of data that pydoc spews out.
 
 
 import sys
