@@ -1,7 +1,7 @@
 #!/usr/bin/python3.3
 
 """Photo timestamp localizer and metatada maintenance tool.
-Copyright (c) Rennie deGraaf, 2010-2014.
+Copyright (c) Rennie deGraaf, 2010-2015.
 
 gthumb-comment-update translates various formats of photo metadata that 
 gThumb has used over the years into the format expected by 

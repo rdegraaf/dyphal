@@ -1,5 +1,5 @@
 """Classes to represent a photo and its properties in DyphalGenerator.
-Copyright (c) Rennie deGraaf, 2005-2014.
+Copyright (c) Rennie deGraaf, 2005-2015.
 
 This program is free software; you can redistribute it and/or modify it 
 under the terms of the GNU General Public License as published by the 

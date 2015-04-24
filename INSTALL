@@ -26,6 +26,7 @@ package names may vary depending on your operating system.
 *   python3-PyQt4
 *   exiftool
 *   ImageMagick
+*   jhead
 *   PyQt4-devel (for installation only)
 *   pandoc (for installation only)
 

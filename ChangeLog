@@ -1,5 +1,19 @@
 2015-04-24  Rennie deGraaf  <rennie.degraaf@gmail.com>
 
+    * README, tools/DyphalGenerator.py, tools/gthumb-comment-update.py, 
+      tools/photo.py, tools/photorename.sh, tools/ui-header.py, tools/util.py, 
+      www/album.css, www/common.css, www/debug.css, www/dyphal.js, 
+      www/index.html, www/photo.css: Updated date stamps to 2015.
+
+    * README: Replace "URL" with the more pedantically-correct "URI".
+
+    * www/index.html: Use "self-closing" tags consistently on HTML5 void 
+      elements.
+
+    * INSTALL: Documented photorename.sh's dependency on jhead.
+
+2015-04-24  Rennie deGraaf  <rennie.degraaf@gmail.com>
+
     * www/dyphal.js: Replaced the stylesheet-swapping layout changes with 
       class-swapping on the `body` element, in order to work around an 
       IE/Spartan CSP bug (2014-12-31_001).  This simplified the code 
