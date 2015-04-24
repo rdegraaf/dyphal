@@ -16,32 +16,32 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#thumbnailList, #description {
+body.photo #thumbnailList, body.photo #description {
   display: none;
 }
 
-#navigationPanel, #prevThumbPanel, #nextThumbPanel, #captionPanel, #propertyPanel, #contentPanel {
+body.photo #navigationPanel, body.photo #prevThumbPanel, body.photo #nextThumbPanel, body.photo #captionPanel, body.photo #propertyPanel, body.photo #contentPanel {
   position: absolute;
 }
 
-#navigationPanel, #prevThumbPanel, #nextThumbPanel, #captionPanel, #propertyPanel {
+body.photo #navigationPanel, body.photo #prevThumbPanel, body.photo #nextThumbPanel, body.photo #captionPanel, body.photo #propertyPanel {
   width: 20%;
   max-width: 300px;
 }
 
-#navigationPanel {
+body.photo #navigationPanel {
   top: 25px; /* 0.5*(titlePanel.height - height) */
   height: 30px; /* img.prev.height */
   left: 80%;
 }
 
-#prevThumbPanel, #nextThumbPanel {
+body.photo #prevThumbPanel, body.photo #nextThumbPanel {
   top: 80px; /* titlePanel.height */
   height: 106px; /* img.vnavigation.height + 2*img.vnavigation.border */
   line-height: 0px;
 }
 
-#contentPanel {
+body.photo #contentPanel {
   top: 80px; /* titlePanel.height */
   left: 20%;
   right: 20%;
@@ -50,95 +50,95 @@
   overflow: hidden;
 }
 
-#captionPanel, #propertyPanel {
+body.photo #captionPanel, body.photo #propertyPanel {
   top: 186px; /* titlePanel.height + prevThumbPanel.height */
   bottom: 0;
 }
 
-#prevThumbPanel, #captionPanel {
+body.photo #prevThumbPanel, body.photo #captionPanel {
   right: 80%;
 }
 
-#nextThumbPanel, #propertyPanel {
+body.photo #nextThumbPanel, body.photo #propertyPanel {
   left: 80%;
 }
 
-img.hnavigation, img.vnavigation {
+body.photo img.hnavigation, body.photo img.vnavigation {
   border: 3px solid #AAAAAA;
   border-radius: 5px;
   box-shadow: 2px 2px 4px #000000;
 }
 
-img.hnavigation {
+body.photo img.hnavigation {
   width: 100px;
   height: 75px;
 }
 
-img.vnavigation {
+body.photo img.vnavigation {
   width: 75px;
   height: 100px;
 }
 
-#propertyTable {
+body.photo #propertyTable {
   border-style: none;
 }
 
-#propertyTable td {
+body.photo #propertyTable td {
   line-height: 100%;
 }
 
-#propertyTable td:first-child {
+body.photo #propertyTable td:first-child {
   color: #AAAAAA;
   font-weight: bold;
   width: 0%;
 }
 
-#propertyTable td:last-child {
+body.photo #propertyTable td:last-child {
   width: 100%;
 }
 
-#photo {
+body.photo #photo {
   border: 3px solid black;
   vertical-align: middle;
 }
 
-#index, #captionPanel {
+body.photo #index, body.photo #captionPanel {
   font-size: 12pt;
 }
 
-#index {
+body.photo #index {
   font-weight: bold;
 }
 
-p.captionItem, #propertyTable {
+body.photo p.captionItem, body.photo #propertyTable {
   padding: 1ex;
   margin: 0;
 }
 
-p.captionItem {
+body.photo p.captionItem {
   white-space: pre-line;
 }
 
-#navigationPanel, #prevThumbPanel, #nextThumbPanel, #contentPanel {
+body.photo #navigationPanel, body.photo #prevThumbPanel, body.photo #nextThumbPanel, body.photo #contentPanel {
   text-align: center;
 }
 
-#prevImage,#nextImage {
+body.photo #prevImage, body.photo #nextImage {
   display: inline-block;
   width: 40px; /* prevImage.width */
   height: 30px; /* prevImage.height */
   margin: 0px;
 }
 
-#prevImage {
+body.photo #prevImage {
   background-image: url(prev.png);
 }
 
-#nextImage {
+body.photo #nextImage {
   background-image: url(next.png);
 }
 
-#prevLink, #nextLink {
+body.photo #prevLink, body.photo #nextLink {
   display: inline-block;
   width: 100%;
   height: 100%;
@@ -147,7 +147,7 @@ p.captionItem {
   color: #4b4b4b; /* same as background; hide text in Opera */
 }
 
-#overlay {
+body.photo #overlay {
   display: none;
   position: absolute;
   top: 0;
@@ -157,7 +157,7 @@ p.captionItem {
   background-color: rgba(0, 0, 0, 0.6);
 }
 
-#photoOverlay {
+body.photo #photoOverlay {
   border: 3px solid black;
   margin: 0;
   padding: 0;
@@ -165,20 +165,20 @@ p.captionItem {
   background-repeat: no-repeat;
 }
 
-label {
+body.photo label {
   display: block;
 }
 
-#overlayCheckbox:checked ~ #overlay {
+body.photo #overlayCheckbox:checked ~ #overlay {
   display: block;
 }
 
 @media (max-width: 750px), (max-height: 750px) {
-  #prevThumbPanel, #nextThumbPanel, #overlayCheckbox:checked ~ #overlay {
+  body.photo #prevThumbPanel, body.photo #nextThumbPanel, body.photo #overlayCheckbox:checked ~ #overlay {
     display: none;
   }
 
-  #navigationPanel {
+  body.photo #navigationPanel {
     top: 63px; /* 2 * (width - indexPanel.height - height) / 3 + indexPanel.height */
     width: 110px;
     right: 0;
@@ -186,19 +186,19 @@ label {
     max-width: none;
   }
 
-  #prevImage {
+  body.photo #prevImage {
     position: absolute;
     top: 0;
     left: 0;
   }
 
-  #nextImage {
+  body.photo #nextImage {
     position: absolute;
     top: 0;
     right: 0;
   }
 
-  #contentPanel {
+  body.photo #contentPanel {
     top: 110px;
     left: 0;
     right: 0;
@@ -208,50 +208,50 @@ label {
     position: absolute;
   }
 
-  #description {
+  body.photo #description {
     padding-left: 5px;
     padding-right: 5px;
   }
 
-  #captionPanel {
+  body.photo #captionPanel {
     width: 50%;
     left: 0;
     right: auto;
     border-right: 3px solid black;
   }
 
-  #propertyPanel {
+  body.photo #propertyPanel {
     width: 50%;
     left: auto;
     right: 0;
     border-left: 3px solid black;
   }
 
-  #captionPanel, #propertyPanel {
+  body.photo #captionPanel, body.photo #propertyPanel {
     top: auto;
     bottom: 80px;
     border-bottom: 3px solid black; /* photo.border */
   }
 
-  #captionPanel, #propertyPanel, #footerPanel {
+  body.photo #captionPanel, body.photo #propertyPanel, body.photo #footerPanel {
     border-top: 3px solid black; /* photo.border */
     background-color: rgba(71, 71, 71, 0.8); /* body.background-color */
     pointer-events: none;
     visibility: hidden;
   }
 
-  #overlayCheckbox:checked ~ #captionPanel, #overlayCheckbox:checked ~ #propertyPanel, #overlayCheckbox:checked ~ #footerPanel {
+  body.photo #overlayCheckbox:checked ~ #captionPanel, body.photo #overlayCheckbox:checked ~ #propertyPanel, body.photo #overlayCheckbox:checked ~ #footerPanel {
     visibility: visible;
   }
 }
 
 @media (max-width: 750px) and (orientation: landscape), (max-height: 750px) and (orientation: landscape) {
-  #contentPanel {
+  body.photo #contentPanel {
     top: 0;
     left: 110px
   }
 
-  #navigationPanel {
+  body.photo #navigationPanel {
     right: auto;
     top: 0;
     left: 63px;
@@ -263,10 +263,10 @@ label {
     -ms-transform: rotate(-90deg) translate(-110px);
   }
   
-  #captionPanel, #propertyPanel {
+  body.photo #captionPanel, body.photo #propertyPanel {
     bottom: 40px;
   }
-  #footerPanel {
+  body.photo #footerPanel {
     height: 40px;
   }
 }

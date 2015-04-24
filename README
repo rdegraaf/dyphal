@@ -211,12 +211,11 @@ various colours, and logs some information to the browser console.
 
 Everything is implemented in as standards-conformant a manner as possible.  IE 
 8 has some significant issues and is handled using some IE-specific shims in 
-ie8compat.js.  Everything should be CSP-compatible.  Browser-specific logic was 
+ie8compat.js.  Everything should be CSP-compatible.  Browser-specific logic is 
 implemented using feature detection rather than browser detection where 
-possible; browser detection is only used to work around the lack of functioning 
-load events on link elements in Android browsers (prior to version 4.4) and the 
-buggy touch tracking in Android browsers because no way to fix these issues 
-using feature detection could be found.
+possible; browser detection is only used to work around the buggy touch 
+tracking in Android browsers because no way to fix this issue using feature 
+detection could be found.
 
 If my JavaScript has idiosyncrasies, it's probably because I'm a C++ programmer 
 who taught himself JavaScript by trial and error.

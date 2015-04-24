@@ -16,11 +16,11 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#navigationPanel,#prevThumbPanel,#nextThumbPanel,#captionPanel,#propertyPanel,#photo,#overlay {
+body.album #navigationPanel, body.album #prevThumbPanel, body.album #nextThumbPanel, body.album #captionPanel, body.album #propertyPanel, body.album #photo, body.album #overlay {
   display: none;
 }
 
-img.hthumbnail, img.vthumbnail {
+body.album img.hthumbnail, body.album img.vthumbnail {
   vertical-align: middle;
   border: 9px solid #AAAAAA;
   display: block;
@@ -29,20 +29,20 @@ img.hthumbnail, img.vthumbnail {
   margin-left: auto;
   margin-right: auto;
 }
-img.hthumbnail {
+body.album img.hthumbnail {
   width: 160px;
   height: 120px;
 }
-img.vthumbnail {
+body.album img.vthumbnail {
   width: 120px;
   height: 160px;
 }
 
-#thumbnailList {
+body.album #thumbnailList {
   padding-left: 0px;
 }
 
-li.thumbnail {
+body.album li.thumbnail {
   margin: 10px;
   width: 178px; /* img.hthumbnail.width + 2*img.hthumbnail.border */
   min-height: 138px; /* img.hthumbnail.height + 2* img.hthumbnail.border */
@@ -52,7 +52,7 @@ li.thumbnail {
   display: inline-block;
 }
 
-#contentPanel {
+body.album #contentPanel {
   margin-left: 80px;
   margin-right: 80px;
   margin-bottom: 80px;
@@ -60,7 +60,7 @@ li.thumbnail {
   line-height: 0px;
 }
 
-#description {
+body.album #description {
   display: inline-block;
   font-size: 12pt;
   line-height: normal;
@@ -69,19 +69,19 @@ li.thumbnail {
 }
 
 @media (max-width: 750px), (max-height: 750px) {
-  #contentPanel {
+  body.album #contentPanel {
     margin-left: 0;
     margin-right: 0;
   }
 
-  #description {
+  body.album #description {
     padding-left: 5px;
     padding-right: 5px;
   }
 }
 
 @media (max-width: 750px) and (orientation: landscape), (max-height: 750px) and (orientation: landscape) {
-  #contentPanel {
+  body.album #contentPanel {
     margin-left: 110px;
   }
 }

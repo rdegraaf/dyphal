@@ -21,13 +21,6 @@
     those browsers and cannot be handled in Javascript.
 
 
-2014-01-10_001  Rennie deGraaf  <rennie.degraaf@gmail.com>
-    The error event doesn't fire if the debug stylesheet fails to load in Opera.
-
-    WONTFIX.  This is not a core feature and 100% support for Opera is not 
-    necessary.  Bug reported to Opera (DSK-387854).
-
-
 2014-01-12_001  Rennie deGraaf  <rennie.degraaf@gmail.com>
     CSS properties loaded through obj.style[prop] need to be camelCase.  The 
     preferred way to get them is obj.style.getPropertyValue(prop), but this 
@@ -39,18 +32,6 @@
     Chrome's behaviour is a non-standard extension.  Using obj.style[prop] and 
     camelCasing property names as needed seems to work on all supported 
     platforms.
-
-
-2014-01-17_001  Rennie deGraaf  <rennie.degraaf@gmail.com>
-    The first photo doesn't load and debug mode doesn't work on Android 
-    browsers. Evidently, they don't support the load event for link elements.  
-    This issue was supposedly fixed in Android 4.4 (it works in the Android 
-    4.4.2 simulator), but is still broken in the Android 4.4.2 browser on my 
-    Galaxy S3. 
-
-    WORKAROUND: I can't find any way to feature-detect browsers with this bug, 
-    so I check for an Android browser and start a poll loop with an exponential 
-    backoff until the stylesheet is present. 
 
 
 2014-01-18_001  Rennie deGraaf  <rennie.degraaf@gmail.com>
@@ -167,7 +148,7 @@
 
 
 2014-05-11_001  Rennie deGraaf  <rennie.degraaf@gmail.com>
-    Touch navigation doesn't work on Windows Mobile.
+    Swipe navigation doesn't work on Windows Mobile.
 
     POSTPONED: Of course IE 10 and 11 don't use the same touch event interface 
     as everything else, because that might be compatible or something.  
@@ -203,12 +184,3 @@
     WONTFIX: This is not a core feature and 100% support for IE 8 is not 
     necessary.
 
-
-2014-12-31_001  Rennie deGraaf  <rennie.degraaf@gmail.com>
-    Photos don't display in IE 11.0.9879.0 (the Windows 10 preview build).  
-    
-    EXTERNAL: IE refuses to apply photo.css, instead leaving album.css in 
-    place.  It claims that this constitutes in-line CSS, which violates the 
-    CSP.  Removing the CSP, or allowing 'unsafe-inline' for style-src, allows 
-    pages to load properly.  However, this is not an acceptable workaround as 
-    it removes CSP protections.

@@ -1,3 +1,25 @@
+2015-04-24  Rennie deGraaf  <rennie.degraaf@gmail.com>
+
+    * www/dyphal.js: Replaced the stylesheet-swapping layout changes with 
+      class-swapping on the `body` element, in order to work around an 
+      IE/Spartan CSP bug (2014-12-31_001).  This simplified the code 
+      considerably and made bugs 2014-01-10_001 and 2014-01-17_001 irrelevant.  
+      Down-side: clients always have to load ever stylesheet (including debug).
+
+    * www/album.css, www/debug.css, www/photo.css: body.{album,photo,debug} 
+      descendent selectors on everything for the new layout-changing mechanism. 
+
+    * www/common.css: Moved some properties from `html` to `body` so that they 
+      can be overridden by changing the class on the `body` element.
+
+    * www/dyphal.js: Replaced some `elmt.setAttribute("class", ...)` calls with 
+      `elmt.className = ...`. 
+
+    * www/debug.css: Removed an invalid style property
+
+    * README: Updated notes on browser-detection because one of the cases was 
+      removed.
+
 2015-04-21  Rennie deGraaf  <rennie.degraaf@gmail.com>
 
     * tools/DyphalGenerator.py: Typo correction.

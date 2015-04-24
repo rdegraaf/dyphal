@@ -112,20 +112,6 @@ function getJSON(object, callback, fatalErrors, args) {
 }
 
 
-// Poll 'test' with an exponential backoff starting with 'interval' milliseconds between attempts. 
-// When it returns true, call 'action'.  If it fails 'maxtries' times, call 'error'.
-function pollUntil(interval, maxtries, test, action, error) {
-    if (test()) {
-        action();
-    } else if (maxtries > 0) {
-        setTimeout(function () { pollUntil(interval * 2, maxtries - 1, test, action, error); }, 
-                   interval);
-    } else {
-        error();
-    }
-}
-
-
 // Add a suffix-match method to String.
 String.prototype.endsWith = function (suffix) {
     var lastIndex = this.lastIndexOf(suffix);
@@ -168,15 +154,14 @@ function setScreenSize() {
 function unloadDebug() {
     log("unloadDebug enter");
 
-    // Unload the debug stylesheet
-    var cssElement = document.getElementById("debugStylesheet");
-    if (null != cssElement)
-        cssElement.parentNode.removeChild(cssElement);
+    // Remove the debug class
+    document.body.className = document.body.className.replace(/(?:^|\s)debug(?!\S)/g, "");
 
     // Remove the debug panel
     var debugPanel = document.getElementById("debugPanel");
-    if (null != debugPanel)
+    if (null !== debugPanel) {
         debugPanel.parentNode.removeChild(debugPanel);
+    }
 
     // Remove the debug keyword from navivation links
     var links = document.querySelectorAll("a.navigationlink");
@@ -185,107 +170,32 @@ function unloadDebug() {
         links[i].setAttribute("href", generatePhotoURL(links[i].getAttribute("data-target")));
     }
 
-    // resume the load process, now that we've removed the debug document elements.
-    start();
-
     log("unloadDebug exit");
-}
-
-
-// Leave debug mode due to failure of the debug stylesheet to load
-function loadDebugError() {
-    log("loadDebugError enter");
-
-    try {
-        debug = false;
-
-        // Unload the debug stylesheet
-        var cssElement = document.getElementById("debugStylesheet");
-        cssElement.parentNode.removeChild(cssElement);
-
-        // Remove the debug tag from the URL
-        window.location.hash = generatePhotoURL(page, false);
-    } catch (e) {
-        error(e.name + ": " + e.message);
-        throw e;
-    }
-
-    log("loadDebugError exit");
-}
-
-
-// Update the page after the debug stylesheet has loaded
-function loadDebugAfterStylesheet() {
-    log("loadDebugAfterStylesheet enter");
-
-    try {
-        // Create a link to leave debug mode
-        var debugPanel = document.createElement("div");
-        debugPanel.setAttribute("id", "debugPanel");
-        var debugLink = document.createElement("a");
-        debugLink.setAttribute("id", "debugLink");
-        debugLink.setAttribute("href", generatePhotoURL(page, true));
-        debugLink.textContent = "Leave debug mode";
-        debugPanel.appendChild(debugLink);
-        document.getElementsByTagName("body")[0].appendChild(debugPanel);
-
-        // Add the debug keyword to navigation links
-        var links = document.querySelectorAll("a.navigationlink");
-        var i;
-        for (i = 0; i < links.length; ++i) {
-            links[i].setAttribute("href", generatePhotoURL(links[i].getAttribute("data-target")));
-        }
-
-        // resume the load process, now that we have the debug document elements.
-        start();
-    } catch (e) {
-        error(e.name + ": " + e.message);
-        throw e;
-    }
-
-    log("loadDebugAfterStylesheet exit");
-}
-
-
-// Check if the browser is known to not fire load events on link elements.
-function brokenLoadEventOnLink() {
-    // Load events on link elements are broken on Android.  I haven't been able 
-    // to find any way practical to detect this problem by feature testing, so 
-    // version detection it is.  This was apparently fixed in 4.4, but still 
-    // doesn't work in the Android 4.4.2 browser on my Samsung Galaxy S3.  
-    var regex = /Android ([0-9]+)\.([0-9]+)(?:[^0-9]|$)/i;
-    var match = regex.exec(navigator.userAgent);
-    if (null !== match && 3 === match.length) {
-        return true;
-        // Use this instead if some Android version reliably fixes this bug
-        //return (match[1] < 4 || match[2] < 4);
-    }
-
-    return false;
 }
 
 
 // Load the debug stylesheet and update links
 function loadDebug() {
     log("loadDebug enter");
+    
+    document.body.className += " debug";
 
-    // Load the debug stylesheet
-    var cssElement = document.createElement("link");
-    // We'll only update the links if the stylesheet loads correctly.
-    cssElement.addEventListener("load", loadDebugAfterStylesheet, false);
-    cssElement.addEventListener("error", loadDebugError, false);
-    cssElement.setAttribute("rel", "stylesheet");
-    cssElement.setAttribute("href", "debug.css");
-    cssElement.setAttribute("id", "debugStylesheet");
-    document.getElementsByTagName("head")[0].appendChild(cssElement);
+    // Create a link to leave debug mode
+    var debugPanel = document.createElement("div");
+    debugPanel.id = "debugPanel";
+    var debugLink = document.createElement("a");
+    debugLink.id = "debugLink";
+    debugLink.setAttribute("href", generatePhotoURL(page, true));
+    debugLink.textContent = "Leave debug mode";
+    debugPanel.appendChild(debugLink);
+    document.getElementsByTagName("body")[0].appendChild(debugPanel);
 
-    // Some browsers don't call load events on link objects.  So we need to poll 
-    // until the stylesheet is present.
-    if (brokenLoadEventOnLink()) {
-        pollUntil(50, 6, function () { return document.styleSheets[document.styleSheets.length - 1]
-                                                                .href.endsWith("/debug.css"); }, 
-                  loadDebugAfterStylesheet, loadDebugError);
-    }
+    // Add the debug keyword to navigation links
+    var links = document.querySelectorAll("a.navigationlink");
+    var i;
+    for (i = 0; i < links.length; ++i) {
+        links[i].setAttribute("href", generatePhotoURL(links[i].getAttribute("data-target")));
+     }
 
     log("loadDebug exit");
 }
@@ -468,7 +378,7 @@ function loadPhotoContent() {
     log("loadPhotoContent enter");
 
     try {
-        document.getElementById("stylesheet").removeEventListener("load", loadPhotoContent);
+        document.body.className = "photo" + (debug ? " debug" : "");
         document.getElementById("photo").style["visibility"] = "hidden";
         document.body.style["display"] = "";
 
@@ -511,7 +421,7 @@ function loadPhotoContent() {
         for (idx in photoData.caption) {
             if (photoData.caption.hasOwnProperty(idx)) {
                 captionElement = document.createElement("p");
-                captionElement.setAttribute("class", "captionItem");
+                captionElement.className = "captionItem";
                 captionElement.textContent = photoData.caption[idx];
                 captionPanel.appendChild(captionElement);
             }
@@ -551,9 +461,9 @@ function loadPhotoContent() {
             var prevThumbElement = document.getElementById("prevThumbImage");
             prevThumbElement.setAttribute("src", albumPath + album.photos[page - 1 - 1].thumbnail);
             if ("vertical" === album.photos[page - 1 - 1].orientation) {
-                prevThumbElement.setAttribute("class", "vnavigation");
+                prevThumbElement.className = "vnavigation";
             } else {
-                prevThumbElement.setAttribute("class", "hnavigation");
+                prevThumbElement.className = "hnavigation";
             }
             document.getElementById("prevThumbPanel").style["visibility"] = "";
 
@@ -576,9 +486,9 @@ function loadPhotoContent() {
             var nextThumbElement = document.getElementById("nextThumbImage");
             nextThumbElement.setAttribute("src", albumPath + album.photos[page - 1 + 1].thumbnail);
             if ("vertical" === album.photos[page - 1 + 1].orientation) {
-                nextThumbElement.setAttribute("class", "vnavigation");
+                nextThumbElement.className = "vnavigation";
             } else {
-                nextThumbElement.setAttribute("class", "hnavigation");
+                nextThumbElement.className = "hnavigation";
             }
             document.getElementById("nextThumbPanel").style["visibility"] = "";
 
@@ -604,34 +514,6 @@ function loadPhotoContent() {
 }
 
 
-// Make sure that a particular stylesheet is loaded, then make a callback when it is ready.
-function ensureStylesheet(stylesheet, afterLoadCB) {
-    log("ensureStylesheet enter");
-
-    var cssElement = document.getElementById("stylesheet");
-    if (stylesheet !== cssElement.getAttribute("href")) {
-        document.body.style["display"] = "none";
-
-        var cssElementNew = cssElement.cloneNode();
-        cssElementNew.addEventListener("load", afterLoadCB, false);
-        cssElementNew.setAttribute("href", stylesheet);
-        cssElement.parentNode.replaceChild(cssElementNew, cssElement);
-
-        // Some browsers don't call load events on link objects.  So we need to 
-        // poll until the stylesheet is present.
-        if (brokenLoadEventOnLink()) {
-            pollUntil(50, 6, function () { return (document.styleSheets.length >= 2)
-                                    && document.styleSheets[1].href.endsWith("/" + stylesheet); },
-                      afterLoadCB, function () { error("Error loading stylesheet"); });
-        }
-    } else {
-        afterLoadCB();
-    }
-
-    log("ensureStylesheet exit");
-}
-
-
 // Load a photo description, then display the photo.
 function loadPhoto(status, photoData, args) {
     log("loadPhoto enter");
@@ -642,7 +524,7 @@ function loadPhoto(status, photoData, args) {
         if (page === args.page) {
             verifyPhoto(photoData);
             pages[page - 1] = photoData;
-            ensureStylesheet("photo.css", loadPhotoContent);
+            loadPhotoContent();
         }
     }
 
@@ -655,7 +537,7 @@ function loadAlbumContent() {
     log("loadAlbumContent enter");
 
     try {
-        document.getElementById("stylesheet").removeEventListener("load", loadAlbumContent);
+        document.body.className = "album" + (debug ? " debug" : "");
         document.body.style["display"] = "";
 
         // Set the title
@@ -671,7 +553,7 @@ function loadAlbumContent() {
 
         // Insert thumbnails as clones of a template
         var templateElement = document.createElement("li");
-        templateElement.setAttribute("class", "thumbnail");
+        templateElement.className = "thumbnail";
         var templateLinkElement = document.createElement("a");
         var templatePhotoElement = document.createElement("img");
         templatePhotoElement.setAttribute("alt", "Photo thumbnail");
@@ -683,13 +565,13 @@ function loadAlbumContent() {
             linkElement = itemElement.getElementsByTagName("a")[0];
             photoElement = itemElement.getElementsByTagName("img")[0];
             linkElement.setAttribute("href", generatePhotoURL(i + 1));
-            linkElement.setAttribute("class", "navigationlink");
+            linkElement.className = "navigationlink";
             linkElement.setAttribute("data-target", i + 1);
             photoElement.setAttribute("src", albumPath + album.photos[i].thumbnail);
             if ("vertical" === album.photos[i].orientation) {
-                photoElement.setAttribute("class", "vthumbnail");
+                photoElement.className = "vthumbnail";
             } else {
-                photoElement.setAttribute("class", "hthumbnail");
+                photoElement.className = "hthumbnail";
             }
             listElement.appendChild(itemElement);
         }
@@ -744,14 +626,14 @@ function loadAlbum(status, albumData, args) {
         // Now that we have the album loaded, set the keystroke handler
         document.addEventListener("keydown", keyHandler, false);
         if (0 === page) {
-            ensureStylesheet("album.css", loadAlbumContent);
+            loadAlbumContent();
         } else if (page > album.photos.length) {
             throw new Error("Photo number out of range");
         } else if (undefined === pages[page - 1]) {
             getJSON(albumPath + album.metadataDir + album.photos[page - 1].name + ".json", 
                     loadPhoto, true, {"page" : page});
         } else {
-            ensureStylesheet("photo.css", loadPhotoContent);
+            loadPhotoContent();
         }
     }
 
@@ -864,7 +746,6 @@ function start() {
             }
         }
 
-        // We need to set albumName before we set debug so that loadDebugError() can work.
         if (albumName !== albumNameNew) {
             albumName = albumNameNew;
             albumPath = "./" + albumName.replace(/[^\/]+$/, '');
@@ -879,10 +760,6 @@ function start() {
             } else {
                 unloadDebug();
             }
-
-            // These methods register load callbacks that change the DOM, so we need to wait until 
-            // they complete before we can finish loading
-            return;
         }
 
         if (page !== pageNew) {
@@ -890,14 +767,14 @@ function start() {
             if (null === album) {
                 getJSON("./" + albumName + ".json", loadAlbum, true, null);
             } else if (0 === page) {
-                ensureStylesheet("album.css", loadAlbumContent);
+                loadAlbumContent();
             } else if (page > album.photos.length) {
                 error("Photo number out of range");
             } else if (undefined === pages[page - 1]) {
                 getJSON(albumPath + album.metadataDir + album.photos[page - 1].name + ".json", 
                         loadPhoto, true, {"page" : page});
             } else {
-                ensureStylesheet("photo.css", loadPhotoContent);
+                loadPhotoContent();
             }
         }
     } catch (e) {

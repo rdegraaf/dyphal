@@ -5,6 +5,19 @@ For version 3:
     * Pre-populate the file name in the Generate Album dialog if the album has 
       already been saved and a name is known.
 
+    * Remove self-closing tags on void elements (see 
+      http://www.w3.org/TR/html5/syntax.html#void-elements)
+
+    * 2015 date stamps
+    
+    * setAttribute cleanup - see http://www.w3.org/TR/DOM-Level-2-HTML/html.html
+
+    * s/URL/URI/g
+
+    * Document the dependency on jhead
+
+    * Beta 2
+
 For future versions:
 
     * Create an index view, populated from an index JSON that lists all albums. 
@@ -113,5 +126,9 @@ For future versions:
 
     * Don't re-generate scaled photos if only album metadata has changed.
 
-    * Stylesheet for printing
+    * Stylesheet for printing.
+
+    * Use a CSS pre-processor that lets me nest selectors, so that I don't have 
+      to repeat "body.whatever" on so many selectors.  Also, combine all four 
+      stylesheets into one.
 
