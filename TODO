@@ -5,7 +5,14 @@ For version 3:
     * Pre-populate the file name in the Generate Album dialog if the album has 
       already been saved and a name is known.
 
-    * setAttribute cleanup - see http://www.w3.org/TR/DOM-Level-2-HTML/html.html
+    * Overlay view doesn't work correctly on Android?
+
+    * Other software: DigiKam uses an opqaue database for metadata, but can 
+      store metadata in photo tags.  However, it's metadata editor is heavily 
+      focused on the implementation details.  For instance, to set a location, 
+      you need to switch to the "IPTC" tab and enter the location field.  
+      KPhotoAlbum appears not to be able to write photo tags at all, or even to 
+      import them into its opaque database.  It also has a confusing UI.
 
     * Beta 2
 
@@ -121,5 +128,7 @@ For future versions:
 
     * Use a CSS pre-processor that lets me nest selectors, so that I don't have 
       to repeat "body.whatever" on so many selectors.  Also, combine all four 
-      stylesheets into one.
+      stylesheets into one.  
 
+    * Support photo list formats from other software (DigiKam, KPhotoAlbum, 
+      etc?)

@@ -167,7 +167,7 @@ function unloadDebug() {
     var links = document.querySelectorAll("a.navigationlink");
     var i;
     for (i = 0; i < links.length; ++i) {
-        links[i].setAttribute("href", generatePhotoURL(links[i].getAttribute("data-target")));
+        links[i].href = generatePhotoURL(links[i].getAttribute("data-target"));
     }
 
     log("unloadDebug exit");
@@ -185,7 +185,7 @@ function loadDebug() {
     debugPanel.id = "debugPanel";
     var debugLink = document.createElement("a");
     debugLink.id = "debugLink";
-    debugLink.setAttribute("href", generatePhotoURL(page, true));
+    debugLink.href = generatePhotoURL(page, true);
     debugLink.textContent = "Leave debug mode";
     debugPanel.appendChild(debugLink);
     document.getElementsByTagName("body")[0].appendChild(debugPanel);
@@ -194,8 +194,8 @@ function loadDebug() {
     var links = document.querySelectorAll("a.navigationlink");
     var i;
     for (i = 0; i < links.length; ++i) {
-        links[i].setAttribute("href", generatePhotoURL(links[i].getAttribute("data-target")));
-     }
+        links[i].href = generatePhotoURL(links[i].getAttribute("data-target"));
+    }
 
     log("loadDebug exit");
 }
@@ -348,7 +348,7 @@ function fitPhoto() {
                 if (photoAspect >= windowAspect) {
                     // Constrained by width.
                     var overlayWidth = Math.min(windowWidth - 6, photoData.width);
-                    photoOverlay.style["width"] =  overlayWidth + "px";
+                    photoOverlay.style["width"] = overlayWidth + "px";
                     photoOverlay.style["height"] = (overlayWidth / photoAspect) + "px";
                 } else {
                     // Constrained by height.
@@ -393,12 +393,12 @@ function loadPhotoContent() {
         window.removeEventListener("orientationchange", fitPhoto, false);
         // Webkit doesn't fire a load event if the src doesn't change.  So let's make sure it 
         // changes.
-        photoElement.setAttribute("src", "");
+        photoElement.src = "";
         photoElement.style["width"] = photoData.width + "px";
         photoElement.style["height"] = photoData.height + "px";
         photoElement.addEventListener("load", fitPhoto, false);
         // Make sure that the event listener is in place before we set the photo
-        photoElement.setAttribute("src", albumPath + photoData.photo);
+        photoElement.src = albumPath + photoData.photo;
         window.addEventListener("resize", fitPhoto, false);
         window.addEventListener("orientationchange", fitPhoto, false);
 
@@ -456,10 +456,10 @@ function loadPhotoContent() {
         } else {
             // Set the previous photo thumbnail
             var prevLinkElement = document.getElementById("prevThumbLink");
-            prevLinkElement.setAttribute("href", generatePhotoURL(page - 1));
+            prevLinkElement.href = generatePhotoURL(page - 1);
             prevLinkElement.setAttribute("data-target", page - 1);
             var prevThumbElement = document.getElementById("prevThumbImage");
-            prevThumbElement.setAttribute("src", albumPath + album.photos[page - 1 - 1].thumbnail);
+            prevThumbElement.src = albumPath + album.photos[page - 1 - 1].thumbnail;
             if ("vertical" === album.photos[page - 1 - 1].orientation) {
                 prevThumbElement.className = "vnavigation";
             } else {
@@ -469,7 +469,7 @@ function loadPhotoContent() {
 
             // Set the previous photo link
             prevLinkElement = document.getElementById("prevLink");
-            prevLinkElement.setAttribute("href", generatePhotoURL(page - 1));
+            prevLinkElement.href = generatePhotoURL(page - 1);
             prevLinkElement.setAttribute("data-target", page - 1);
             document.getElementById("prevImage").style["visibility"] = "";
         }
@@ -481,10 +481,10 @@ function loadPhotoContent() {
         } else {
             // Set the next photo thumbnail
             var nextLinkElement = document.getElementById("nextThumbLink");
-            nextLinkElement.setAttribute("href", generatePhotoURL(page + 1));
+            nextLinkElement.href = generatePhotoURL(page + 1);
             nextLinkElement.setAttribute("data-target", page + 1);
             var nextThumbElement = document.getElementById("nextThumbImage");
-            nextThumbElement.setAttribute("src", albumPath + album.photos[page - 1 + 1].thumbnail);
+            nextThumbElement.src = albumPath + album.photos[page - 1 + 1].thumbnail;
             if ("vertical" === album.photos[page - 1 + 1].orientation) {
                 nextThumbElement.className = "vnavigation";
             } else {
@@ -494,14 +494,14 @@ function loadPhotoContent() {
 
             // Set the next photo link
             nextLinkElement = document.getElementById("nextLink");
-            nextLinkElement.setAttribute("href", generatePhotoURL(page + 1));
+            nextLinkElement.href = generatePhotoURL(page + 1);
             nextLinkElement.setAttribute("data-target", page + 1);
             document.getElementById("nextImage").style["visibility"] = "";
         }
 
-        document.getElementById("indexLink").setAttribute("href", generatePhotoURL(0));
+        document.getElementById("indexLink").href = generatePhotoURL(0);
         if (debug) {
-            document.getElementById("debugLink").setAttribute("href", generatePhotoURL(page, true));
+            document.getElementById("debugLink").href = generatePhotoURL(page, true);
         }
 
         cacheNext();
@@ -556,7 +556,7 @@ function loadAlbumContent() {
         templateElement.className = "thumbnail";
         var templateLinkElement = document.createElement("a");
         var templatePhotoElement = document.createElement("img");
-        templatePhotoElement.setAttribute("alt", "Photo thumbnail");
+        templatePhotoElement.alt = "Photo thumbnail";
         templateLinkElement.appendChild(templatePhotoElement);
         templateElement.appendChild(templateLinkElement);
         var i, itemElement, linkElement, photoElement;
@@ -564,10 +564,10 @@ function loadAlbumContent() {
             itemElement = templateElement.cloneNode(true);
             linkElement = itemElement.getElementsByTagName("a")[0];
             photoElement = itemElement.getElementsByTagName("img")[0];
-            linkElement.setAttribute("href", generatePhotoURL(i + 1));
+            linkElement.href = generatePhotoURL(i + 1);
             linkElement.className = "navigationlink";
             linkElement.setAttribute("data-target", i + 1);
-            photoElement.setAttribute("src", albumPath + album.photos[i].thumbnail);
+            photoElement.src = albumPath + album.photos[i].thumbnail;
             if ("vertical" === album.photos[i].orientation) {
                 photoElement.className = "vthumbnail";
             } else {
@@ -576,9 +576,9 @@ function loadAlbumContent() {
             listElement.appendChild(itemElement);
         }
 
-        document.getElementById("indexLink").setAttribute("href", ".");
+        document.getElementById("indexLink").href = ".";
         if (debug) {
-            document.getElementById("debugLink").setAttribute("href", generatePhotoURL(0, true));
+            document.getElementById("debugLink").href = generatePhotoURL(0, true);
         }
 
         cacheNext();
