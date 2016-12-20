@@ -300,7 +300,7 @@ class PhotoFile(RefCounted, QtGui.QListWidgetItem):
         #print(json.dumps(data, indent=2, sort_keys=True))
 
         with open(os.path.join(out_dir_name, self._jsonName), "w") as json_file:
-            json.dump(data, json_file)
+            json.dump(data, json_file, sort_keys=True)
 
     def generatePhoto(self, out_dir_name, width_base, height_base, quality):
         """Generate a scaled-down photo."""

@@ -3,7 +3,8 @@ For version 3:
     * Test swipe navigation on Surface?
 
     * Pre-populate the file name in the Generate Album dialog if the album has 
-      already been saved and a name is known.
+      already been saved and a name is known.  Also don't prompt to overwrite 
+      re-saving an existing album.
 
     * Overlay view doesn't work correctly on Android?
 
@@ -18,16 +19,10 @@ For version 3:
 
     * Make DyphalGenerator work on non-Linux platforms
 
-    * Output JSON fields in a defined order so that albums don't get randomized 
-      on re-save (use sort_keys=true in json.dumps()?).
-
     * full-screen on small screens: https://developer.mozilla.org/en-US/docs/Web/API/Fullscreen_API
 
     * Better way to close an album and open a new one.  Show a progress UI 
       while removing photos?
-
-    * Generate JSON in a defined order, so that files aren't completely 
-      different after every little change.
 
 
 For future versions:

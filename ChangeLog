@@ -1,5 +1,10 @@
 2016-12-19  Rennie deGraaf <rennie.degraaf@gmail.com>
 
+    * tools/DyphalGenerator.py, tools/photo.py: sort JSON fields on save for 
+      better interaction with version-controlled outputs.
+
+2016-12-19  Rennie deGraaf <rennie.degraaf@gmail.com>
+
     * www/album.css: Preserve newlines in album descriptions.
 
 2016-12-19  Rennie deGraaf <rennie.degraaf@gmail.com>

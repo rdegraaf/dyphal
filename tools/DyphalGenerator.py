@@ -159,7 +159,7 @@ class Config(object):
 
             self._file.seek(0)
             self._file.truncate(0)
-            json.dump(data, self._file)
+            json.dump(data, self._file, sort_keys=True)
             self._file.flush()
 
     def close(self):
@@ -710,7 +710,7 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
         if None is not dir_creation_task:
             concurrent.futures.wait([dir_creation_task])
         with open(get_album_file_name(), "w") as album_file:
-            json.dump(album, album_file)
+            json.dump(album, album_file, sort_keys=True)
         self._incProgressSignal.emit()
 
     def _bgTasksComplete(self, tasks, directories, message):
