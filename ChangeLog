@@ -1,6 +1,10 @@
+2015-08-01  Rennie deGraaf <rennie.degraaf@gmail.com>
+
+    * tools/photo.py: Corrected a comment.
+
 2015-07-16  Rennie deGraaf <rennie.degraaf@gmail.com>
 
-    * www/index.html: Added "rel" attributes to hyperlinks.
+    * www/index.html: Added `rel` attributes to hyperlinks.
 
     * www/dyphal.js: Replaced a bunch of calls to `setAttribute()` with writes 
       to built-in DOM properties.
@@ -25,7 +29,7 @@
       class-swapping on the `body` element, in order to work around an 
       IE/Spartan CSP bug (2014-12-31_001).  This simplified the code 
       considerably and made bugs 2014-01-10_001 and 2014-01-17_001 irrelevant.  
-      Down-side: clients always have to load ever stylesheet (including debug).
+      Down-side: clients always have to load every stylesheet (including debug).
 
     * www/album.css, www/debug.css, www/photo.css: body.{album,photo,debug} 
       descendent selectors on everything for the new layout-changing mechanism. 
@@ -36,7 +40,7 @@
     * www/dyphal.js: Replaced some `elmt.setAttribute("class", ...)` calls with 
       `elmt.className = ...`. 
 
-    * www/debug.css: Removed an invalid style property
+    * www/debug.css: Removed an invalid style property.
 
     * README: Updated notes on browser-detection because one of the cases was 
       removed.

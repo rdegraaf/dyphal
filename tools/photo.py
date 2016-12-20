@@ -200,7 +200,7 @@ class PhotoFile(RefCounted, QtGui.QListWidgetItem):
                 elif None is not prop.default:
                     self.properties[prop.text] = prop.default
 
-            # Override the file name property because exiftool saw the our generated file name
+            # Override the file name property because exiftool saw our generated file name
             self.properties["File name"] = os.path.basename(filepath)
 
             # Get the photo dimensions
