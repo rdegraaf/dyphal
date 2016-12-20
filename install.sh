@@ -3,7 +3,7 @@
 
 # Edit these paths to suit your local environment
 BIN_PATH="$HOME/bin"
-PKG_PATH="$HOME/.local/lib/python3.4/site-packages"
+PKG_PATH="$HOME/.local/lib/python3.5/site-packages"
 DATA_PATH="$HOME/.share/dyphal"
 
 #
