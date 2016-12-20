@@ -1,5 +1,9 @@
 2016-12-19  Rennie deGraaf <rennie.degraaf@gmail.com>
 
+    * www/album.css: Preserve newlines in album descriptions.
+
+2016-12-19  Rennie deGraaf <rennie.degraaf@gmail.com>
+
     * install.sh: Updated the installation location to python3.4, since 
       Python doesn't seem to have a version-agnostic installation directory.
 
