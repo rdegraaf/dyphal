@@ -143,6 +143,7 @@ class Config(object):
 
         # Not stored in the configuration file
         self.tempDir = tempfile.TemporaryDirectory()
+        self.currentAlbumFileName = None
 
     def save(self):
         """Save the current state to the configuration file."""
@@ -594,8 +595,11 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
         background tasks to generate album and photo JSON, thumbnails, 
         and down-scaled photos.  """
         # Get the output file name
+        selected = self._config.outputDir
+        if None != self._config.currentAlbumFileName:
+            selected = self._config.currentAlbumFileName
         album_file_name = QtGui.QFileDialog.getSaveFileName(self, "Album File", 
-                                                            self._config.outputDir, 
+                                                            selected, 
                                                             self.FILTER_ALBUMS)
         if "" != album_file_name:
             album_dir_name = os.path.dirname(album_file_name)
@@ -696,6 +700,7 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
             self._backgroundStart(tasks)
 
             self._config.outputDir = album_dir_name
+            self._config.currentAlbumFileName = album_file_name
 
     def _bgCreateOutputDirectory(self, dir_path, directories, name):
         """Background task to create a directory and link to it from 
@@ -815,6 +820,7 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
                 path = urllib.parse.unquote(photo["path"])
                 photos.append((os.path.expanduser(path), os.path.basename(path)))
             self._addPhotoFiles(photos)
+            self._config.currentAlbumFileName = album_file_name
         except KeyError:
             QtGui.QMessageBox.warning(None, Config.PROGRAM_NAME, 
                                       "Unable to load an album from '%s'." % 

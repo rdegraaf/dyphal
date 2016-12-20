@@ -1,5 +1,10 @@
 2016-12-19  Rennie deGraaf <rennie.degraaf@gmail.com>
 
+    * tools/DyphalGenerator.py: keep track of the current album file and 
+      pre-populate the file name in the save dialog when re-saving.
+
+2016-12-19  Rennie deGraaf <rennie.degraaf@gmail.com>
+
     * tools/DyphalGenerator.py, tools/photo.py: sort JSON fields on save for 
       better interaction with version-controlled outputs.
 

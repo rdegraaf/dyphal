@@ -2,9 +2,7 @@ For version 3:
 
     * Test swipe navigation on Surface?
 
-    * Pre-populate the file name in the Generate Album dialog if the album has 
-      already been saved and a name is known.  Also don't prompt to overwrite 
-      re-saving an existing album.
+    * Don't prompt to overwrite when re-saving an existing album.
 
     * Overlay view doesn't work correctly on Android?
 
