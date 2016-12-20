@@ -1,3 +1,11 @@
+2015-08-29  Rennie deGraaf <rennie.degraaf@gmail.com>
+
+    * tools/gthumb-comment-update.py: Relaxed the requirement that the 
+      interpreter be specifically Python 3.3 to some Python 3 version.
+
+    * install.sh: Updated the installation location to python3.4, since Python 
+      doesn't seem to have a version-agnostic installation directory.
+
 2015-08-01  Rennie deGraaf <rennie.degraaf@gmail.com>
 
     * tools/photo.py: Corrected a comment.

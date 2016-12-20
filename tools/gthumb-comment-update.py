@@ -1,4 +1,4 @@
-#!/usr/bin/python3.3
+#!/usr/bin/python3
 
 """Photo timestamp localizer and metatada maintenance tool.
 Copyright (c) Rennie deGraaf, 2010-2015.
