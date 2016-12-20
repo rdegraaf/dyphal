@@ -883,7 +883,7 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
         new_names = []
         for photoName in photo_names:
             prompt_dialog.setText("There is already a photo with the name %s in the album.  " \
-                                 "Would you like to rename or remove the new one?" % (photoName))
+                                  "Would you like to rename or remove the new one?" % (photoName))
             prompt_dialog.exec_()
             if rename_button is prompt_dialog.clickedButton():
                 # It seems that if I try to re-use the QFileDialog, changing the selected file has 

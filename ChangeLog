@@ -1,3 +1,7 @@
+2016-03-20  Rennie deGraaf <rennie.degraaf@gmail.com>
+
+    * tools/DyphalGenerator.py: correction to a string.
+
 2015-08-29  Rennie deGraaf <rennie.degraaf@gmail.com>
 
     * tools/gthumb-comment-update.py: Relaxed the requirement that the 

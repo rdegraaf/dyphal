@@ -16,6 +16,20 @@ For version 3:
 
     * Beta 2
 
+    * Make DyphalGenerator work on non-Linux platforms
+
+    * Output JSON fields in a defined order so that albums don't get randomized 
+      on re-save (use sort_keys=true in json.dumps()?).
+
+    * full-screen on small screens: https://developer.mozilla.org/en-US/docs/Web/API/Fullscreen_API
+
+    * Better way to close an album and open a new one.  Show a progress UI 
+      while removing photos?
+
+    * Generate JSON in a defined order, so that files aren't completely 
+      different after every little change.
+
+
 For future versions:
 
     * Create an index view, populated from an index JSON that lists all albums. 
@@ -25,10 +39,10 @@ For future versions:
       generated.  Consider automatically copying the album template when 
       generating albums in DyphalGenerator.
 
-    * Revisit whether IE8 support is still needed.  If not, get rid of the 
-      compat crap and replace PNG buttons with SVG.  Maybe use data URIs in CSS 
-      to reduce server round-trips?  Replace top-level divs with html5 header, 
-      footer, main, details, nav elements?
+    * Drop support for IE <11.  Get rid of the compat crap and replace PNG 
+      buttons with SVG.  Maybe use data URIs in CSS to reduce server round-
+      trips?  Replace top-level divs with html5 header, footer, main, details, 
+      nav elements?  calc() might make some of the CSS simpler.
 
     * Revisit whether Android <4.4 support is still needed.  If not, get rid of 
       the poll loop and overlay touching.  See bugs 2014-01-17_001 and 
@@ -110,8 +124,6 @@ For future versions:
 
     * Handle photo orientations other than top-left in DyphalGenerator.
 
-    * calc() might make some of the CSS simpler.  Not supported by IE 8.
-
     * Putting <div> and other block elements inside a <label> violates the HTML 
       standard.
 
@@ -128,7 +140,7 @@ For future versions:
 
     * Use a CSS pre-processor that lets me nest selectors, so that I don't have 
       to repeat "body.whatever" on so many selectors.  Also, combine all four 
-      stylesheets into one.  
+      stylesheets into one to reduce server requests.  
 
     * Support photo list formats from other software (DigiKam, KPhotoAlbum, 
-      etc?)
+      geeqie, etc?)
