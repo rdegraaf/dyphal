@@ -1,5 +1,9 @@
 2016-12-21  Rennie deGraaf <rennie.degraaf@gmail.com>
 
+    * tools/util.py: Null out the correct object when destroying a RefCounted.
+
+2016-12-21  Rennie deGraaf <rennie.degraaf@gmail.com>
+
     * tools/DyphalGenerator.py: Move photo object deletion to the background, 
       because that involves I/O.  
 

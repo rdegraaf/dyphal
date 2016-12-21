@@ -1,5 +1,5 @@
 """Utility functions and classes for DyphalGenerator.
-Copyright (c) Rennie deGraaf, 2005-2015.
+Copyright (c) Rennie deGraaf, 2005-2016.
 
 This program is free software; you can redistribute it and/or modify it 
 under the terms of the GNU General Public License as published by the 
@@ -72,7 +72,7 @@ class RefCounted(object):
         assert(0 <= count)
         if 0 >= count:
             self._dispose()
-            count = None # Guard against addRef() being called again.
+            self.__refCount = None # Guard against addRef() being called again.
         return count
 
     def _dispose(self):
