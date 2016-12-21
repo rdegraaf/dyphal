@@ -1,5 +1,10 @@
 2016-12-20  Rennie deGraaf <rennie.degraaf@gmail.com>
 
+    * tools/DyphalGenerator.py: Handle the correct exception when exiftool and 
+      convert aren't found (bug 2016-03-20_001)
+
+2016-12-20  Rennie deGraaf <rennie.degraaf@gmail.com>
+
     * tools/DyphalGenerator.py: Don't prompt for overwrite confirmation when 
       re-saving an existing album.  QFileDialog can't do that natively, so I 
       had to break out the confirmation prompt logic.
@@ -24,7 +29,7 @@
 
 2016-12-19  Rennie deGraaf <rennie.degraaf@gmail.com>
 
-    * install.sh: Updated the installation location to python3.4, since 
+    * install.sh: Updated the installation location to python3.5, since 
       Python doesn't seem to have a version-agnostic installation directory.
 
 2016-03-20  Rennie deGraaf <rennie.degraaf@gmail.com>

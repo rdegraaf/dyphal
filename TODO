@@ -23,6 +23,8 @@ For version 3:
 
 For future versions:
 
+    * An automated test suite would be nice.
+
     * Create an index view, populated from an index JSON that lists all albums. 
       Add album thumbnails to album JSON; load all album JSONs from the index 
       view and display the title and thumbnail for each album.  Come up with 

@@ -950,14 +950,14 @@ def main():
         sys.exit(1)
     try:
         subprocess.check_call(["exiftool", "-ver"], stdout=subprocess.DEVNULL, timeout=1)
-    except (subprocess.CalledProcessError, subprocess.TimeoutExpired):
+    except (IOError, subprocess.CalledProcessError, subprocess.TimeoutExpired):
         QtGui.QMessageBox.critical(None, Config.PROGRAM_NAME, 
                                    "This program requires that 'exiftool' be available in your " \
                                    "PATH.", QtGui.QMessageBox.Ok, QtGui.QMessageBox.Ok)
         sys.exit(1)
     try:
         subprocess.check_call(["convert", "--version"], stdout=subprocess.DEVNULL, timeout=1)
-    except (subprocess.CalledProcessError, subprocess.TimeoutExpired):
+    except (IOError, subprocess.CalledProcessError, subprocess.TimeoutExpired):
         QtGui.QMessageBox.critical(None, Config.PROGRAM_NAME, "This program requires that " \
                                    "'convert' from the 'ImageMagick' package be available in " \
                                    "your PATH.", QtGui.QMessageBox.Ok, QtGui.QMessageBox.Ok)
