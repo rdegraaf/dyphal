@@ -1,3 +1,13 @@
+2016-12-20  Rennie deGraaf <rennie.degraaf@gmail.com>
+
+    * tools/DyphalGenerator.py: Don't prompt for overwrite confirmation when 
+      re-saving an existing album.  QFileDialog can't do that natively, so I 
+      had to break out the confirmation prompt logic.
+
+    * tools/DyphalGenerator.py: Put the curent album name in the title bar.
+
+    * INSTALL: Better language around Python and PyQt requirements.
+
 2016-12-19  Rennie deGraaf <rennie.degraaf@gmail.com>
 
     * tools/DyphalGenerator.py: keep track of the current album file and 

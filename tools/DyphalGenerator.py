@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 """Server-side data generator for Dyphal, the Dynamic Photo Album.
-Copyright (c) Rennie deGraaf, 2005-2015.
+Copyright (c) Rennie deGraaf, 2005-2016.
 
 DyphalGenerator is a tool to create photo albums to display using 
 Dyphal.  It can import metadata from a variety of embedded photo tags 
@@ -354,8 +354,8 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
         elif self._addPhotosGthumb3 is sender:
             # Add a gThumb 3 catalog
             catalog_file_name = QtGui.QFileDialog.getOpenFileName(self, "Select catalog", 
-                                                               self._config.gthumb3Dir, 
-                                                               self.FILTER_GTHUMB3_CATALOGS)
+                                                                  self._config.gthumb3Dir, 
+                                                                  self.FILTER_GTHUMB3_CATALOGS)
             # The QT documentation says that getOpenFileName returns a null string on cancel.  But 
             # it returns an empty string here.  Maybe that's a PyQt bug?
             if "" != catalog_file_name:
@@ -595,12 +595,25 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
         background tasks to generate album and photo JSON, thumbnails, 
         and down-scaled photos.  """
         # Get the output file name
+        # Default to the file name of the current album (if it exists).  Do not prompt for 
+        # overwrite when re-saving.  QFileDialog can't do that natively, so we implement that logic 
+        # here.  Note that it's still vulerable to races.
         selected = self._config.outputDir
         if None != self._config.currentAlbumFileName:
             selected = self._config.currentAlbumFileName
-        album_file_name = QtGui.QFileDialog.getSaveFileName(self, "Album File", 
-                                                            selected, 
-                                                            self.FILTER_ALBUMS)
+        album_file_name = None
+        while True:
+            album_file_name = QtGui.QFileDialog.getSaveFileName(self, "Album File", 
+                                                            selected, self.FILTER_ALBUMS, 
+                                                            QtGui.QFileDialog.DontConfirmOverwrite)
+            if self._config.currentAlbumFileName == album_file_name \
+               or not os.path.isfile(album_file_name) \
+               or QtGui.QMessageBox.Yes == QtGui.QMessageBox.warning(self, "Album File", 
+                      self.tr("%s already exists.\nDo you want to replace it?") % (album_file_name), 
+                      QtGui.QMessageBox.Yes | QtGui.QMessageBox.No, QtGui.QMessageBox.No):
+                break
+            selected = album_file_name
+
         if "" != album_file_name:
             album_dir_name = os.path.dirname(album_file_name)
 
@@ -619,7 +632,7 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
             #  3. Construct the /proc/<pid>/fd/<fd> path to the directory using the file 
             #     descriptor. 
             #  4. Create a symlink from the temporary directory to the /proc path.  The link's name 
-            #     is  unique but predictable; that's ok because the directory is secure.
+            #     is unique but predictable; that's ok because the directory is secure.
             #  5. Use the symlink as the path when creating files.
 
             self._backgroundInit(3 * self.photosList.count() + 5)
@@ -701,6 +714,7 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
 
             self._config.outputDir = album_dir_name
             self._config.currentAlbumFileName = album_file_name
+            self.setWindowTitle(Config.PROGRAM_NAME + ": " + os.path.basename(album_file_name))
 
     def _bgCreateOutputDirectory(self, dir_path, directories, name):
         """Background task to create a directory and link to it from 
@@ -821,6 +835,8 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
                 photos.append((os.path.expanduser(path), os.path.basename(path)))
             self._addPhotoFiles(photos)
             self._config.currentAlbumFileName = album_file_name
+            self.setWindowTitle(Config.PROGRAM_NAME + ": " + os.path.basename(album_file_name))
+
         except KeyError:
             QtGui.QMessageBox.warning(None, Config.PROGRAM_NAME, 
                                       "Unable to load an album from '%s'." % 

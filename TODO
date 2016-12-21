@@ -2,8 +2,6 @@ For version 3:
 
     * Test swipe navigation on Surface?
 
-    * Don't prompt to overwrite when re-saving an existing album.
-
     * Overlay view doesn't work correctly on Android?
 
     * Other software: DigiKam uses an opqaue database for metadata, but can 

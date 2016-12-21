@@ -22,12 +22,12 @@ Dependencies
 The following packages are required to install and run Dyphal.  The exact 
 package names may vary depending on your operating system.
 
-*   Python 3.3
-*   python3-PyQt4
+*   Python 3.3 or newer
+*   PyQt4 for Python 3
 *   exiftool
 *   ImageMagick
 *   jhead
-*   PyQt4-devel (for installation only)
+*   Development tools for PyQt4 for Python 3 (for installation only)
 *   pandoc (for installation only)
 
 Please note that DyphalGenerator only runs on Linux at this time.

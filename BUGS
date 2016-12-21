@@ -184,6 +184,7 @@
     WONTFIX: This is not a core feature and 100% support for IE 8 is not 
     necessary.
 
+
 2016-03-20_001  Rennie deGraaf  <rennie.degraaf@gmail.com>
     The error dialogs if convert and exiftool aren't found don't appear.
     
