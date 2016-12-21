@@ -185,7 +185,12 @@
     necessary.
 
 
-2016-03-20_001  Rennie deGraaf  <rennie.degraaf@gmail.com>
-    The error dialogs if convert and exiftool aren't found don't appear.
+2016-12-20_001  Rennie deGraaf  <rennie.degraaf@gmail.com>
+    Race conditions in file name selection: files that don't exist when they  
+    are chosen in QFileDialog dialogs might get created before we try to write 
+    to them.  The album file name chosen in DyphalUI._generateAlbum has this 
+    issue; DyphalUI._renamePhotos might as well.
     
-    OPEN
+    OPEN.  Pass information through to _bgGenerateAlbum whether the file is new 
+    or existant; refuse overwrite if it should be new and refuse creation 
+    otherwise.
