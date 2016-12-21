@@ -391,14 +391,25 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
 
     def _removePhotosHandler(self):
         """Remove the currently selected photos from the album."""
-        for item in self.photosList.selectedItems():
-            # removeItemWidget() doesn't seem to work
-            photo = self.photosList.takeItem(self.photosList.indexFromItem(item).row())
-            photo.release()
-
-        # Update the available properties list
-        self.showAllPropertiesFlag.stateChanged.emit(0)
-        self.showAllCaptionsFlag.stateChanged.emit(0)
+        items = self.photosList.selectedItems()
+        if 0 < len(items):
+            # Clear the selection so that I donn't need to update the selection and make callbacks 
+            # with every deletion, which takes a while.
+            self.photosList.clearSelection()
+            
+            # I need to remove the photo from the list on foreground thread, because the list is 
+            # owned by the GUI.  I need to close the Photo object on a background thread, because 
+            # that's I/O.
+            self._backgroundInit(len(items))
+            tasks = []
+            task = None
+            for item in items:
+                photo = self.photosList.takeItem(self.photosList.indexFromItem(item).row())
+                task = self._threads.submit(self._bgRemovePhoto, photo)
+                tasks.append(task)
+            self._threads.submit(functools.partial(handle_exceptions, self._bgRemovePhotosComplete), 
+                                 tasks)
+            self._backgroundStart(tasks)
 
     def _addPhoto(self, photo):
         """Add a photo that has been loaded to the album."""
@@ -522,6 +533,24 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
             self._renamePhotosSignal.emit(rename_photos)
 
         # re-enable any disabled buttons
+        self._backgroundCompleteSignal.emit()
+
+    def _bgRemovePhoto(self, photo):
+        """Background task to clean up after removing a photo."""
+        photo.release()
+        self._incProgressSignal.emit()
+
+    def _bgRemovePhotosComplete(self, tasks):
+        """Background task to perform clean-up after removing photos."""
+        # Wait for the removePhoto tasks to complete.
+        (done, not_done) = concurrent.futures.wait(tasks)
+        assert(0 == len(not_done))
+
+        # Update the available properties and captions
+        self.showAllPropertiesFlag.stateChanged.emit(0)
+        self.showAllCaptionsFlag.stateChanged.emit(0)
+
+        # Re-enable any disabled buttons
         self._backgroundCompleteSignal.emit()
 
     def _updatePhotoProperties(self):

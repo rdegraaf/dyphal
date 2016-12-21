@@ -17,8 +17,7 @@ For version 3:
 
     * full-screen on small screens: https://developer.mozilla.org/en-US/docs/Web/API/Fullscreen_API
 
-    * Better way to close an album and open a new one.  Show a progress UI 
-      while removing photos?
+    * Better way to close an album and open a new one.  
 
 
 For future versions:
@@ -137,3 +136,11 @@ For future versions:
 
     * Support photo list formats from other software (DigiKam, KPhotoAlbum, 
       geeqie, etc?)
+
+    * When an existing album is re-opened, track of what gets changed so that I 
+      don't need to re-generate everything on save.  Re-loading the photo JSON 
+      and comparing it to fresh data is probably not worth the effort, but 
+      substantial time could be saved by not re-generating scaled photos.  
+      However, this would require me to store some measure if whether the photo 
+      itself has changed.  Can I get a hash of the photo that excludes embedded 
+      metadata?

@@ -1,3 +1,11 @@
+2016-12-21  Rennie deGraaf <rennie.degraaf@gmail.com>
+
+    * tools/DyphalGenerator.py: Move photo object deletion to the background, 
+      because that involves I/O.  
+
+    * tools/DyphalGenerator.py: Deselect everything before removing selected 
+      photos, which speeds up photo removal tremendously.
+
 2016-12-20  Rennie deGraaf <rennie.degraaf@gmail.com>
 
     * tools/DyphalGenerator.py: Handle the correct exception when exiftool and 
