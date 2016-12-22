@@ -44,6 +44,12 @@
            </property>
            <widget class="QWidget" name="widget_2" native="true">
             <layout class="QVBoxLayout" name="verticalLayout_7" stretch="1,0">
+             <property name="spacing">
+              <number>0</number>
+             </property>
+             <property name="margin">
+              <number>0</number>
+             </property>
              <item>
               <widget class="QListWidget" name="photosList">
                <property name="toolTip">
@@ -169,7 +175,7 @@
        </widget>
       </item>
       <item>
-       <layout class="QVBoxLayout" name="verticalLayout_8" stretch="2,2,1,1,1">
+       <layout class="QVBoxLayout" name="verticalLayout_8" stretch="2,2,1,2,1">
         <item>
          <widget class="QGroupBox" name="groupBox_2">
           <property name="title">
@@ -198,9 +204,6 @@
               <widget class="QPushButton" name="addCaptionButton">
                <property name="toolTip">
                 <string>Add a field to the photos' captions.</string>
-               </property>
-               <property name="styleSheet">
-                <string notr="true">QPushButton{text-align: left;} QPushButton::menu-indicator{subcontrol-position: right center; left: -10px;}</string>
                </property>
                <property name="text">
                 <string>Add Caption...</string>
@@ -300,9 +303,6 @@
               <widget class="QPushButton" name="addPropertyButton">
                <property name="toolTip">
                 <string>Add a field to the photos' properties.</string>
-               </property>
-               <property name="styleSheet">
-                <string notr="true">QPushButton{text-align: left;} QPushButton::menu-indicator{subcontrol-position: right center; left: -10px;} QMenu {menu-scrollable: 1;}</string>
                </property>
                <property name="text">
                 <string>Add Property...</string>
@@ -437,6 +437,21 @@
     </item>
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_5">
+      <item>
+       <widget class="QPushButton" name="newAlbumButton">
+        <property name="toolTip">
+         <string>Close the current album and create a new one.</string>
+        </property>
+        <property name="text">
+         <string>New</string>
+        </property>
+        <property name="icon">
+         <iconset theme="document-new">
+          <normaloff/>
+         </iconset>
+        </property>
+       </widget>
+      </item>
       <item>
        <widget class="QPushButton" name="openAlbumButton">
         <property name="toolTip">

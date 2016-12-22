@@ -143,7 +143,6 @@ class Config(object):
 
         # Not stored in the configuration file
         self.tempDir = tempfile.TemporaryDirectory()
-        self.currentAlbumFileName = None
 
     def save(self):
         """Save the current state to the configuration file."""
@@ -229,6 +228,7 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
         self._threads = concurrent.futures.ThreadPoolExecutor(self._config.maxWorkers)
         self._backgroundCount = 0
         self._backgroundTasks = None
+        self._currentAlbumFileName = None
 
         self.setupUi(self)
         if None is not self._config.dimensions:
@@ -283,6 +283,7 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
         self.removeCaptionsButton.clicked.connect(self._removeCaptionsHandler)
         self.removePropertiesButton.clicked.connect(self._removePropertiesHandler)
         self.generateAlbumButton.clicked.connect(self._generateAlbum)
+        self.newAlbumButton.clicked.connect(self._closeAlbum)
         self.openAlbumButton.clicked.connect(self._openAlbum)
         self.installTemplateButton.clicked.connect(self._installTemplate)
         self.cancelButton.clicked.connect(self._cancelBackgroundTasks)
@@ -628,14 +629,14 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
         # overwrite when re-saving.  QFileDialog can't do that natively, so we implement that logic 
         # here.  Note that it's still vulerable to races.
         selected = self._config.outputDir
-        if None != self._config.currentAlbumFileName:
-            selected = self._config.currentAlbumFileName
+        if None != self._currentAlbumFileName:
+            selected = self._currentAlbumFileName
         album_file_name = None
         while True:
             album_file_name = QtGui.QFileDialog.getSaveFileName(self, "Album File", 
                                                             selected, self.FILTER_ALBUMS, 
                                                             QtGui.QFileDialog.DontConfirmOverwrite)
-            if self._config.currentAlbumFileName == album_file_name \
+            if self._currentAlbumFileName == album_file_name \
                or not os.path.isfile(album_file_name) \
                or QtGui.QMessageBox.Yes == QtGui.QMessageBox.warning(self, "Album File", 
                       self.tr("%s already exists.\nDo you want to replace it?") % (album_file_name), 
@@ -742,7 +743,7 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
             self._backgroundStart(tasks)
 
             self._config.outputDir = album_dir_name
-            self._config.currentAlbumFileName = album_file_name
+            self._currentAlbumFileName = album_file_name
             self.setWindowTitle(Config.PROGRAM_NAME + ": " + os.path.basename(album_file_name))
 
     def _bgCreateOutputDirectory(self, dir_path, directories, name):
@@ -822,6 +823,27 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
         photo.release()
         self._incProgressSignal.emit()
 
+    def _closeAlbum(self):
+        """Clear the current album data."""
+        # Clear the selected photos.  I can't just call clear() because there's cleanup to do.
+        self.photosList.selectAll()
+        self._removePhotosHandler()
+
+        # Clear selections and text fields.  Restore defaults if available.
+        if None is not self._config.uiData:
+            self._restoreUIData(self._config.uiData)
+        else:
+            self.captionsList.clear()
+            self.propertiesList.clear()
+            self.footerText.setPlainText(None)
+            self.photoSizeButton.setCurrentIndex(0)
+        self.titleText.setPlainText(None)
+        self.descriptionText.setPlainText(None)
+
+        self._currentAlbumFileName = None
+        self.setWindowTitle(Config.PROGRAM_NAME)
+
+
     def _openAlbum(self):
         """Prompt the user for an album JSON file to load then spawn a 
         background task to load it."""
@@ -831,6 +853,7 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
         # The QT documentation says that getOpenFileName returns a null string on cancel.  But it
         # returns an empty string here.  Maybe that's a PyQt bug?
         if "" != album_file_name:
+            self._closeAlbum()
             # Load the file in a background thread.
             self._backgroundInit(1)
             task = self._threads.submit(functools.partial(handle_exceptions, self._bgLoadAlbum, 
@@ -863,7 +886,7 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
                 path = urllib.parse.unquote(photo["path"])
                 photos.append((os.path.expanduser(path), os.path.basename(path)))
             self._addPhotoFiles(photos)
-            self._config.currentAlbumFileName = album_file_name
+            self._currentAlbumFileName = album_file_name
             self.setWindowTitle(Config.PROGRAM_NAME + ": " + os.path.basename(album_file_name))
 
         except KeyError:

@@ -1,5 +1,25 @@
 2016-12-21  Rennie deGraaf <rennie.degraaf@gmail.com>
 
+    * tools/DyphalGenerator.ui, tools/DyphalGenerator.py: Added a "New" button 
+      to the GUI to clear and start a new album.
+
+    * tools/DyphalGenerator.py: Clear everything before loading an album.
+
+    * tools/DyphalGenerator.py: Move the current album name from the Config 
+      object to the GUI object.
+
+    * tools/DyphalGenerator.ui: Remove the unnecessary padding around the 
+      photo list and its buttons.
+
+    * tools/DyphalGenerator.ui: Make the description field taller than the 
+      title and footer fields.
+
+    * tools/DyphalGenerator.ui: Remove the stylesheets from addCaptionButton 
+      and addPropertyButton, since they didn't seem to do anything and were 
+      causing the buttons' icons to be mis-aligned.
+
+2016-12-21  Rennie deGraaf <rennie.degraaf@gmail.com>
+
     * tools/util.py: Null out the correct object when destroying a RefCounted.
 
 2016-12-21  Rennie deGraaf <rennie.degraaf@gmail.com>

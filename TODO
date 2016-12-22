@@ -17,7 +17,9 @@ For version 3:
 
     * full-screen on small screens: https://developer.mozilla.org/en-US/docs/Web/API/Fullscreen_API
 
-    * Better way to close an album and open a new one.  
+    * Warn on exit from DyphalGenerator if anything has changed since the last save.
+
+    * Warn on exit from DyphalGenerator if there is an operation in progress
 
 
 For future versions:
