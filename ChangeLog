@@ -1,5 +1,17 @@
 2016-12-21  Rennie deGraaf <rennie.degraaf@gmail.com>
 
+    * install.sh: Programmatically generate version strings and release dates 
+      from git metadata at install-time and insert them into the appropriate 
+      places, rather than relying on manual updates to the files.
+
+    * README, tools/DyphalGenerator.py, tools/gthumb-comment-update.py,
+      www/index.html: Replace the out-of-date version string with a 
+      placeholder.
+
+    * tools/photorename.sh: Add a version string placeholder.
+      
+2016-12-21  Rennie deGraaf <rennie.degraaf@gmail.com>
+
     * tools/DyphalGenerator.ui, tools/DyphalGenerator.py: Added a "New" button 
       to the GUI to clear and start a new album.
 

@@ -21,6 +21,8 @@ For version 3:
 
     * Warn on exit from DyphalGenerator if there is an operation in progress
 
+    * Signed tags? Annotated tags? Simple tags?  What's the difference, why is 
+      one prefered over the others for releases?
 
 For future versions:
 

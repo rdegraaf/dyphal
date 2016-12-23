@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # photorename.sh
-# Copyright (c) Rennie deGraaf, 2010-2015.
+# Copyright (c) Rennie deGraaf, 2010-2016.
 #
 # Rename photos to encode a camera name into the file names rather than a 
 # meaningless string like "IMG".  Use a ".jpeg" suffix on the resulting 
@@ -24,6 +24,12 @@
 # Usage: photorename.sh <camera name> <photos...>
 # For example, "$ photorename.sh sx10 2014/*.JPG" will rename all ".JPG" files 
 # in "2014/" to names like "SX10_0023.jpeg".
+
+# author: Rennie deGraaf <rennie.degraaf@gmail.com>
+# version: VERSION
+# credits: Rennie deGraaf
+# date: DATE
+
 
 PATH=/bin:/usr/bin
 
