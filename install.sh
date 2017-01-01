@@ -1,10 +1,14 @@
 #!/bin/sh
 # Installation script for Dyphal.
+#
+# This script assumes that you have a cloned git tree.  It will fail badly 
+# otherwise.
 
 # Edit these paths to suit your local environment
 BIN_PATH="$HOME/bin"
 PKG_PATH="$HOME/.local/lib/python3.5/site-packages"
 DATA_PATH="$HOME/.share/dyphal"
+CONFIG_PATH="$HOME/.config/"
 
 #
 # You probably shouldn't edit anything below this.
@@ -44,6 +48,7 @@ cat tools/DyphalGenerator.py | sed -r \
         -e "s@(^__version__[ ]*=[ ]*).*\$@\1\"${version}\"@" \
         -e "s@(^__date__[ ]*=[ ]*).*\$@\1\"${date}\"@" \
         -e "s@(^DATA_PATH[ ]*=[ ]*).*\$@\1\"${DATA_PATH}\"@" \
+        -e "s@(^CONFIG_PATH[ ]*=[ ]*).*\$@\1\"${CONFIG_PATH}\"@" \
     >"$BIN_PATH"/DyphalGenerator
 chmod +x "$BIN_PATH"/DyphalGenerator
 

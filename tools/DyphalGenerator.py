@@ -56,7 +56,8 @@ from dyphal.photo import *
 
 # These variables may be re-written by the installation script
 DATA_PATH = os.path.expanduser("~/.share/dyphal/")
-CONFIG_FILE = os.path.expanduser("~/.config/DyphalGenerator.conf")
+CONFIG_PATH = os.path.expanduser("~/.config/")
+CONFIG_NAME = "DyphalGenerator.conf"
 
 
 class Config(object):
@@ -111,9 +112,9 @@ class Config(object):
         data = {}
         self._umask = os.umask(0o22)
         try:
-            ensure_directory(os.path.dirname(CONFIG_FILE))
+            ensure_directory(CONFIG_PATH)
             # Python's 'r+' mode doesn't create files if they don't already exist.
-            self._file = open(CONFIG_FILE, "r+", 
+            self._file = open(os.path.join(CONFIG_PATH, CONFIG_NAME), "r+", 
                               opener=lambda path, flags: os.open(path, flags|os.O_CREAT, 0o666))
             data = json.load(self._file)
         except (FileNotFoundError, ValueError):

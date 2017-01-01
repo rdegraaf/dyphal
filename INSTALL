@@ -3,16 +3,19 @@ Installing Dyphal
 
 To install Dyphal:
 
-1.  Edit `BIN_PATH`, `PKG_PATH`, and `DATA_PATH` in `install.sh` to suit your 
-    local environment.  The defaults are designed to install to the current 
-    user's home directory; to install to `/usr/local` instead, use something 
-    like the following:
+1.  Clone the git repository.
+
+2.  Edit `BIN_PATH`, `PKG_PATH`, `DATA_PATH`, and `CONFIG_PATH` in `install.sh` 
+    to suit your local environment.  The defaults are designed to install to 
+    the current user's home directory; to install to `/usr/local` instead, use 
+    something like the following:
 
         BIN_PATH="/usr/local/bin"
         PKG_PATH="/usr/local/lib/python3.3/site-packages"
         DATA_PATH="/usr/local/share/Dyphal"
+        CONFIG_PATH="$HOME/.config"
 
-2.  Run `install.sh` as a user with write permissions to the directories chosen 
+3.  Run `install.sh` as a user with write permissions to the directories chosen 
     above.
 
 

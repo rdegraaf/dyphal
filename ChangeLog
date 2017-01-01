@@ -1,5 +1,12 @@
 2016-12-31  Rennie deGraaf <rennie.degraaf@gmail.com>
 
+    * install.sh, INSTALL, tools/DyphalGenerator.py: Allow the configuration 
+      file path to be set by the installation script.
+
+    * install.sh, INSTALL: Document that install.sh requires a git tree.
+
+2016-12-31  Rennie deGraaf <rennie.degraaf@gmail.com>
+
     * tools/DyphalGenerator.py: Use QThread.idealThreadCount() to set the 
       number of worker threads.
 
