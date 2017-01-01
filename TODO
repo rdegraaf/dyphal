@@ -17,12 +17,13 @@ For version 3:
 
     * full-screen on small screens: https://developer.mozilla.org/en-US/docs/Web/API/Fullscreen_API
 
-    * Warn on exit from DyphalGenerator if anything has changed since the last save.
-
-    * Warn on exit from DyphalGenerator if there is an operation in progress
+    * Warn on New, Open, Exit from DyphalGenerator if anything has changed 
+      since the last save.
 
     * Signed tags? Annotated tags? Simple tags?  What's the difference, why is 
       one prefered over the others for releases?
+
+    * Use QThread.idealThreadCount for the thread pool initialization?
 
 For future versions:
 
@@ -130,8 +131,6 @@ For future versions:
     * Command-line mode for DyphalGenerator to generate an album for an 
       existing album file, and to install the template to a listed directory.
 
-    * Don't re-generate scaled photos if only album metadata has changed.
-
     * Stylesheet for printing.
 
     * Use a CSS pre-processor that lets me nest selectors, so that I don't have 
@@ -139,12 +138,15 @@ For future versions:
       stylesheets into one to reduce server requests.  
 
     * Support photo list formats from other software (DigiKam, KPhotoAlbum, 
-      geeqie, etc?)
+      geeqie, etc?) in DyphalGenerator.
 
-    * When an existing album is re-opened, track of what gets changed so that I 
-      don't need to re-generate everything on save.  Re-loading the photo JSON 
-      and comparing it to fresh data is probably not worth the effort, but 
-      substantial time could be saved by not re-generating scaled photos.  
-      However, this would require me to store some measure if whether the photo 
-      itself has changed.  Can I get a hash of the photo that excludes embedded 
-      metadata?
+    * When an existing album is re-opened in DyphalGenerator, track of what 
+      gets changed so that I don't need to re-generate everything on save.  
+      Re-loading the photo JSON and comparing it to fresh data is probably not 
+      worth the effort, but substantial time could be saved by not 
+      re-generating scaled photos.  However, this would require me to store 
+      some measure if whether the photo itself has changed.  Can I get a hash 
+      of the photo that excludes embedded metadata?
+
+    * Better icons in DyphalGenerator
+

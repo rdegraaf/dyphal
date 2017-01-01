@@ -215,9 +215,10 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
     _addPhotoSignal = QtCore.pyqtSignal(PhotoFile)  # Photo is ready to be added to the UI.
     _showErrorSignal = QtCore.pyqtSignal(str)  # An error message needs to be displayed.
     _incProgressSignal = QtCore.pyqtSignal()  # A background processing step has completed.
-    _backgroundCompleteSignal = QtCore.pyqtSignal()  # Background processing has completed.
+    _backgroundCompleteSignal = QtCore.pyqtSignal(bool)  # Background processing has completed.
     _renamePhotosSignal = QtCore.pyqtSignal(list)  # Photos need to be renamed due to collisions.
     _setAlbumDataSignal = QtCore.pyqtSignal(str, dict)  # An album has been loaded.
+    _closeSignal = QtCore.pyqtSignal() # Program exit was requested from a background thread.
 
     def __init__(self, config):
         """Initialize a DyphalUI.  Hooks up event handlers and 
@@ -295,10 +296,47 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
         self._propertiesListFilter.escKeyPressed.connect(self.propertiesList.clearSelection)
         self._renamePhotosSignal.connect(self._renamePhotos)
         self._setAlbumDataSignal.connect(self._setAlbumData)
+        self._closeSignal.connect(self.close)
+
+    def _bgExit(self, pending_tasks):
+        """Background task to trigger program exit."""
+        if None is not pending_tasks:
+            concurrent.futures.wait(pending_tasks)
+        self._backgroundCompleteSignal.emit(True)
+        # self.close() can't be called from a background thread.
+        self._closeSignal.emit()
 
     def closeEvent(self, event):
         """Main window close event handler.  Shutdown the thread pool 
         and save the run-time configuration."""
+        if 0 != self._backgroundCount:
+            # Prompt to wait or exit
+            prompt_dialog = QtGui.QMessageBox(self)
+            prompt_dialog.setWindowTitle("Exit")
+            prompt_dialog.setIcon(QtGui.QMessageBox.Warning)
+            prompt_dialog.setText("There is an operation in progress.  Wait for it to complete, or exit anyway?")
+            wait_button = prompt_dialog.addButton("Wait", QtGui.QMessageBox.ApplyRole)
+            exit_button = prompt_dialog.addButton("Exit", QtGui.QMessageBox.DestructiveRole)
+            prompt_dialog.setDefaultButton(wait_button)
+            prompt_dialog.setEscapeButton(wait_button)
+            prompt_dialog.exec_()
+            if wait_button is prompt_dialog.clickedButton():
+                # Disable UI controls, except the Cancel button.
+                for child in self.findChildren(QtGui.QWidget):
+                    if child is not self.cancelButton and child is not self.progressBar \
+                       and None is child.findChild(QtGui.QPushButton, "cancelButton"):
+                        child.setEnabled(False)
+                
+                # Post a background task to exit after everything else completes.
+                # Don't register the task so that it cannot be cancelled.
+                self._backgroundInit(0)
+                task = self._threads.submit(self._bgExit, self._backgroundTasks)
+                self._backgroundStart([])
+                event.ignore()
+                return
+            else:
+                self._cancelBackgroundTasks()
+
         self._threads.shutdown()
         self._config.dimensions = (self.size().width(), self.size().height())
         self._config.uiData = self._saveUIData()
@@ -386,9 +424,9 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
                 task = self._threads.submit(self._bgAddPhoto, path, name, task)
                 task.photoName = path
                 tasks.append(task)
-            self._threads.submit(functools.partial(handle_exceptions, self._bgAddPhotoComplete), 
-                                 tasks)
-            self._backgroundStart(tasks)
+            task = self._threads.submit(functools.partial(handle_exceptions, 
+                                                          self._bgAddPhotoComplete), tasks)
+            self._backgroundStart(tasks+[task])
 
     def _removePhotosHandler(self):
         """Remove the currently selected photos from the album."""
@@ -408,9 +446,9 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
                 photo = self.photosList.takeItem(self.photosList.indexFromItem(item).row())
                 task = self._threads.submit(self._bgRemovePhoto, photo)
                 tasks.append(task)
-            self._threads.submit(functools.partial(handle_exceptions, self._bgRemovePhotosComplete), 
-                                 tasks)
-            self._backgroundStart(tasks)
+            task = self._threads.submit(functools.partial(handle_exceptions, 
+                                                          self._bgRemovePhotosComplete), tasks)
+            self._backgroundStart(tasks+[task])
 
     def _addPhoto(self, photo):
         """Add a photo that has been loaded to the album."""
@@ -464,15 +502,19 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
         self.progressBar.setVisible(True)
         self.cancelButton.setVisible(True)
 
-    def _backgroundComplete(self):
+    def _backgroundComplete(self, force):
         """Dismiss the cancellation UI."""
-        assert(0 < self._backgroundCount)
-        if 1 == self._backgroundCount:
+        if True == force:
+            assert(0 <= self._backgroundCount)
+            self._backgroundCount = 0
+        else:
+            assert(0 < self._backgroundCount)
+            self._backgroundCount -= 1
+        if True == force or 0 == self._backgroundCount:
             self.cancelButton.setVisible(False)
             self.progressBar.setVisible(False)
             self.generateAlbumButton.setVisible(True)
             self._backgroundTasks = None
-        self._backgroundCount -= 1
 
     def _bgAddPhoto(self, path, name, prev_task):
         """Background task to load a photo and signal the UI to add it 
@@ -534,7 +576,7 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
             self._renamePhotosSignal.emit(rename_photos)
 
         # re-enable any disabled buttons
-        self._backgroundCompleteSignal.emit()
+        self._backgroundCompleteSignal.emit(False)
 
     def _bgRemovePhoto(self, photo):
         """Background task to clean up after removing a photo."""
@@ -552,7 +594,7 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
         self.showAllCaptionsFlag.stateChanged.emit(0)
 
         # Re-enable any disabled buttons
-        self._backgroundCompleteSignal.emit()
+        self._backgroundCompleteSignal.emit(False)
 
     def _updatePhotoProperties(self):
         """Rebuild the list of properties available in the currently 
@@ -738,9 +780,10 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
                     task.photoName = photo.getPath()
                     tasks.append(task)
 
-            self._threads.submit(functools.partial(handle_exceptions, self._bgTasksComplete), 
-                                 tasks, directories, "generating the album")
-            self._backgroundStart(tasks)
+            task = self._threads.submit(functools.partial(handle_exceptions, 
+                                                          self._bgTasksComplete), 
+                                              tasks, directories, "generating the album")
+            self._backgroundStart(tasks+[task])
 
             self._config.outputDir = album_dir_name
             self._currentAlbumFileName = album_file_name
@@ -792,7 +835,7 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
                                        (len(errors), message) + "\n".join(errors))
 
         # Dismiss the cancellation UI
-        self._backgroundCompleteSignal.emit()
+        self._backgroundCompleteSignal.emit(False)
 
     def _bgGeneratePhotoJSON(self, photo, get_out_dir_name, width, height, captions, properties, 
                              dir_creation_task):
@@ -873,7 +916,7 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
         except (KeyError, ValueError, OSError):
             self._showErrorSignal.emit("Unable to load an album from '%s'." % 
                                        (os.path.basename(album_file_name)))
-        self._backgroundCompleteSignal.emit()
+        self._backgroundCompleteSignal.emit(False)
 
     def _setAlbumData(self, album_file_name, data):
         """Pushes data from a loaded album JSON file into the UI."""
@@ -925,9 +968,10 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
                                                                       filename), 
                                                   album_dir_task))
 
-            self._threads.submit(functools.partial(handle_exceptions, self._bgTasksComplete, tasks, 
-                                                   directories, "installing the template"))
-            self._backgroundStart(tasks)
+            task = self._threads.submit(functools.partial(handle_exceptions, 
+                                                          self._bgTasksComplete), 
+                                        tasks, directories, "installing the template")
+            self._backgroundStart(tasks+[task])
 
     def _bgCopyFile(self, source, get_destination, dir_creation_task):
         """Background task to copy a file."""
@@ -940,9 +984,10 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
     def _cancelBackgroundTasks(self):
         """Attempt to cancel any pending background tasks."""
         if None is not self._backgroundTasks:
-            for task in self._backgroundTasks:
+            for task in reversed(self._backgroundTasks):
                 task.cancel()
-        self._backgroundComplete()
+        concurrent.futures.wait(self._backgroundTasks)
+        self._backgroundComplete(True)
 
     def _renamePhotos(self, photo_names):
         """Prompt the user to rename photos that share names with other 

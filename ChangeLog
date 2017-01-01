@@ -1,3 +1,10 @@
+2016-12-31  Rennie deGraaf <rennie.degraaf@gmail.com>
+
+    * tools/DyphalGenerator.py: Warn on exit if there is a background task in 
+      progress.  I had to add the completion tasks to the cancellation list 
+      and add an option to force the post-task UI cleanup to make everything 
+      work correctly.
+
 2016-12-21  Rennie deGraaf <rennie.degraaf@gmail.com>
 
     * install.sh: Programmatically generate version strings and release dates 
