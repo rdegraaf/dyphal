@@ -135,7 +135,13 @@ class Config(object):
             self.photoQuality = data["photoQuality"]
 
         # Used only at startup and stored in the configuration file
-        self.maxWorkers = self.DEFAULT_THREADS
+        idealThreadCount = QtCore.QThread.idealThreadCount()
+        if 0 < idealThreadCount:
+            # Some tasks are I/O-bound and some are CPU-bound, so let's go with
+            # twice the number of CPU cores.
+            self.maxWorkers = 2 * idealThreadCount # 
+        else:
+            self.maxWorkers = self.DEFAULT_THREADS
         if "threads" in data and 0 < data["threads"] and 50 >= data["threads"]:
             self.maxWorkers = data["threads"]
         self.dimensions = data["dimensions"] if "dimensions" in data else None

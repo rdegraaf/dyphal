@@ -23,7 +23,8 @@ For version 3:
     * Signed tags? Annotated tags? Simple tags?  What's the difference, why is 
       one prefered over the others for releases?
 
-    * Use QThread.idealThreadCount for the thread pool initialization?
+    * Add some sort of "About" dialog in DyphalGenerator with credits and 
+      licence details.
 
 For future versions:
 
