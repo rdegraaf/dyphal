@@ -1,5 +1,10 @@
 2016-12-31  Rennie deGraaf <rennie.degraaf@gmail.com>
 
+    * bumpversion.sh: Deleted, as it is no longer needed since the changes to 
+      install.sh from 2016-12-21.
+
+2016-12-31  Rennie deGraaf <rennie.degraaf@gmail.com>
+
     * install.sh, INSTALL, tools/DyphalGenerator.py: Allow the configuration 
       file path to be set by the installation script.
 
