@@ -28,8 +28,11 @@ else
     dirty=true
     date=$(date --iso-8601)
 fi
-if ! version=$(git name-rev --name-only --tags --no-undefined HEAD -- 2>/dev/null)
+if version=$(git name-rev --name-only --tags --no-undefined HEAD -- 2>/dev/null)
 then
+    # On a tag.  Strip off the parent suffix.
+    version=$(echo $version | sed -e 's/\^.*//')
+else
     # Not on a tag.  Get the most recent tag and decorate it like "git describe --tags"
     tag=$(git for-each-ref refs/tags --merged HEAD --count 1 --sort taggerdate --format '%(refname:strip=2)')
     count=$(git rev-list "${tag}"..HEAD --count)
