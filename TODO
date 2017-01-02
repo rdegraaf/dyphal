@@ -4,8 +4,6 @@ For version 3:
 
     * Overlay view doesn't work correctly on Android?
 
-    * Beta 2
-
     * Fix bug 2016-12-20_001.
 
     * Add a checkbox to the DyphalGenerator UI to make it possible to re-open 
@@ -23,13 +21,10 @@ For version 3:
 
     * full-screen on small screens: https://developer.mozilla.org/en-US/docs/Web/API/Fullscreen_API
 
-    * Signed tags? Annotated tags? Simple tags?  What's the difference, why is 
-      one prefered over the others for releases?
-
     * Add some sort of "About" dialog in DyphalGenerator with credits and 
       licence details.
 
-    * type hints?
+    * Python type hints?
 
 For future versions:
 
@@ -162,4 +157,6 @@ For future versions:
       the native dialog in DyphalUI::_installTemplate()
 
     * Add command-line options to install.sh to set the installation paths.
+
+    * Get rid of ChangeLog in favour of git log?
 
