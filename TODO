@@ -4,14 +4,20 @@ For version 3:
 
     * Overlay view doesn't work correctly on Android?
 
-    * Other software: DigiKam uses an opqaue database for metadata, but can 
-      store metadata in photo tags.  However, it's metadata editor is heavily 
-      focused on the implementation details.  For instance, to set a location, 
-      you need to switch to the "IPTC" tab and enter the location field.  
-      KPhotoAlbum appears not to be able to write photo tags at all, or even to 
-      import them into its opaque database.  It also has a confusing UI.
-
     * Beta 2
+
+    * Fix bug 2016-12-20_001.
+
+    * Add a checkbox to the DyphalGenerator UI to make it possible to re-open 
+      an album.  If checked, DyphalGenerator will continue to output file paths 
+      and other information that's not used by the web page.  If unchecked, 
+      only output information needed by the web page.  This will address bug 
+      2014-04-07_002.
+
+      Alternately, create a separate album metadata file that's hidden from the 
+      user.  When an album is opened, look for the additional information and 
+      load it as well.  Maybe put a unique ID in the album file to make this 
+      easier?  This will require a new file format version.
 
     * Make DyphalGenerator work on non-Linux platforms
 
@@ -22,8 +28,6 @@ For version 3:
 
     * Add some sort of "About" dialog in DyphalGenerator with credits and 
       licence details.
-
-    * Is the KDE directory chooser still buggy?  See _installTemplate()
 
 For future versions:
 
@@ -61,18 +65,10 @@ For future versions:
     * Handle unexpected values in the DyphalGenerator configuration file and 
       album files without crashing.  See bug 2014-04-05_001 for more details.
 
-    * Add a checkbox to the DyphalGenerator UI to make it possible to re-open 
-      an album.  If checked, DyphalGenerator will continue to output file paths 
-      and other information that's not used by the web page.  If unchecked, 
-      only output information needed by the web page.  This will address bug 
-      2014-04-07_002.
-
     * Add a "sort mode" option to DyphalGenerator, which can be set to "by file 
       name", "by time", or "none".  If set to "by file name", automatically 
       sort photos by file name.  If "by time", automatically sort by time.  If 
       "none", don't sort by default and allow the user to sort manually.
-
-    * Support other operating systems besides Linux in DyphalGenerator.
 
     * Switch to a proper bug-tracking system.
 
@@ -139,6 +135,14 @@ For future versions:
 
     * Support photo list formats from other software (DigiKam, KPhotoAlbum, 
       geeqie, etc?) in DyphalGenerator.
+      
+      DigiKam uses an opqaue database for metadata, but can store metadata in 
+      photo tags.  However, it's metadata editor is heavily focused on the 
+      implementation details.  For instance, to set a location, you need to 
+      switch to the "IPTC" tab and enter the location field.  KPhotoAlbum 
+      appears not to be able to write photo tags at all, or even to import them 
+      into its opaque database.  It also has a confusing UI.
+
 
     * When an existing album is re-opened in DyphalGenerator, track of what 
       gets changed so that I don't need to re-generate everything on save.  
@@ -152,4 +156,7 @@ For future versions:
 
     * Make things like the thumbnail size and template file names configurable 
       in DyphalGenerator.
+
+    * If KDE ever fixes their buggy directory chooser, consider switching to 
+      the native dialog in DyphalUI::_installTemplate()
 

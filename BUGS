@@ -82,6 +82,15 @@
     config file will get things working again.
 
 
+2014-06-06_001  Rennie deGraaf  <rennie.degraaf@gmail.com>
+    The directory chooser for template installation doesn't expand the current
+    directory on open and double-clicking on a diretory prompts the user to 
+    rename it rather than expanding it.
+
+    WORKAROUND: Apparently the KDE directory chooser is all kinds of buggy.  
+    Using the Qt directory chooser instead.
+
+
 2014-04-07_001  Rennie deGraaf  <rennie.degraaf@gmail.com>
     Album JSON files store photo paths relative to the user's home directory 
     and don't state the user name.  This limits their ability to be shared 

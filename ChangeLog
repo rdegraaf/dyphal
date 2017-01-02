@@ -1,5 +1,10 @@
 2017-01-01  Rennie deGraaf <rennie.degraaf@gmail.com>
 
+    * tools/DyphalGenerator.py: Reference bug 2014-06-06_001 instead of 
+      repeating its details.
+
+2017-01-01  Rennie deGraaf <rennie.degraaf@gmail.com>
+
     * tools/DyphalGenerator.py: Only show the "Generate Album" button if there 
       is at least one photo in the album.
 

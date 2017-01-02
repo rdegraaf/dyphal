@@ -1004,9 +1004,7 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
         """Install the photo album template files.  Prompt the user for 
         a directory, then copy the files over on background threads."""
         # Get the destination directory
-        # The KDE directory chooser dialog is all kinds of buggy: it doesn't expand the current 
-        # directory on open, and double-clicking on a directory prompts the user to rename it. So 
-        # I'm using the QT directory chooser instead.
+        # Using the Qt directory chooser to work around bug 2014-06-06_001.
         out_dir = QtGui.QFileDialog.getExistingDirectory(self, "Album directory", 
                                                          self._config.outputDir, 
                                                          QtGui.QFileDialog.ShowDirsOnly|
