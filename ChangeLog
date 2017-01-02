@@ -1,5 +1,9 @@
 2017-01-02  Rennie deGraaf <rennie.degraaf@gmail.com>
 
+    * install.sh: Fix a bug when HEAD is an annotated tag.
+
+2017-01-02  Rennie deGraaf <rennie.degraaf@gmail.com>
+
     * Version 3.0-beta2
 
 2017-01-02  Rennie deGraaf <rennie.degraaf@gmail.com>

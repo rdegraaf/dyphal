@@ -22,14 +22,17 @@ if git diff-index --quiet HEAD -- # returns 0 if no local changes
 then
     # Clean; get the commit date.
     dirty=false
-    date=$(git rev-list --max-count 1 --date=short --pretty=format:%cd HEAD)
+    date=$(git rev-list --max-count 1 --date=short --pretty=format:%cd HEAD | grep -v ^commit) 
 else
     # Dirty; use today's date.
     dirty=true
     date=$(date --iso-8601)
 fi
-if ! version=$(git name-rev --name-only --tags --no-undefined HEAD -- 2>/dev/null)
+if version=$(git name-rev --name-only --tags --no-undefined HEAD -- 2>/dev/null)
 then
+    # On a tag.  Strip off the parent suffix.
+    version=$(echo $version | sed -e 's/\^.*//')
+else
     # Not on a tag.  Get the most recent tag and decorate it like "git describe --tags"
     tag=$(git for-each-ref refs/tags --merged HEAD --count 1 --sort taggerdate --format '%(refname:strip=2)')
     count=$(git rev-list "${tag}"..HEAD --count)
