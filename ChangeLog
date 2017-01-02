@@ -1,5 +1,11 @@
 2017-01-02  Rennie deGraaf <rennie.degraaf@gmail.com>
 
+    * README, tools/ui-header.py, www/albm.css, www/common.css, 
+      www/debug.css, www/dyphal.js, www/index.html, www/photo.css: Updated 
+      all remaining copyright years to 2017.
+
+2017-01-02  Rennie deGraaf <rennie.degraaf@gmail.com>
+
     * install.sh, tools/DyphalGenerator.py, tools/gthumb-comment-update.py, 
       tools/photo.py, tools/photorename.sh, tools/util.py: Stylistic changes 
       based on pylint and shellcheck results.
