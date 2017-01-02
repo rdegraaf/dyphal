@@ -23,8 +23,6 @@ For version 3:
     * Add some sort of "About" dialog in DyphalGenerator with credits and 
       licence details.
 
-    * Only generate an album if self.photosList.count() is non-zero.
-    
     * Is the KDE directory chooser still buggy?  See _installTemplate()
 
 For future versions:

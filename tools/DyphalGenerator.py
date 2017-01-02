@@ -246,6 +246,7 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
             self._restoreUIData(self._config.uiData)
         self.progressBar.setVisible(False)
         self.cancelButton.setVisible(False)
+        self.generateAlbumButton.setVisible(False)
         self._dirty = False
 
         # Set the sizes of the photo list and properties within the splitter.
@@ -355,7 +356,7 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
                     if child is not self.cancelButton and child is not self.progressBar \
                        and None is child.findChild(QtGui.QPushButton, "cancelButton"):
                         child.setEnabled(False)
-                
+
                 # Post a background task to exit after everything else completes.
                 # Don't register the task so that it cannot be cancelled.
                 self._backgroundInit(0)
@@ -478,11 +479,14 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
             task = self._threads.submit(functools.partial(handle_exceptions, 
                                                           self._bgRemovePhotosComplete), tasks)
             self._backgroundStart(tasks+[task])
+            if 0 == self.photosList.count():
+                self.generateAlbumButton.setVisible(False)
             self._dirty = True
 
     def _addPhoto(self, photo, dirtying):
         """Add a photo that has been loaded to the album."""
         self.photosList.addItem(photo)
+        self.generateAlbumButton.setVisible(True)
         if dirtying:
             self._dirty = True
 
@@ -545,8 +549,9 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
         if True == force or 0 == self._backgroundCount:
             self.cancelButton.setVisible(False)
             self.progressBar.setVisible(False)
-            self.generateAlbumButton.setVisible(True)
             self._backgroundTasks = None
+            if 0 < self.photosList.count():
+                self.generateAlbumButton.setVisible(True)
 
     def _bgAddPhoto(self, path, name, prev_task, dirtying):
         """Background task to load a photo and signal the UI to add it 
@@ -705,7 +710,8 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
         # Get the output file name
         # Default to the file name of the current album (if it exists).  Do not prompt for 
         # overwrite when re-saving.  QFileDialog can't do that natively, so we implement that logic 
-        # here.  Note that it's still vulerable to races.
+        # here.  Note that it's still vulerable to races: a file that doesn't exist now might exist 
+        # when we try to write to it.
         selected = self._config.outputDir
         if None != self._currentAlbumFileName:
             selected = self._currentAlbumFileName
@@ -925,6 +931,7 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
 
         self._currentAlbumFileName = None
         self.setWindowTitle(Config.PROGRAM_NAME)
+        self.generateAlbumButton.setVisible(False)
         self._dirty = False
 
     def _newAlbum(self):
