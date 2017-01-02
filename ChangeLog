@@ -1,3 +1,9 @@
+2017-01-01  Rennie deGraaf <rennie.degraaf@gmail.com>
+
+    * tools/DyphalGenerator.py: Track whether the current album has been 
+      modified since last save, and if so, prompt before exiting or loading 
+      a new album.
+
 2016-12-31  Rennie deGraaf <rennie.degraaf@gmail.com>
 
     * bumpversion.sh: Deleted, as it is no longer needed since the changes to 

@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 """Server-side data generator for Dyphal, the Dynamic Photo Album.
-Copyright (c) Rennie deGraaf, 2005-2016.
+Copyright (c) Rennie deGraaf, 2005-2017.
 
 DyphalGenerator is a tool to create photo albums to display using 
 Dyphal.  It can import metadata from a variety of embedded photo tags 
@@ -219,13 +219,14 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
     FILTER_GTHUMB3_CATALOGS = "gThumb catalogs (*.catalog)"
     FILTER_ALBUMS = "Albums (*.json)"
 
-    _addPhotoSignal = QtCore.pyqtSignal(PhotoFile)  # Photo is ready to be added to the UI.
+    _addPhotoSignal = QtCore.pyqtSignal(PhotoFile, bool)  # A photo is ready to be added to the UI.
     _showErrorSignal = QtCore.pyqtSignal(str)  # An error message needs to be displayed.
     _incProgressSignal = QtCore.pyqtSignal()  # A background processing step has completed.
     _backgroundCompleteSignal = QtCore.pyqtSignal(bool)  # Background processing has completed.
     _renamePhotosSignal = QtCore.pyqtSignal(list)  # Photos need to be renamed due to collisions.
     _setAlbumDataSignal = QtCore.pyqtSignal(str, dict)  # An album has been loaded.
     _closeSignal = QtCore.pyqtSignal() # Program exit was requested from a background thread.
+    _dirtySignal = QtCore.pyqtSignal(bool) # A background thread dirtied or undirtied the album.
 
     def __init__(self, config):
         """Initialize a DyphalUI.  Hooks up event handlers and 
@@ -245,6 +246,7 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
             self._restoreUIData(self._config.uiData)
         self.progressBar.setVisible(False)
         self.cancelButton.setVisible(False)
+        self._dirty = False
 
         # Set the sizes of the photo list and properties within the splitter.
         self.splitter.setStretchFactor(0, 5)
@@ -291,7 +293,7 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
         self.removeCaptionsButton.clicked.connect(self._removeCaptionsHandler)
         self.removePropertiesButton.clicked.connect(self._removePropertiesHandler)
         self.generateAlbumButton.clicked.connect(self._generateAlbum)
-        self.newAlbumButton.clicked.connect(self._closeAlbum)
+        self.newAlbumButton.clicked.connect(self._newAlbum)
         self.openAlbumButton.clicked.connect(self._openAlbum)
         self.installTemplateButton.clicked.connect(self._installTemplate)
         self.cancelButton.clicked.connect(self._cancelBackgroundTasks)
@@ -304,6 +306,15 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
         self._renamePhotosSignal.connect(self._renamePhotos)
         self._setAlbumDataSignal.connect(self._setAlbumData)
         self._closeSignal.connect(self.close)
+        self.photoSizeButton.currentIndexChanged.connect(lambda: self._setDirty())
+        self.titleText.textChanged.connect(self._setDirty)
+        self.footerText.textChanged.connect(self._setDirty)
+        self.descriptionText.textChanged.connect(self._setDirty)
+        self._dirtySignal.connect(self._setDirty)
+
+    def _setDirty(self, dirty=True):
+        """Marks the current album as having changed."""
+        self._dirty = dirty
 
     def _bgExit(self, pending_tasks):
         """Background task to trigger program exit."""
@@ -316,8 +327,19 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
     def closeEvent(self, event):
         """Main window close event handler.  Shutdown the thread pool 
         and save the run-time configuration."""
+        if self._dirty:
+            print("Dirty!")
+
+        # Prompt if the album is dirty.
+        if self._dirty and 0 < self.photosList.count() \
+           and QtGui.QMessageBox.No == QtGui.QMessageBox.warning(self, "Exit", 
+                      "The current album has not been saved.  Realy exit?", 
+                      QtGui.QMessageBox.Yes | QtGui.QMessageBox.No, QtGui.QMessageBox.No):
+            event.ignore()
+            return
+
+        # Prompt if there are background operations in progress.
         if 0 != self._backgroundCount:
-            # Prompt to wait or exit
             prompt_dialog = QtGui.QMessageBox(self)
             prompt_dialog.setWindowTitle("Exit")
             prompt_dialog.setIcon(QtGui.QMessageBox.Warning)
@@ -421,14 +443,14 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
         else:
             print("ERROR: unknown item selected in 'Add Photos' control")
 
-    def _addPhotoFiles(self, filenames):
+    def _addPhotoFiles(self, filenames, dirtying=True):
         """Start background tasks to load a list of photos."""
         if 0 < len(filenames):
             self._backgroundInit(len(filenames))
             tasks = []
             task = None
             for (path, name) in filenames:
-                task = self._threads.submit(self._bgAddPhoto, path, name, task)
+                task = self._threads.submit(self._bgAddPhoto, path, name, task, dirtying)
                 task.photoName = path
                 tasks.append(task)
             task = self._threads.submit(functools.partial(handle_exceptions, 
@@ -456,10 +478,13 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
             task = self._threads.submit(functools.partial(handle_exceptions, 
                                                           self._bgRemovePhotosComplete), tasks)
             self._backgroundStart(tasks+[task])
+            self._dirty = True
 
-    def _addPhoto(self, photo):
+    def _addPhoto(self, photo, dirtying):
         """Add a photo that has been loaded to the album."""
         self.photosList.addItem(photo)
+        if dirtying:
+            self._dirty = True
 
     def _showProperties(self):
         """Display the properties of the most recently selected photo."""
@@ -523,7 +548,7 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
             self.generateAlbumButton.setVisible(True)
             self._backgroundTasks = None
 
-    def _bgAddPhoto(self, path, name, prev_task):
+    def _bgAddPhoto(self, path, name, prev_task, dirtying):
         """Background task to load a photo and signal the UI to add it 
         to the album when done."""
         photo = PhotoFile(path, name, self._config)
@@ -532,7 +557,7 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
         # correct order.
         if None is not prev_task:
             concurrent.futures.wait([prev_task])
-        self._addPhotoSignal.emit(photo)
+        self._addPhotoSignal.emit(photo, dirtying)
         self._incProgressSignal.emit()
 
     def _bgAddPhotoComplete(self, tasks):
@@ -582,7 +607,7 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
         if 0 != len(rename_photos):
             self._renamePhotosSignal.emit(rename_photos)
 
-        # re-enable any disabled buttons
+        # Re-enable any disabled buttons
         self._backgroundCompleteSignal.emit(False)
 
     def _bgRemovePhoto(self, photo):
@@ -649,18 +674,21 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
         if 0 == len(self.captionsList.findItems(self.sender().text(), 
                                                 QtCore.Qt.MatchFixedString)):
             self.captionsList.addItem(self.sender().text())
+            self._dirty = True
 
     def _removeCaptionsHandler(self):
         """Remove the selected caption fields from the album captions."""
         for item in self.captionsList.selectedItems():
             # removeItemWidget() doesn't seem to work
             self.captionsList.takeItem(self.captionsList.indexFromItem(item).row())
+            self._dirty = True
 
     def _addPropertyHandler(self):
         """Add the selected property field to the album properties."""
         if 0 == len(self.propertiesList.findItems(self.sender().text(), 
                                                   QtCore.Qt.MatchFixedString)):
             self.propertiesList.addItem(self.sender().text())
+            self._dirty = True
 
     def _removePropertiesHandler(self):
         """Remove the selected properties fields from the album 
@@ -668,6 +696,7 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
         for item in self.propertiesList.selectedItems():
             # removeItemWidget() doesn't seem to work
             self.propertiesList.takeItem(self.propertiesList.indexFromItem(item).row())
+            self._dirty = True
 
     def _generateAlbum(self):
         """Save an album.  Prompt the user for a file name, then spawn 
@@ -789,7 +818,7 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
 
             task = self._threads.submit(functools.partial(handle_exceptions, 
                                                           self._bgTasksComplete), 
-                                              tasks, directories, "generating the album")
+                                        tasks, directories, "generating the album", cleansing=True)
             self._backgroundStart(tasks+[task])
 
             self._config.outputDir = album_dir_name
@@ -812,7 +841,7 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
             json.dump(album, album_file, sort_keys=True)
         self._incProgressSignal.emit()
 
-    def _bgTasksComplete(self, tasks, directories, message):
+    def _bgTasksComplete(self, tasks, directories, message, cleansing=False):
         """Background task to display any errors encountered while 
         executing background tasks and clean up any file descriptors 
         and links that were needed by the background tasks."""
@@ -844,6 +873,10 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
         # Dismiss the cancellation UI
         self._backgroundCompleteSignal.emit(False)
 
+        # Mark the document as no longer dirty.
+        if cleansing:
+            self._dirtySignal.emit(False)
+
     def _bgGeneratePhotoJSON(self, photo, get_out_dir_name, width, height, captions, properties, 
                              dir_creation_task):
         """Background task to generate a photo JSON file."""
@@ -873,14 +906,14 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
         photo.release()
         self._incProgressSignal.emit()
 
-    def _closeAlbum(self):
+    def _closeAlbum(self, use_defaults):
         """Clear the current album data."""
         # Clear the selected photos.  I can't just call clear() because there's cleanup to do.
         self.photosList.selectAll()
         self._removePhotosHandler()
 
         # Clear selections and text fields.  Restore defaults if available.
-        if None is not self._config.uiData:
+        if use_defaults and None is not self._config.uiData:
             self._restoreUIData(self._config.uiData)
         else:
             self.captionsList.clear()
@@ -892,23 +925,38 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
 
         self._currentAlbumFileName = None
         self.setWindowTitle(Config.PROGRAM_NAME)
+        self._dirty = False
 
+    def _newAlbum(self):
+        """Create a new album."""
+        # Prompt if the album is dirty.
+        if not self._dirty or 0 == self.photosList.count() \
+           or QtGui.QMessageBox.Yes == QtGui.QMessageBox.warning(self, "New Album", 
+                      "The current album has not been saved.  Realy discard it?", 
+                      QtGui.QMessageBox.Yes | QtGui.QMessageBox.No, QtGui.QMessageBox.No):
+            self._closeAlbum(use_defaults=True)
 
     def _openAlbum(self):
         """Prompt the user for an album JSON file to load then spawn a 
         background task to load it."""
-        album_file_name = QtGui.QFileDialog.getOpenFileName(self, "Select album", 
-                                                            self._config.outputDir, 
-                                                            self.FILTER_ALBUMS)
-        # The QT documentation says that getOpenFileName returns a null string on cancel.  But it
-        # returns an empty string here.  Maybe that's a PyQt bug?
-        if "" != album_file_name:
-            self._closeAlbum()
-            # Load the file in a background thread.
-            self._backgroundInit(1)
-            task = self._threads.submit(functools.partial(handle_exceptions, self._bgLoadAlbum, 
-                                                          album_file_name))
-            self._backgroundStart([task])
+        # Prompt if the album is dirty.
+        if not self._dirty or 0 == self.photosList.count() \
+           or QtGui.QMessageBox.Yes == QtGui.QMessageBox.warning(self, "Open Album", 
+                      "The current album has not been saved.  Realy discard it?", 
+                      QtGui.QMessageBox.Yes | QtGui.QMessageBox.No, QtGui.QMessageBox.No):
+
+            album_file_name = QtGui.QFileDialog.getOpenFileName(self, "Select album", 
+                                                                self._config.outputDir, 
+                                                                self.FILTER_ALBUMS)
+            # The QT documentation says that getOpenFileName returns a null string on cancel.  But 
+            # it returns an empty string here.  Maybe that's a PyQt bug?
+            if "" != album_file_name:
+                self._closeAlbum(use_defaults=False)
+                # Load the file in a background thread.
+                self._backgroundInit(1)
+                task = self._threads.submit(functools.partial(handle_exceptions, 
+                                                            self._bgLoadAlbum), album_file_name)
+                self._backgroundStart([task])
 
     def _bgLoadAlbum(self, album_file_name):
         """Background task to open and parse an album JSON file."""
@@ -935,10 +983,10 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
             for photo in data["photos"]:
                 path = urllib.parse.unquote(photo["path"])
                 photos.append((os.path.expanduser(path), os.path.basename(path)))
-            self._addPhotoFiles(photos)
+            self._addPhotoFiles(photos, dirtying=False)
             self._currentAlbumFileName = album_file_name
             self.setWindowTitle(Config.PROGRAM_NAME + ": " + os.path.basename(album_file_name))
-
+            self._dirty = False
         except KeyError:
             QtGui.QMessageBox.warning(None, Config.PROGRAM_NAME, 
                                       "Unable to load an album from '%s'." % 

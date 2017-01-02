@@ -17,14 +17,15 @@ For version 3:
 
     * full-screen on small screens: https://developer.mozilla.org/en-US/docs/Web/API/Fullscreen_API
 
-    * Warn on New, Open, Exit from DyphalGenerator if anything has changed 
-      since the last save.
-
     * Signed tags? Annotated tags? Simple tags?  What's the difference, why is 
       one prefered over the others for releases?
 
     * Add some sort of "About" dialog in DyphalGenerator with credits and 
       licence details.
+
+    * Only generate an album if self.photosList.count() is non-zero.
+    
+    * Is the KDE directory chooser still buggy?  See _installTemplate()
 
 For future versions:
 
@@ -149,5 +150,8 @@ For future versions:
       some measure if whether the photo itself has changed.  Can I get a hash 
       of the photo that excludes embedded metadata?
 
-    * Better icons in DyphalGenerator
+    * Better icons in DyphalGenerator.
+
+    * Make things like the thumbnail size and template file names configurable 
+      in DyphalGenerator.
 
