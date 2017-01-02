@@ -1,5 +1,10 @@
 2017-01-01  Rennie deGraaf <rennie.degraaf@gmail.com>
 
+    * install.sh: retrieve the Python user site package directory rather than 
+      hard-coding it as the default for PKG_PATH.
+
+2017-01-01  Rennie deGraaf <rennie.degraaf@gmail.com>
+
     * tools/DyphalGenerator.py: Reference bug 2014-06-06_001 instead of 
       repeating its details.
 
@@ -49,7 +54,7 @@
       placeholder.
 
     * tools/photorename.sh: Add a version string placeholder.
-      
+
 2016-12-21  Rennie deGraaf <rennie.degraaf@gmail.com>
 
     * tools/DyphalGenerator.ui, tools/DyphalGenerator.py: Added a "New" button 

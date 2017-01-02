@@ -6,7 +6,7 @@
 
 # Edit these paths to suit your local environment
 BIN_PATH="$HOME/bin"
-PKG_PATH="$HOME/.local/lib/python3.5/site-packages"
+PKG_PATH=$(python3 -m site --user-site)
 DATA_PATH="$HOME/.share/dyphal"
 CONFIG_PATH="$HOME/.config/"
 
