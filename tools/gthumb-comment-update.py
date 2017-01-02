@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 """Photo timestamp localizer and metatada maintenance tool.
-Copyright (c) Rennie deGraaf, 2010-2016.
+Copyright (c) Rennie deGraaf, 2010-2017.
 
 gthumb-comment-update translates various formats of photo metadata that 
 gThumb has used over the years into the format expected by 
@@ -23,19 +23,18 @@ WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
 General Public License for more details.
 
-You should have received a copy of the GNU General Public License
+You should have received a copy of the GNU General Public License 
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 __author__ = "Rennie deGraaf <rennie.degraaf@gmail.com>"
 __version__ = "VERSION"
-__credits__ = "Rennie deGraaf"
 __date__ = "DATE"
 
 import argparse
 import os
+import os.path
 import subprocess
 import json
-import os.path
 import xml.etree.ElementTree
 import gzip
 import datetime
@@ -49,7 +48,7 @@ import pytz
 # If -z was specified, use the Exif time and ignore all others.
 # Otherwise, use the following order: XMP, IPTC, XML, Exif
 
-# If gThumb3 XML is found, preserve all unrecognized elements.  
+# If gThumb3 XML is found, preserve all unrecognized elements.
 # If gThumb2 XML is found, convert it to gThumb3.
 # If no gThumb XML is found, do not output gThumb XML.
 
@@ -93,7 +92,7 @@ def convert_gthxml2(obj):
     description = obj.find("./Note").text
     location = obj.find("./Place").text
     timeobj = pytz.timezone("UTC").localize(datetime.datetime.fromtimestamp(int(obj.find("./Time")
-                                                                                            .text)))
+                                                                                .text)))
 
     root = xml.etree.ElementTree.Element("comment")
     root.set("version", "3.0")
@@ -158,7 +157,7 @@ def extract_time(embedded_props, xml_props):
         return None
 
 
-def extract_localize_time(embedded_props, xml_props, camera_timezone, timezone):
+def extract_localize_time(embedded_props, camera_timezone, timezone):
     """Extract and localize the EXIF timestamp from a photo."""
     if "EXIF:DateTimeOriginal" in embedded_props:
         return pytz.timezone(camera_timezone).localize(datetime.datetime.strptime(
@@ -175,11 +174,11 @@ def open_xml_comments(file_name):
     xml_fd = None
     try:
         xml_fd = os.open(os.path.join(os.path.dirname(file_name), ".comments", 
-                                                os.path.basename(file_name) + ".xml"), os.O_RDWR)
+                                      os.path.basename(file_name) + ".xml"), os.O_RDWR)
         xml_path = "/proc/%d/fd/%d" % (os.getpid(), xml_fd)
         try:
             xml_props = xml.etree.ElementTree.parse(xml_path).getroot()
-        except (xml.etree.ElementTree.ParseError):
+        except xml.etree.ElementTree.ParseError:
             # Maybe it's compressed?
             with gzip.GzipFile(xml_path, mode="r") as compressed_xml:
                 xml_props = xml.etree.ElementTree.fromstring(compressed_xml.read())
@@ -200,13 +199,13 @@ def update_photo_props(props, embedded_props, xml_props, photo_path, xml_path):
     """Writes photo comments into the photo metadata.  If an XML 
     comment file was found, updates it as well."""
     # Build an exiftool command and update xml_props.
-    iptc=False
+    iptc = False
     exiftool_cmd = ["exiftool", "-P", "-overwrite_original_in_place"]
     if None is not props["description"]:
         exiftool_cmd.append("-XMP:Description=" + props["description"])
         if "IPTC:Caption-Abstract" in embedded_props:
             exiftool_cmd.append("-IPTC:Caption-Abstract=" + props["description"])
-            iptc=True
+            iptc = True
         if "EXIF:UserComment" in embedded_props:
             exiftool_cmd.append("-EXIF:UserComment=" + props["description"])
         if None is not xml_props:
@@ -218,7 +217,7 @@ def update_photo_props(props, embedded_props, xml_props, photo_path, xml_path):
         exiftool_cmd.append("-XMP:Location=" + props["location"])
         if "IPTC:ContentLocationName" in embedded_props:
             exiftool_cmd.append("-IPTC:ContentLocationName=" + props["location"])
-            iptc=True
+            iptc = True
         if None is not xml_props:
             place_elmt = xml_props.find("place")
             if None is place_elmt:
@@ -229,17 +228,17 @@ def update_photo_props(props, embedded_props, xml_props, photo_path, xml_path):
         exiftool_cmd.append("-XMP:DateTimeOriginal=" + time_str)
         if "IPTC:DateCreated" in embedded_props:
             exiftool_cmd.append("-IPTC:DateCreated=" + time_str.split(" ")[0])
-            iptc=True
+            iptc = True
         if "IPTC:TimeCreated" in embedded_props:
             exiftool_cmd.append("-IPTC:TimeCreated=" + time_str.split(" ")[1])
-            iptc=True
+            iptc = True
         if None is not xml_props:
             time_elmt = xml_props.find("time")
             if None is not time_elmt:
                 time_elmt.set("value", time_str)
             else:
                 xml.etree.ElementTree.SubElement(xml_props, "time", {"value":time_str})
-    if True == iptc:
+    if True is iptc:
         exiftool_cmd.extend(["-charset", "iptc=UTF8", "-IPTC:CodedCharacterSet=UTF8"])
     exiftool_cmd.append("-XMP:XMPToolkit=")
     exiftool_cmd.append(photo_path)
@@ -269,7 +268,7 @@ def main():
     parser.add_argument("file_names", metavar="photo", type=str, nargs="+", 
                         help="Photos to update.")
     args = parser.parse_args()
-    assert(0 != len(args.file_names))
+    assert 0 != len(args.file_names)
 
     backup_archive = None
     if None is not args.backup:
@@ -297,7 +296,7 @@ def main():
                     timeout=BG_TIMEOUT, universal_newlines=True, stderr=subprocess.STDOUT)
                 embedded_props = json.loads(properties_text)[0]
 
-                # Try to read the XML comment file.  
+                # Try to read the XML comment file.
                 # It's not an error for it to be missing or unparsable.
                 (xml_props, xml_path, xml_fd) = open_xml_comments(file_name)
 
@@ -306,8 +305,8 @@ def main():
                 props["description"] = extract_description(embedded_props, xml_props)
                 props["location"] = extract_location(embedded_props, xml_props)
                 if None is not args.timezone:
-                    props["time"] = extract_localize_time(embedded_props, xml_props, 
-                                                          args.camera_timezone, args.timezone)
+                    props["time"] = extract_localize_time(embedded_props, args.camera_timezone, 
+                                                          args.timezone)
                 else:
                     props["time"] = extract_time(embedded_props, xml_props)
 

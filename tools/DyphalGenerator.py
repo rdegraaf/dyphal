@@ -23,12 +23,11 @@ WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
 General Public License for more details.
 
-You should have received a copy of the GNU General Public License
+You should have received a copy of the GNU General Public License 
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 __author__ = "Rennie deGraaf <rennie.degraaf@gmail.com>"
 __version__ = "VERSION"
-__credits__ = "Rennie deGraaf"
 __date__ = "DATE"
 
 #__all__ = "" # Uncomment to limit the amount of data that pydoc spews out.
@@ -50,9 +49,9 @@ import urllib.parse
 from PyQt4 import QtCore
 from PyQt4 import QtGui
 
-from dyphal.ui import *
-from dyphal.util import *
-from dyphal.photo import *
+from dyphal.ui import Ui_MainWindow
+from dyphal.util import DirectoryHandleList, handle_exceptions, ensure_directory
+from dyphal.photo import PhotoFile
 
 # These variables may be re-written by the installation script
 DATA_PATH = os.path.expanduser("~/.share/dyphal/")
@@ -136,11 +135,11 @@ class Config(object):
             self.photoQuality = data["photoQuality"]
 
         # Used only at startup and stored in the configuration file
-        idealThreadCount = QtCore.QThread.idealThreadCount()
-        if 0 < idealThreadCount:
+        ideal_thread_count = QtCore.QThread.idealThreadCount()
+        if 0 < ideal_thread_count:
             # Some tasks are I/O-bound and some are CPU-bound, so let's go with
             # twice the number of CPU cores.
-            self.maxWorkers = 2 * idealThreadCount # 
+            self.maxWorkers = 2 * ideal_thread_count
         else:
             self.maxWorkers = self.DEFAULT_THREADS
         if "threads" in data and 0 < data["threads"] and 50 >= data["threads"]:
@@ -213,6 +212,9 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
                 (*not* tasks) that are pending.
         _backgroundTasks (list of concurrent.futures.Future): Pending 
                 background tasks.
+        _currentAlbumFileName (str): The name of the current album file.
+        _dirty (bool): True if the album data has changed since the 
+                last save; false otherwise.
     """
 
     FILTER_IMAGES = "Images (*.jpeg *.jpg *.png *.tiff *.tif)"
@@ -328,8 +330,6 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
     def closeEvent(self, event):
         """Main window close event handler.  Shutdown the thread pool 
         and save the run-time configuration."""
-        if self._dirty:
-            print("Dirty!")
 
         # Prompt if the album is dirty.
         if self._dirty and 0 < self.photosList.count() \
@@ -344,9 +344,10 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
             prompt_dialog = QtGui.QMessageBox(self)
             prompt_dialog.setWindowTitle("Exit")
             prompt_dialog.setIcon(QtGui.QMessageBox.Warning)
-            prompt_dialog.setText("There is an operation in progress.  Wait for it to complete, or exit anyway?")
+            prompt_dialog.setText("There is an operation in progress.  Wait for it to complete, " \
+                                  "or exit anyway?")
             wait_button = prompt_dialog.addButton("Wait", QtGui.QMessageBox.ApplyRole)
-            exit_button = prompt_dialog.addButton("Exit", QtGui.QMessageBox.DestructiveRole)
+            prompt_dialog.addButton("Exit", QtGui.QMessageBox.DestructiveRole)
             prompt_dialog.setDefaultButton(wait_button)
             prompt_dialog.setEscapeButton(wait_button)
             prompt_dialog.exec_()
@@ -360,7 +361,7 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
                 # Post a background task to exit after everything else completes.
                 # Don't register the task so that it cannot be cancelled.
                 self._backgroundInit(0)
-                task = self._threads.submit(self._bgExit, self._backgroundTasks)
+                self._threads.submit(self._bgExit, self._backgroundTasks)
                 self._backgroundStart([])
                 event.ignore()
                 return
@@ -408,7 +409,7 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
             for prop in ui_data["propertyFields"]:
                 self.propertiesList.addItem(prop)
 
-    def _addPhotosHandler(self, index):
+    def _addPhotosHandler(self):
         """Prompt the user for photos to add to the album, then load 
         them."""
         sender = self.sender()
@@ -429,7 +430,7 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
             # it returns an empty string here.  Maybe that's a PyQt bug?
             if "" != catalog_file_name:
                 tree = xml.etree.ElementTree.parse(catalog_file_name)
-                # Files appear in arbitrary order in a gThumb 3 catalog file.  
+                # Files appear in arbitrary order in a gThumb 3 catalog file.
                 # I assume that the display order is the names sorted alphabetically.
                 if "1.0" == tree.getroot().get("version"):
                     filenames = sorted(
@@ -465,7 +466,7 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
             # Clear the selection so that I donn't need to update the selection and make callbacks 
             # with every deletion, which takes a while.
             self.photosList.clearSelection()
-            
+
             # I need to remove the photo from the list on foreground thread, because the list is 
             # owned by the GUI.  I need to close the Photo object on a background thread, because 
             # that's I/O.
@@ -540,13 +541,13 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
 
     def _backgroundComplete(self, force):
         """Dismiss the cancellation UI."""
-        if True == force:
-            assert(0 <= self._backgroundCount)
+        if True is force:
+            assert 0 <= self._backgroundCount
             self._backgroundCount = 0
         else:
-            assert(0 < self._backgroundCount)
+            assert 0 < self._backgroundCount
             self._backgroundCount -= 1
-        if True == force or 0 == self._backgroundCount:
+        if True is force or 0 == self._backgroundCount:
             self.cancelButton.setVisible(False)
             self.progressBar.setVisible(False)
             self._backgroundTasks = None
@@ -572,7 +573,7 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
         captions."""
         # Wait for the addPhoto tasks to complete.
         (done, not_done) = concurrent.futures.wait(tasks)
-        assert(0 == len(not_done))
+        assert 0 == len(not_done)
 
         # Display any error messages and find any files that need to be renamed
         errors = []
@@ -580,12 +581,12 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
         for task in done:
             try:
                 task.result()
-            except FileNotFoundError as e:
+            except FileNotFoundError as exc:
                 # Either exiftool or the photo was missing.
-                if "exiftool" == e.filename:
+                if "exiftool" == exc.filename:
                     errors.append("Error executing 'exiftool'.  Is it installed?")
                 else:
-                    errors.append("Error opening photo " + e.filename)
+                    errors.append("Error opening photo " + exc.filename)
             except (subprocess.CalledProcessError, subprocess.TimeoutExpired):
                 # Exiftool failed or timed out.
                 errors.append("Error reading metadata from photo " + task.photoName)
@@ -623,8 +624,8 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
     def _bgRemovePhotosComplete(self, tasks):
         """Background task to perform clean-up after removing photos."""
         # Wait for the removePhoto tasks to complete.
-        (done, not_done) = concurrent.futures.wait(tasks)
-        assert(0 == len(not_done))
+        not_done = concurrent.futures.wait(tasks)[1]
+        assert 0 == len(not_done)
 
         # Update the available properties and captions
         self.showAllPropertiesFlag.stateChanged.emit(0)
@@ -723,8 +724,8 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
             if self._currentAlbumFileName == album_file_name \
                or not os.path.isfile(album_file_name) \
                or QtGui.QMessageBox.Yes == QtGui.QMessageBox.warning(self, "Album File", 
-                      self.tr("%s already exists.\nDo you want to replace it?") % (album_file_name), 
-                      QtGui.QMessageBox.Yes | QtGui.QMessageBox.No, QtGui.QMessageBox.No):
+                     self.tr("%s already exists.\nDo you want to replace it?") % (album_file_name), 
+                     QtGui.QMessageBox.Yes | QtGui.QMessageBox.No, QtGui.QMessageBox.No):
                 break
             selected = album_file_name
 
@@ -744,7 +745,7 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
             #  1. Create a secure temporary directory.
             #  2. Open the output directory.  Get its file descriptor.
             #  3. Construct the /proc/<pid>/fd/<fd> path to the directory using the file 
-            #     descriptor. 
+            #     descriptor.
             #  4. Create a symlink from the temporary directory to the /proc path.  The link's name 
             #     is unique but predictable; that's ok because the directory is secure.
             #  5. Use the symlink as the path when creating files.
@@ -777,7 +778,7 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
             if 0 != len(Config.THUMBNAIL_DIR):
                 thumbnail_dir_task = self._threads.submit(self._bgCreateOutputDirectory, 
                                                           os.path.join(album_dir_name, 
-                                                                       Config.THUMBNAIL_DIR),
+                                                                       Config.THUMBNAIL_DIR), 
                                                           directories, "thumbnails")
                 tasks.append(thumbnail_dir_task)
 
@@ -799,7 +800,7 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
                     # generic wrapper that calls self._incProgressSignal.emit() after an arbitrary 
                     # method call, rather than needing to write wrappers for every method call.
                     task = self._threads.submit(self._bgGeneratePhotoJSON, photo, 
-                                                lambda: directories.getPath("metadata"),
+                                                lambda: directories.getPath("metadata"), 
                                                 album["photoResolution"][0], 
                                                 album["photoResolution"][1], captions, properties, 
                                                 metadata_dir_task)
@@ -853,7 +854,7 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
         and links that were needed by the background tasks."""
         # Wait for the tasks to complete.
         (done, not_done) = concurrent.futures.wait(tasks)
-        assert(0 == len(not_done))
+        assert 0 == len(not_done)
 
         # Close any file descriptors.  Ignore errors.
         directories.closeAll()
@@ -962,7 +963,7 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
                 # Load the file in a background thread.
                 self._backgroundInit(1)
                 task = self._threads.submit(functools.partial(handle_exceptions, 
-                                                            self._bgLoadAlbum), album_file_name)
+                                                              self._bgLoadAlbum), album_file_name)
                 self._backgroundStart([task])
 
     def _bgLoadAlbum(self, album_file_name):
@@ -1021,11 +1022,10 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
             tasks.append(album_dir_task)
 
             # Spawn background tasks to do the copying.
-            for f in Config.TEMPLATE_FILE_NAMES:
-                tasks.append(self._threads.submit(self._bgCopyFile, os.path.join(DATA_PATH, f), 
-                                                  lambda filename=f: os.path.join(
-                                                                      directories.getPath("album"), 
-                                                                      filename), 
+            for name in Config.TEMPLATE_FILE_NAMES:
+                tasks.append(self._threads.submit(self._bgCopyFile, os.path.join(DATA_PATH, name), 
+                                                  lambda filename=name: os.path.join(
+                                                          directories.getPath("album"), filename), 
                                                   album_dir_task))
 
             task = self._threads.submit(functools.partial(handle_exceptions, 
@@ -1056,13 +1056,13 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
         prompt_dialog = QtGui.QMessageBox(self)
         prompt_dialog.setIcon(QtGui.QMessageBox.Question)
         rename_button = prompt_dialog.addButton("Rename...", QtGui.QMessageBox.YesRole)
-        remove_button = prompt_dialog.addButton("Remove", QtGui.QMessageBox.NoRole)
+        prompt_dialog.addButton("Remove", QtGui.QMessageBox.NoRole)
 
         # Get new names for the files
         new_names = []
-        for photoName in photo_names:
+        for photo_name in photo_names:
             prompt_dialog.setText("There is already a photo with the name %s in the album.  " \
-                                  "Would you like to rename or remove the new one?" % (photoName))
+                                  "Would you like to rename or remove the new one?" % (photo_name))
             prompt_dialog.exec_()
             if rename_button is prompt_dialog.clickedButton():
                 # It seems that if I try to re-use the QFileDialog, changing the selected file has 
@@ -1075,12 +1075,12 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
                 # confirmations on, QFileDialog prompts to overwrite the directory if a user hits 
                 # "Save" with nothing selected.  Disabling confirmation avoids this.
                 file_dialog.setOption(QtGui.QFileDialog.DontConfirmOverwrite)
-                file_dialog.selectFile(os.path.basename(photoName))
+                file_dialog.selectFile(os.path.basename(photo_name))
                 file_dialog.exec_()
                 if 0 < len(file_dialog.selectedFiles()):
-                    assert(1 == len(file_dialog.selectedFiles()))
+                    assert 1 == len(file_dialog.selectedFiles())
                     new_file_name = file_dialog.selectedFiles()[0]
-                    new_names.append((photoName, os.path.basename(new_file_name)))
+                    new_names.append((photo_name, os.path.basename(new_file_name)))
 
         # Spawn background tasks to load the files using the new names.
         self._addPhotoFiles(new_names)
@@ -1098,7 +1098,7 @@ def main():
                                    QtGui.QMessageBox.Ok, QtGui.QMessageBox.Ok)
         sys.exit(1)
     try:
-        with open("/proc/%d/fd/0" % (os.getpid())) as f:
+        with open("/proc/%d/fd/0" % (os.getpid())) as fd:
             pass
     except IOError:
         QtGui.QMessageBox.critical(None, Config.PROGRAM_NAME, 

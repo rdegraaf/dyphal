@@ -1,3 +1,13 @@
+2017-01-02  Rennie deGraaf <rennie.degraaf@gmail.com>
+
+    * install.sh, tools/DyphalGenerator.py, tools/gthumb-comment-update.py, 
+      tools/photo.py, tools/photorename.sh, tools/util.py: Stylistic changes 
+      based on pylint and shellcheck results.
+
+    * .pylintrc: New file, containing pylint configuration
+
+    * tools/DyphalGenerator.py: Removed some test code.
+
 2017-01-01  Rennie deGraaf <rennie.degraaf@gmail.com>
 
     * install.sh: retrieve the Python user site package directory rather than 

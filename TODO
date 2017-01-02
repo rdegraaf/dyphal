@@ -29,6 +29,10 @@ For version 3:
     * Add some sort of "About" dialog in DyphalGenerator with credits and 
       licence details.
 
+    * Update remaining copyright years to 2017.
+
+    * type hints?
+
 For future versions:
 
     * An automated test suite would be nice.
@@ -143,7 +147,6 @@ For future versions:
       appears not to be able to write photo tags at all, or even to import them 
       into its opaque database.  It also has a confusing UI.
 
-
     * When an existing album is re-opened in DyphalGenerator, track of what 
       gets changed so that I don't need to re-generate everything on save.  
       Re-loading the photo JSON and comparing it to fresh data is probably not 
@@ -159,4 +162,6 @@ For future versions:
 
     * If KDE ever fixes their buggy directory chooser, consider switching to 
       the native dialog in DyphalUI::_installTemplate()
+
+    * Add command-line options to install.sh to set the installation paths.
 

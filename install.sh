@@ -18,8 +18,7 @@ PATH=/bin:/usr/bin
 PKG_NAME="dyphal"
 
 # Get the current version and commit date.
-git diff-index --quiet HEAD -- # returns 0 if no local changes
-if [ $? == 0 ]
+if git diff-index --quiet HEAD -- # returns 0 if no local changes
 then
     # Clean; get the commit date.
     dirty=false
@@ -29,16 +28,15 @@ else
     dirty=true
     date=$(date --iso-8601)
 fi
-version=$(git name-rev --name-only --tags --no-undefined HEAD -- 2>/dev/null)
-if [ $? != 0 ]
+if ! version=$(git name-rev --name-only --tags --no-undefined HEAD -- 2>/dev/null)
 then
     # Not on a tag.  Get the most recent tag and decorate it like "git describe --tags"
     tag=$(git for-each-ref refs/tags --merged HEAD --count 1 --sort taggerdate --format '%(refname:strip=2)')
-    count=$(git rev-list ${tag}..HEAD --count)
+    count=$(git rev-list "${tag}"..HEAD --count)
     commit=$(git rev-list --max-count 1 --abbrev-commit HEAD)
     version="${tag}-${count}-g${commit}"
 fi
-if [ "$dirty" == "true" ]
+if [ "$dirty" = "true" ]
 then
     version="${version}-dirty"
 fi

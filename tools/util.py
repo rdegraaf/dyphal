@@ -1,5 +1,5 @@
 """Utility functions and classes for DyphalGenerator.
-Copyright (c) Rennie deGraaf, 2005-2016.
+Copyright (c) Rennie deGraaf, 2005-2017.
 
 This program is free software; you can redistribute it and/or modify it 
 under the terms of the GNU General Public License as published by the 
@@ -11,7 +11,7 @@ WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
 General Public License for more details.
 
-You should have received a copy of the GNU General Public License
+You should have received a copy of the GNU General Public License 
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
@@ -69,7 +69,7 @@ class RefCounted(object):
     def release(self):
         """Release a reference and potentially destroy the object."""
         count = self.__refCount.decr()
-        assert(0 <= count)
+        assert 0 <= count
         if 0 >= count:
             self._dispose()
             self.__refCount = None # Guard against addRef() being called again.
@@ -83,7 +83,7 @@ class RefCounted(object):
 class DirectoryHandleList(object):
     """Thread-safe name to file descriptor mapping."""
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self):
         """Initialize a DirectoryHandleList."""
         self._directories = {}
         self._lock = threading.Lock()
@@ -128,5 +128,4 @@ def ensure_directory(name):
         os.makedirs(name, exist_ok=True)
     except FileExistsError:
         pass
-
 

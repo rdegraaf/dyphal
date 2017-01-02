@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # photorename.sh
-# Copyright (c) Rennie deGraaf, 2010-2016.
+# Copyright (c) Rennie deGraaf, 2010-2017.
 #
 # Rename photos to encode a camera name into the file names rather than a 
 # meaningless string like "IMG".  Use a ".jpeg" suffix on the resulting 
@@ -18,7 +18,7 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
 # General Public License for more details.
 #
-# You should have received a copy of the GNU General Public License
+# You should have received a copy of the GNU General Public License 
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 # Usage: photorename.sh <camera name> <photos...>
@@ -27,7 +27,6 @@
 
 # author: Rennie deGraaf <rennie.degraaf@gmail.com>
 # version: VERSION
-# credits: Rennie deGraaf
 # date: DATE
 
 
@@ -48,20 +47,19 @@ do
     file_name=$(basename "$file")
 
     # Make sure we're dealing with a file name pattern that we can handle.
-    echo "$file_name" | egrep -i '^[^_]+_([0-9]{4})\.jpe?g$' > /dev/null
-    if [ $? -ne 0 ]
+    if ! echo "$file_name" | grep -Ei '^[^_]+_([0-9]{4})\.jpe?g$' > /dev/null
     then
         echo "Unrecognized file name pattern '" "$file" "'"
         continue
     fi
 
     # Extract the photo's number.
-    number=$(echo $file_name | sed -re 's/^[^_]+_0*([0-9]+)\..*$/\1/')
+    number=$(echo "$file_name" | sed -re 's/^[^_]+_0*([0-9]+)\..*$/\1/')
     # I accidentally reset the numbering on my A80 in spring 2009.
     #number=$((number+4080))
 
     # Rename the photo
-    new_name=$(printf "%s/%s_%04i.jpeg" "$dir_name" "$camera" $number)
+    new_name=$(printf "%s/%s_%04i.jpeg" "$dir_name" "$camera" "$number")
     if [ -e "$new_name" ] # this check is vulnerable to races, so don't rely on it
     then
         echo "\"$new_name\" already exists; skipping $file"
@@ -72,10 +70,10 @@ do
     fi
 
     # If there's a gThumb XML comment file, rename it too.
-    gthxml_name=$(echo "$dir_name"/.comments/"$file_name".xml)
+    gthxml_name="$dir_name"/.comments/"$file_name".xml
     if [ -e "$gthxml_name" ]
     then
-        new_name=$(printf "%s/.comments/%s_%04i.jpeg.xml" "$dir_name" "$camera" $number)
+        new_name=$(printf "%s/.comments/%s_%04i.jpeg.xml" "$dir_name" "$camera" "$number")
         if [ -e "$new_name" ] # this check is vulnerable to races, so don't rely on it
         then
             echo "\"$new_name\" already exists; skipping $file"

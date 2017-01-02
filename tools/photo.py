@@ -1,5 +1,5 @@
 """Classes to represent a photo and its properties in DyphalGenerator.
-Copyright (c) Rennie deGraaf, 2005-2015.
+Copyright (c) Rennie deGraaf, 2005-2017.
 
 This program is free software; you can redistribute it and/or modify it 
 under the terms of the GNU General Public License as published by the 
@@ -11,7 +11,7 @@ WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
 General Public License for more details.
 
-You should have received a copy of the GNU General Public License
+You should have received a copy of the GNU General Public License 
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
@@ -26,7 +26,7 @@ import math
 
 from PyQt4 import QtGui
 
-from dyphal.util import *
+from dyphal.util import RefCounted
 
 class PropertyError(Exception):
     """Exception raised if a photo property has an unexpected value."""
@@ -52,11 +52,8 @@ class Property(object):
         self.default = default
         if None is not transform:
             self.transform = transform
-
-    @staticmethod
-    def transform(value):
-        """The default (null) transformation to perform on a property."""
-        return value
+        else:
+            self.transform = lambda x: x
 
 
 def transform_exif_time(timestamp):
@@ -87,7 +84,7 @@ def format_display_time(timestamp):
         # Python 3.3's strftime ignores tm_gmtoff when formatting "%z", so I need to do it myself.
         # Use RFC 3339 conventions.
         time_zone = "UTC"
-        if None == parsed_time.tm_gmtoff:
+        if None is parsed_time.tm_gmtoff:
             time_zone += "-00:00"
         elif 0 > parsed_time.tm_gmtoff:
             time_zone += time.strftime("-%H:%M", time.gmtime(-parsed_time.tm_gmtoff))
@@ -125,21 +122,21 @@ class PhotoFile(RefCounted, QtGui.QListWidgetItem):
     """
 
     _recognizedProperties = [
-        Property("Composite:Aperture", "Aperture", transform=lambda f : "f/"+str(f)),
+        Property("Composite:Aperture", "Aperture", transform=lambda f: "f/"+str(f)),
         Property("Composite:DigitalZoom", "Digital zoom", default="None"),
         Property("Composite:DriveMode", "Drive mode", default="Normal"),
         Property("Composite:FlashType", "Flash type", default="None"),
-        Property("Composite:FOV", "Field of view", transform=lambda s : s+"rees"),
+        Property("Composite:FOV", "Field of view", transform=lambda s: s+"rees"),
         Property("Composite:FocalLength35efl", "Focal length"),
         Property("Composite:HyperfocalDistance", "Hyperfocal distance"),
-        Property("Composite:ImageSize", "Image dimensions", transform=lambda s : s+" pixels"),
+        Property("Composite:ImageSize", "Image dimensions", transform=lambda s: s+" pixels"),
         #Property("Composite:ISO", "ISO"),
         Property("Composite:Lens35efl", "Lens"),
         Property("Composite:LensID", "Lens ID"),
         Property("Composite:LightValue", "Light value"),
         Property("Composite:ScaleFactor35efl", "Scale factor"),
         Property("Composite:ShootingMode", "Shooting mode"),
-        Property("Composite:ShutterSpeed", "Exposure", transform=lambda s : str(s)+" sec."),
+        Property("Composite:ShutterSpeed", "Exposure", transform=lambda s: str(s)+" sec."),
         Property("EXIF:DateTimeOriginal", "Creation time", transform=transform_exif_time),
         Property("EXIF:ExposureCompensation", "Exposure compensation"),
         Property("EXIF:ExposureMode", "Exposure mode"),
@@ -152,7 +149,7 @@ class PhotoFile(RefCounted, QtGui.QListWidgetItem):
         Property("File:FileSize", "File size"),
         Property("File:FileType", "File type"),
         Property("MakerNotes:MacroMode", "Macro mode"),
-        Property("MakerNotes:Rotation", "Rotation", transform=lambda i : str(i)+" degrees")
+        Property("MakerNotes:Rotation", "Rotation", transform=lambda i: str(i)+" degrees")
     ]
 
     def __init__(self, filepath, fileName, config):
@@ -182,9 +179,9 @@ class PhotoFile(RefCounted, QtGui.QListWidgetItem):
 
         try:
             self._fileDescriptor = os.open(filepath, os.O_RDONLY)
-            linkPath = os.path.join(config.tempDir.name, self._fileName)
-            os.symlink("/proc/%d/fd/%d" % (os.getpid(), self._fileDescriptor), linkPath)
-            self._linkPath = linkPath
+            link_path = os.path.join(config.tempDir.name, self._fileName)
+            os.symlink("/proc/%d/fd/%d" % (os.getpid(), self._fileDescriptor), link_path)
+            self._linkPath = link_path
             # gThumb stores IPTC strings as UTF-8, but does not set CodedCharacterSet
             properties_text = subprocess.check_output(
                 ["exiftool", "-charset", "iptc=UTF8", "-json", "-a", "-G", "-All", self._linkPath], 
@@ -309,7 +306,7 @@ class PhotoFile(RefCounted, QtGui.QListWidgetItem):
         subprocess.check_call(["convert", self._linkPath, "-resize", "%dx%d>" % (width, height), 
                                "-strip", "-quality", str(quality), 
                                os.path.join(out_dir_name, self._fileName)], 
-                               timeout=self._config.BG_TIMEOUT)
+                              timeout=self._config.BG_TIMEOUT)
 
     def generateThumbnail(self, out_dir_name, width_base, height_base, quality):
         """Generate a thumbnail for the photo."""
@@ -322,4 +319,4 @@ class PhotoFile(RefCounted, QtGui.QListWidgetItem):
                                "-gravity", "center", "-extent", "%dx%d" % (width, height), 
                                "-quality", str(quality), 
                                os.path.join(out_dir_name, self._thumbName)], 
-                               timeout=self._config.BG_TIMEOUT)
+                              timeout=self._config.BG_TIMEOUT)
