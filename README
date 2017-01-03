@@ -148,9 +148,9 @@ Technical details
 
 An album is represented by a single web page, index.html.  JavaScript running 
 within that page determines what to display based on hash parameters.  The 
-first parameter, which must always be present, identifies the album.  It's the 
-name of the JSON file that describes the album with the ".json" suffix 
-omitted.  If your directory structure looks like this:
+first parameter, which must always be present, identifies the album.  This 
+value is the name of the JSON file that describes the album with the ".json" 
+suffix omitted.  If your directory structure looks like this:
 
         album.css
         common.css
@@ -179,11 +179,14 @@ can fit in the window, potentially hiding the header, footer, and metadata.
 There is also a **help view** that can be opened from either album or photo 
 view using the question mark icon.
 
-When loaded in a window smaller than 800 CSS-pixels wide or tall, the album 
+When loaded in a window smaller than 750 CSS-pixels wide or tall, the album 
 will use **compact layout** that omits the metadata and footer from photo 
 view in order to show the photo at the largest size possible.  In compact 
 layout, overlay view shows the metadata and footer rather than another view of 
-the photo.
+the photo.  The album is also displayed full-screen in browsers that support 
+this feature if the display is less than 750 CSS-pixels wide or tall (though, 
+for technical reasons, the user needs to interact with the page before it can 
+enter full-screen mode).
 
 Each photo view has its own URI, consisting of the URI to the album followed by 
 the index number of the photo (indices start from 1).  For example, the path 
@@ -191,10 +194,10 @@ for the third photo in the "Vacation" album might be
 
         /#/vacation/3
 
-The full-screen photo overlay and help overlay do not have independent URIs.
+The photo and help overlays do not have independent URIs.
 
 Since only one HTML document is used for all views, its differences in 
-appearance are implemented by switching stylesheets and, to a lesser extent, by 
+appearance are implemented by switching styles and, to a lesser extent, by 
 adding and removing document elements.  Photos, thumbnails, and photo metadata 
 are not stored in the HTML; they are loaded from JSON files and their contents 
 are inserted or removed from the document when appropriate.  The album JSON 
@@ -280,7 +283,7 @@ All other values should be assumed to be attacker-controlled.
 To be secure, DyphalGenerator must never emit photo URIs outside of the album 
 directory and albums must never execute any scripts or interpret any markup 
 found in properties, captions, or other fields.  Additionally, albums must 
-never load JSON file or images from outside of the album directory.
+never load JSON files or images from outside of the album directory.
 
 See [javascript.html](javascript.html) for information about Dyphal's use of 
 JavaScript.

@@ -21,6 +21,7 @@ html {
   padding: 0;
   position: relative;
   min-height: 100%;
+  background-color: #4b4b4b; /* Repeated here for full-screen Chrome; see bug 2017-01-02_001. */
 }
 
 /* Sticky footer styles from http://mystrd.at/modern-clean-css-sticky-footer/ */

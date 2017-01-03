@@ -30,6 +30,8 @@ var page = null; // number of the current page, 0 for the album thumbnail view
 var pages = []; // objects describing all pages that have been retrieved.  Based on album.photos.
 var compact = false;
 
+var compactThreshold = 750;
+
 
 // Display an error message in the warning panel
 function error(msg) {
@@ -126,8 +128,8 @@ function setScreenSize() {
     try {
         // Check for a small screen and load the overrides if so.
         var small = false;
-        if ((document.documentElement.clientWidth <= 750) || 
-            (document.documentElement.clientHeight <= 750)) {
+        if ((document.documentElement.clientWidth <= compactThreshold) || 
+            (document.documentElement.clientHeight <= compactThreshold)) {
             small = true;
         }
         if (small &&
@@ -702,6 +704,29 @@ function updateOverlays() {
 }
 
 
+// Try to set full-screen mode on small screens.
+// This can't be done in setScreenSize() because the FullScreen API only works
+// in user-interaction event handlers, for security reasons.
+function tryFullScreen(evt) {
+    log ("tryFullScreen enter");
+
+    try {
+        if (window.screen.width <= compactThreshold || window.screen.height < compactThreshold) {
+            var rfs = document.documentElement.requestFullscreen 
+                      || document.documentElement.webkitRequestFullScreen
+                      || document.documentElement.mozRequestFullScreen
+                      || document.documentElement.msRequestFullscreen;
+            if (rfs) {
+                rfs.call(document.documentElement)
+            }
+        }
+    } catch (e) {
+        error(e.name + ": " + e.message);
+    }
+    log("tryFullScreen exit");
+}
+
+
 // Called when the document loads.  Display the requested page.
 function start() {
     log("start enter");
@@ -896,6 +921,7 @@ function touchEnd(evt) {
     }
 }
 
+
 // Set up event listeners
 window.addEventListener("load", start, false);
 window.addEventListener("hashchange", start, false);
@@ -904,17 +930,22 @@ document.addEventListener("DOMContentLoaded", suppressWarning, false);
 document.addEventListener("DOMContentLoaded", setScreenSize, false);
 window.addEventListener("resize", setScreenSize, false);
 window.addEventListener("orientationchange", setScreenSize, false);
+document.addEventListener("click", tryFullScreen, false);
+document.addEventListener("keydown", tryFullScreen, false);
 if (undefined !== window.ontouchstart) {
     window.addEventListener("touchstart", touchStart, true);
     window.addEventListener("touchend", touchEnd, true);
+    window.addEventListener("touchend", tryFullScreen, true);
 } else if (window.navigator.pointerEnabled) {
     // IE 11 touch events
     window.addEventListener("pointerdown", touchStart);
     window.addEventListener("pointerup", touchEnd);
+    window.addEventListener("pointerup", tryFullScreen);
 } else if (window.navigator.msPointerEnabled) {
     // IE 10 touch events
     window.addEventListener("MSPointerDown", touchStart);
     window.addEventListener("MSPointerUp", touchEnd);
+    window.addEventListener("MSPointerUp", tryFullScreen);
 }
 
 log(navigator.appName);

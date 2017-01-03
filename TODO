@@ -17,9 +17,9 @@ For version 3:
       load it as well.  Maybe put a unique ID in the album file to make this 
       easier?  This will require a new file format version.
 
-    * Make DyphalGenerator work on non-Linux platforms
+    * Center photos vertically, at least in compact layout.
 
-    * full-screen on small screens: https://developer.mozilla.org/en-US/docs/Web/API/Fullscreen_API
+    * Make DyphalGenerator work on non-Linux platforms
 
     * Add some sort of "About" dialog in DyphalGenerator with credits and 
       licence details.
@@ -93,8 +93,6 @@ For future versions:
       supports it?
 
     * Add a 'full' size option to the 'scale' combobox in DyphalGenerator.
-
-    * Center photos vertically, at least in small-screen mode.
 
     * Python's xml.etree.ElementTree is documented as being unsafe for handling 
       untrusted XML.  Use something else (defusedxml?) instead.

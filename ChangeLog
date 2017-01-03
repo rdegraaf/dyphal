@@ -1,5 +1,14 @@
 2017-01-02  Rennie deGraaf <rennie.degraaf@gmail.com>
 
+    * dyphal.js, common.css: Ask browsers to display full-screen on small 
+      screens.  This doesn't have quite the same thresholds as compact 
+      layout because it's based on screen size rather than viewport size.
+
+    * README: Documented the new feature described above, plus some minor
+      unrelated edits.
+
+2017-01-02  Rennie deGraaf <rennie.degraaf@gmail.com>
+
     * install.sh: Fix a bug when HEAD is an annotated tag.
 
 2017-01-02  Rennie deGraaf <rennie.degraaf@gmail.com>

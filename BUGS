@@ -195,11 +195,30 @@
 
 
 2016-12-20_001  Rennie deGraaf  <rennie.degraaf@gmail.com>
-    Race conditions in file name selection: files that don't exist when they  
-    are chosen in QFileDialog dialogs might get created before we try to write 
-    to them.  The album file name chosen in DyphalUI._generateAlbum has this 
-    issue; DyphalUI._renamePhotos might as well.
+    TOCTTOU in file name selection: files that don't exist when they are chosen
+    in QFileDialog dialogs might get created before we try to write to them.  
+    The album file name chosen in DyphalUI._generateAlbum has this issue; 
+    DyphalUI._renamePhotos might as well.
     
     OPEN.  Pass information through to _bgGenerateAlbum whether the file is new 
     or existant; refuse overwrite if it should be new and refuse creation 
     otherwise.
+
+
+2017-01-02_001  Rennie deGraaf  <rennie.degraaf@gmail.com>
+    The background (or sometimes only parts of it) appear as white in Chrome on 
+    Android.
+    
+    WORKAROUND: Setting the background-color on the html element as well as the 
+    body element seems to prevent this from happening.
+
+
+2017-01-02_002  Rennie deGraaf  <rennie.degraaf@gmail.com>
+    Something is inserting a couple pixels below images in portrait mode in 
+    Firefox and Chrome on Android, allowing the page to scroll a couple pixels. 
+    It may happen in landscape mode too, but I haven't tested a photo tall and 
+    narrow enough to reach the bottom of the screen.  I can reproduce it in 
+    Firefox in a VM running in an 800x600 window.
+
+    OPEN.
+
