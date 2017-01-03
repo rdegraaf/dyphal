@@ -212,13 +212,3 @@
     WORKAROUND: Setting the background-color on the html element as well as the 
     body element seems to prevent this from happening.
 
-
-2017-01-02_002  Rennie deGraaf  <rennie.degraaf@gmail.com>
-    Something is inserting a couple pixels below images in portrait mode in 
-    Firefox and Chrome on Android, allowing the page to scroll a couple pixels. 
-    It may happen in landscape mode too, but I haven't tested a photo tall and 
-    narrow enough to reach the bottom of the screen.  I can reproduce it in 
-    Firefox in a VM running in an 800x600 window.
-
-    OPEN.
-

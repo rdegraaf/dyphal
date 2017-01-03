@@ -1,7 +1,14 @@
 2017-01-02  Rennie deGraaf <rennie.degraaf@gmail.com>
 
-    * dyphal.js, common.css: Ask browsers to display full-screen on small 
-      screens.  This doesn't have quite the same thresholds as compact 
+    * www/common.css: Remove the paragraph margins from footerContent to 
+      ensure that the footer doesn't overflow the window in compact layout 
+      if the font takes more than 14 pixels for a line of text.  This should 
+      fix bug 2017-01-02_002.
+
+2017-01-02  Rennie deGraaf <rennie.degraaf@gmail.com>
+
+    * www/dyphal.js, www/common.css: Ask browsers to display full-screen on 
+      small screens.  This doesn't have quite the same thresholds as compact 
       layout because it's based on screen size rather than viewport size.
 
     * README: Documented the new feature described above, plus some minor
