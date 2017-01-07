@@ -1,3 +1,8 @@
+2017-01-06  Rennie deGraaf <rennie.degraaf@gmail.com>
+
+    * www/index.html: Fixed an error in the help text and added some more 
+      details on key bindings.
+
 2017-01-02  Rennie deGraaf <rennie.degraaf@gmail.com>
 
     * www/common.css: Remove the paragraph margins from footerContent to 
