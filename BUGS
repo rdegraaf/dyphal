@@ -212,3 +212,27 @@
     WORKAROUND: Setting the background-color on the html element as well as the 
     body element seems to prevent this from happening.
 
+
+2017-01-06_001  Rennie deGraaf  <rennie.degraaf@gmail.com>
+    Scrolling down doesn't work in full-screen MSIE 11 in album view.  There is 
+    no scroll bar; the keyboard down arrow and page-down have no effect.  Links
+    off the bottom of the screen can be selected by tabbing, but using enter to 
+    attempt to load them yields a blank photo view.
+
+    OPEN
+
+
+2017-01-07_001  Rennie deGraaf  <rennie.degraaf@gmail.com>
+    Photo view is broken on MSIE 8/Windows XP.  It works on IE 11 on Windows 8.1 
+    and 10.  It seems to work on IE 9/Win7.
+
+    OPEN: Drop support for MSIE 8.  Microsoft stopped maintaining it a year ago 
+    (except on a couple Windows Embedded products) and trying to support it is 
+    just not worth the effort.  IE 9 is still supported on Windows Vista until 
+    2017-04-16.  IE 10 will be supported on Windows Server 2012 until 2023.
+
+
+2017-01-07_002  Rennie deGraaf  <rennie.degraaf@gmail.com>
+    Keyboard navigation sometimes fails on Edge.
+
+    OPEN

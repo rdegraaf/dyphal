@@ -1,3 +1,8 @@
+2017-01-07  Rennie deGraaf <rennie.degraaf@gmail.com>
+
+    * www/dyphal.js, www/index.html, www/photo.css: Center photos vertically 
+      in compact layout.
+
 2017-01-06  Rennie deGraaf <rennie.degraaf@gmail.com>
 
     * www/index.html: Fixed an error in the help text and added some more 

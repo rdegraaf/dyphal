@@ -330,14 +330,14 @@ function fitPhoto() {
                 // Constrained by width.
                 var photoWidth = Math.min(photoPanel.clientWidth - (photo.offsetWidth - 
                                                             photo.clientWidth), photoData.width);
-                photo.style["width"] = photoWidth + "px";
-                photo.style["height"] = (photoWidth / photoAspect) + "px";
+                photo.style["max-width"] = photoWidth + "px";
+                photo.style["max-height"] = (photoWidth / photoAspect) + "px";
             } else {
                 // Constrained by height.
                 var photoHeight = Math.min(photoPanel.clientHeight - (photo.offsetHeight - 
                                                             photo.clientHeight), photoData.height);
-                photo.style["height"] = photoHeight + "px";
-                photo.style["width"] = (photoHeight * photoAspect) + "px";
+                photo.style["max-height"] = photoHeight + "px";
+                photo.style["max-width"] = photoHeight * photoAspect + "px";
             }
 
             // Set the dimensions of the overlay
