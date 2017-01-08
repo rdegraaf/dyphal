@@ -7,7 +7,7 @@
 # Edit these paths to suit your local environment
 BIN_PATH="$HOME/bin"
 PKG_PATH=$(python3 -m site --user-site)
-DATA_PATH="$HOME/.share/dyphal"
+DATA_PATH="$HOME/.local/share/dyphal"
 CONFIG_PATH="$HOME/.config/"
 
 #
@@ -34,7 +34,7 @@ then
     version=$(echo $version | sed -e 's/\^.*//')
 else
     # Not on a tag.  Get the most recent tag and decorate it like "git describe --tags"
-    tag=$(git for-each-ref refs/tags --merged HEAD --count 1 --sort taggerdate --format '%(refname:strip=2)')
+    tag=$(git for-each-ref refs/tags --merged HEAD --count 1 --sort -taggerdate --format '%(refname:strip=2)')
     count=$(git rev-list "${tag}"..HEAD --count)
     commit=$(git rev-list --max-count 1 --abbrev-commit HEAD)
     version="${tag}-${count}-g${commit}"

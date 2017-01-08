@@ -1,5 +1,14 @@
 2017-01-07  Rennie deGraaf <rennie.degraaf@gmail.com>
 
+    * install.sh: Fixed the version naming logic.  Apparently that git 
+      command always sorts lightweight tags ahead of full tags, regardless 
+      of the tag date?
+
+    * install.sh: Changed the installation path for template files to better 
+      match everything else on my system.
+
+2017-01-07  Rennie deGraaf <rennie.degraaf@gmail.com>
+
     * tools/DyphalGenerator.py: Removed the reference to ie8compat.js, since 
       that files was deleted in the previous commit.
 
