@@ -40,6 +40,12 @@ For future versions:
       trips?  Replace top-level divs with html5 header, footer, main, details, 
       nav elements?  calc() might make some of the CSS simpler.
 
+      IE 9 is still supported on Windows Vista until 2017-04-16 and on Windows 
+      Server 2008 until 2020-01-14.  IE 10 will be supported on Windows Server 
+      2012 and Windows Embedded 8 Standard until 2023.  IE 8 is actually still 
+      supported on Windows Embedded POSReady 2009 (which is based on Windows 
+      XP) until 2019-04-09.
+
     * Revisit whether Android <4.4 support is still needed.  If not, get rid of 
       the poll loop and overlay touching.  See bugs 2014-01-17_001 and 
       2014-05-16_001 for more details.

@@ -42,7 +42,7 @@ Dyphal was designed to satisfy the following goals:
 7.  All features of the album must work properly on recent versions of Chrome, 
     Firefox, Internet Explorer, and Android.  There should be no major problems 
     in minor browsers such as Opera and on old but still common browsers such 
-    as Internet Explorer 8.  
+    as Internet Explorer 9.  
 8.  All content must be in HTML or be inserted at run-time.  All styling must 
     be in CSS or inserted at run-time.
 9.  Album styles should be changeable without needing to change scripts.
@@ -212,12 +212,11 @@ Appending "`/debug`" to any album or photo URI will load it in debug mode,
 which suppresses some of the styling, outlines various document elements in 
 various colours, and logs some information to the browser console.
 
-Everything is implemented in as standards-conformant a manner as possible.  IE 
-8 has some significant issues and is handled using some IE-specific shims in 
-ie8compat.js.  Everything should be CSP-compatible.  Browser-specific logic is 
-implemented using feature detection rather than browser detection where 
-possible; browser detection is only used to work around the buggy touch 
-tracking in Android browsers because no way to fix this issue using feature 
+Everything is implemented in as standards-conformant a manner as possible.  
+Browser-specific logic is implemented using feature detection rather than 
+browser detection where possible; browser detection is only used to work around 
+the buggy touch tracking in Android browsers and the broken scrolling in 
+full-screen Internet Explorer because no ways to fix these issues using feature 
 detection could be found.
 
 If my JavaScript has idiosyncrasies, it's probably because I'm a C++ programmer 

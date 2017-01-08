@@ -330,21 +330,21 @@ function fitPhoto() {
                 // Constrained by width.
                 var photoWidth = Math.min(photoPanel.clientWidth - (photo.offsetWidth - 
                                                             photo.clientWidth), photoData.width);
-                photo.style["max-width"] = photoWidth + "px";
-                photo.style["max-height"] = (photoWidth / photoAspect) + "px";
+                photo.style["maxWidth"] = photoWidth + "px";
+                photo.style["maxHeight"] = (photoWidth / photoAspect) + "px";
             } else {
                 // Constrained by height.
                 var photoHeight = Math.min(photoPanel.clientHeight - (photo.offsetHeight - 
                                                             photo.clientHeight), photoData.height);
-                photo.style["max-height"] = photoHeight + "px";
-                photo.style["max-width"] = photoHeight * photoAspect + "px";
+                photo.style["maxHeight"] = photoHeight + "px";
+                photo.style["maxWidth"] = photoHeight * photoAspect + "px";
             }
 
             // Set the dimensions of the overlay
             if ((photo.width !== parseInt(photoData.width, 10)) || 
                 (photo.height !== parseInt(photoData.height, 10))) {
-                var windowWidth = window.innerWidth || document.documentElement.clientWidth;
-                var windowHeight = window.innerHeight || document.documentElement.clientHeight;
+                var windowWidth = window.innerWidth;
+                var windowHeight = window.innerHeight;
                 var windowAspect = windowWidth / windowHeight;
 
                 if (photoAspect >= windowAspect) {
@@ -711,7 +711,11 @@ function tryFullScreen(evt) {
     log ("tryFullScreen enter");
 
     try {
-        if (window.screen.width <= compactThreshold || window.screen.height < compactThreshold) {
+        // Scrolling is broken in full-screen MSIE 11, which completely breaks album view.  To work 
+        // around this bug, don't request full screen on MSIE.  Using "Rob W"'s MSIE-detection 
+        // code from https://stackoverflow.com/questions/9847580.
+        if ((window.screen.width <= compactThreshold || window.screen.height < compactThreshold) 
+            && !(/*@cc_on!@*/false || !!document.documentMode) /* is MSIE 6-11 */ ) {
             var rfs = document.documentElement.requestFullscreen 
                       || document.documentElement.webkitRequestFullScreen
                       || document.documentElement.mozRequestFullScreen

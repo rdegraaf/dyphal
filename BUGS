@@ -14,19 +14,17 @@
 
 
 2014-01-06_002  Rennie deGraaf  <rennie.degraaf@gmail.com>
-    Backspace doesn't work for navigation in IE8, Konqueror or Opera.
+    Backspace doesn't work for navigation in Konqueror or Opera.
 
-    WONTFIX.  This is not a core feature and 100% support for IE8, Konqueror, 
-    and Opera is not necessary.  It appears that backspace is tied to "back" in 
-    those browsers and cannot be handled in Javascript.
+    WONTFIX.  This is not a core feature and 100% support Konqueror and Opera 
+    is not necessary.  It appears that backspace is tied to "back" in those 
+    browsers and cannot be handled in Javascript.
 
 
 2014-01-12_001  Rennie deGraaf  <rennie.degraaf@gmail.com>
     CSS properties loaded through obj.style[prop] need to be camelCase.  The 
-    preferred way to get them is obj.style.getPropertyValue(prop), but this 
-    isn't supported by IE8 and is apparently buggy on some Firefox versions for 
-    shorthand properties (eg, "background").  Chrome does support dashed-
-    lowercase CSS properties through obj.style[prop].
+    preferred way to get them is obj.style.getPropertyValue(prop).  Chrome does 
+    support dashed-lowercase CSS properties through obj.style[prop].
 
     WORKAROUND: This is apparently an idiosyncrasy of the standards and 
     Chrome's behaviour is a non-standard extension.  Using obj.style[prop] and 
@@ -133,13 +131,6 @@
     can be loaded from existing albums.
 
 
-2014-04-25_001  Rennie deGraaf  <rennie.degraaf@gmail.com>
-    Compact layout doesn't work on IE 8.
-
-    WONTFIX: This is not a core feature and 100% support for IE 8 is not 
-    necessary.
-
-
 2014-04-27_001  Rennie deGraaf  <rennie.degraaf@gmail.com>
     Touch navigation doesn't work on Jun's Nexus 7" tablet and in the Android 
     4.4.2 simulator.
@@ -186,14 +177,6 @@
     anyway.
 
 
-2014-05-21_002  Rennie deGraaf  <rennie.degraaf@gmail.com>
-    Overlays (full-screen photo and help; caption/properties is inaccessible 
-    due to bug 2014-04-25_001) don't work in IE 8.
-
-    WONTFIX: This is not a core feature and 100% support for IE 8 is not 
-    necessary.
-
-
 2016-12-20_001  Rennie deGraaf  <rennie.degraaf@gmail.com>
     TOCTTOU in file name selection: files that don't exist when they are chosen
     in QFileDialog dialogs might get created before we try to write to them.  
@@ -219,17 +202,10 @@
     off the bottom of the screen can be selected by tabbing, but using enter to 
     attempt to load them yields a blank photo view.
 
-    OPEN
-
-
-2017-01-07_001  Rennie deGraaf  <rennie.degraaf@gmail.com>
-    Photo view is broken on MSIE 8/Windows XP.  It works on IE 11 on Windows 8.1 
-    and 10.  It seems to work on IE 9/Win7.
-
-    OPEN: Drop support for MSIE 8.  Microsoft stopped maintaining it a year ago 
-    (except on a couple Windows Embedded products) and trying to support it is 
-    just not worth the effort.  IE 9 is still supported on Windows Vista until 
-    2017-04-16.  IE 10 will be supported on Windows Server 2012 until 2023.
+    EXTERNAL:  This is apparently a bug in MSIE 11: see 
+    https://stackoverflow.com/questions/33562396.  It works as expected in 
+    Edge; I haven't tested older versions of MSIE.  Working around it by not 
+    requesting full-screen in MSIE.
 
 
 2017-01-07_002  Rennie deGraaf  <rennie.degraaf@gmail.com>

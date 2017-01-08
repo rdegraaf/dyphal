@@ -1,5 +1,16 @@
 2017-01-07  Rennie deGraaf <rennie.degraaf@gmail.com>
 
+    * www/dyphal.js: Don't request full-screen mode in MSIE 11, in order to 
+      work around bug 2017-01-06_001.
+
+    * README, www/dyphal.js, www/index.html, www/ie8compat.js: Drop support 
+      for MSIE 8, as photo view was broken in it (bug 2017-01-07_001) and 
+      it's been unmaintained for almost a year.  There are probably still 
+      various things in the CSS and JS that were only needed for MSIE 8 that 
+      should get cleaned up some time.
+
+2017-01-07  Rennie deGraaf <rennie.degraaf@gmail.com>
+
     * www/dyphal.js, www/index.html, www/photo.css: Center photos vertically 
       in compact layout.
 
