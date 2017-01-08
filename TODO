@@ -158,7 +158,8 @@ For future versions:
     * If KDE ever fixes their buggy directory chooser, consider switching to 
       the native dialog in DyphalUI::_installTemplate()
 
-    * Add command-line options to install.sh to set the installation paths.
+    * Add command-line options to install.sh to set the installation paths and 
+      to uninstall.
 
     * Get rid of ChangeLog in favour of git log?
 

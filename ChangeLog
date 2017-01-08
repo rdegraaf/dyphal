@@ -1,5 +1,10 @@
 2017-01-07  Rennie deGraaf <rennie.degraaf@gmail.com>
 
+    * tools/DyphalGenerator.py: Removed the reference to ie8compat.js, since 
+      that files was deleted in the previous commit.
+
+2017-01-07  Rennie deGraaf <rennie.degraaf@gmail.com>
+
     * www/dyphal.js: Don't request full-screen mode in MSIE 11, in order to 
       work around bug 2017-01-06_001.
 
