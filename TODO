@@ -10,9 +10,6 @@ For version 3:
 
     * De-select DyphalGenerator buttons after they're clicked upon.
 
-    * Add some sort of "About" dialog in DyphalGenerator with credits and 
-      licence details.
-
     * What happens if there is an I/O error in a background task?  For 
       instance, what happens to subsequent tasks if _bgCreateOutputDirectory 
       fails?  What happens to exceptions from _bgGenerateAlbum?  Are there 

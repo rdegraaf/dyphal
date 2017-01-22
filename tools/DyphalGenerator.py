@@ -50,6 +50,7 @@ from PyQt4 import QtCore
 from PyQt4 import QtGui
 
 from dyphal.ui import Ui_MainWindow
+from dyphal.about import Ui_AboutDialog
 from dyphal.util import DirectoryHandleList, handle_exceptions, ensure_directory
 from dyphal.photo import PhotoFile
 from dyphal.album import Album, ParseError, SaveError
@@ -300,6 +301,7 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
         self.openAlbumButton.clicked.connect(self._openAlbum)
         self.installTemplateButton.clicked.connect(self._installTemplate)
         self.cancelButton.clicked.connect(self._cancelBackgroundTasks)
+        self.aboutButton.clicked.connect(self._about)
         self._photosListFilter.delKeyPressed.connect(self._removePhotosHandler)
         self._photosListFilter.escKeyPressed.connect(self.photosList.clearSelection)
         self._captionsListFilter.delKeyPressed.connect(self._removeCaptionsHandler)
@@ -1083,6 +1085,14 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
 
         # Spawn background tasks to load the files using the new names.
         self._addPhotoFiles(new_names)
+
+    def _about(self):
+        """Show the help dialog."""
+        dialog = QtGui.QDialog(self)
+        dialog.ui = Ui_AboutDialog()
+        dialog.ui.setupUi(dialog)
+        dialog.ui.closeButton.clicked.connect(dialog.close)
+        dialog.show()
 
 
 def main():

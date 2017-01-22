@@ -1,5 +1,15 @@
 2017-01-21  Rennie deGraaf <rennie.degraaf@gmail.com>
 
+    * tools/About.ui: New file containing a QT Designer definition for an 
+      About dialog.
+
+    * tools/DyphalGenerator.py, tools/DyphalGenerator.ui: Added an "About" 
+      button to the main window that pops up a modeless dialog.
+
+    * install.sh: Build and install the new dialog UI.
+
+2017-01-21  Rennie deGraaf <rennie.degraaf@gmail.com>
+
     * tools/photo.py, www/dyphal.js: Added an albumVersion field to photo 
       JSON.
 
