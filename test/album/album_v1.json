@@ -2,7 +2,7 @@
     "albumVersion": 1,
     "title": "Test Album with an unnecessarily verbose title",
     "description": "This album is designed to test Dyphal.  It has photos with a mix of different caption types and date formats, a photo with an odd aspect ratio, a low-resolution photo, and a photo with a bunch of unusual characters in its name.",
-    "footer": "Copyright © \"Rennie deGraaf\" 2005-2013. <script>All rights \nreserved.&lt;script&gt;",
+    "footer": "Copyright © \"Rennie deGraaf\" 2005-2017. <script>All rights \nreserved.&lt;script&gt;",
     "photos": [
         {
             "name": "img_0357.jpg",

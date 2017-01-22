@@ -74,6 +74,8 @@ If you generated the album "Vacation" in a directory served as
 http://example.com/photos and installed the web template to the same directory, 
 you can view the album at http://example.com/photos/#/Vacation.
 
+To edit an album in DyphalGenerator, open the ".dyphal" file for the album.
+
 DyphalGenerator does not currently have a metadata editor.  Instead, it pulls 
 metadata fields from embedded photo tags.  The following tags are recognized 
 as "properties" (using exiftool's naming scheme): 
@@ -141,6 +143,10 @@ encouraged to serve Dyphal albums over HTTPS with the following headers:
 *   `Strict-Transport-Security: max-age=31536000`
 
 Since Dyphal uses asynchronous queries, it won't work from file:// URIs.  
+
+The ".dyphal" files created by DyphalGeneraor should **not** be served with the 
+web page.  These files are intended to allow DyphalGenerator to re-open and 
+edit albums.
 
 
 Technical details
@@ -287,8 +293,8 @@ never load JSON files or images from outside of the album directory.
 See [javascript.html](javascript.html) for information about Dyphal's use of 
 JavaScript.
 
-I'm aware that partial local paths are leaked in the `path` fields of album 
-JSON files.  See bug 2014-04-07_001 for details.
+The ".dyphal" files created by DyphalGenerator contain local paths and should 
+not be served with the web page.
 
 Why am I so concerned about TOCTOU in DyphalGenerator when there's no privilege 
 separation to be attacked?  Practice.

@@ -60,7 +60,7 @@ cat "$BIN_PATH"/DyphalGenerator | sed \
     >"$PKG_PATH"/"$PKG_NAME"/__init__.py
 cp tools/ui-header.py "$PKG_PATH"/"$PKG_NAME"/ui.py
 pyuic4 tools/DyphalGenerator.ui >>"$PKG_PATH"/"$PKG_NAME"/ui.py
-cp tools/util.py tools/photo.py "$PKG_PATH"/"$PKG_NAME"/
+cp tools/util.py tools/photo.py tools/album.py "$PKG_PATH"/"$PKG_NAME"/
 
 mkdir -p "$DATA_PATH"
 cp www/* "$DATA_PATH"/

@@ -1,0 +1,26 @@
+{
+    "albumVersion": 2,
+    "title": "Test Album with an unnecessarily verbose title",
+    "description": "",
+    "footer": "Copyright © \"Rennie deGraaf\" 2005-2017. <script>All rights \nreserved.&lt;script&gt;",
+    "photos": [
+        {
+            "path": "%7E/Projects/PhotoAlbum/trunk/test/img_0357.jpg"
+        },
+        {
+            "path": "%7E/Projects/PhotoAlbum/trunk/test/img_2235.jpg"
+        }
+    ],
+    "captionFields": [
+        "Description",
+        "Location"
+    ],
+    "propertyFields": [
+        "File name",
+        "File size"
+    ],
+    "photoResolution": [
+        1024,
+        768
+    ]
+}

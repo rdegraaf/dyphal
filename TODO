@@ -6,27 +6,26 @@ For version 3:
 
     * Fix bug 2016-12-20_001.
 
-    * Add a checkbox to the DyphalGenerator UI to make it possible to re-open 
-      an album.  If checked, DyphalGenerator will continue to output file paths 
-      and other information that's not used by the web page.  If unchecked, 
-      only output information needed by the web page.  This will address bug 
-      2014-04-07_002.
-
-      Alternately, create a separate album metadata file that's hidden from the 
-      user.  When an album is opened, look for the additional information and 
-      load it as well.  Maybe put a unique ID in the album file to make this 
-      easier?  This will require a new file format version.
-
     * Make DyphalGenerator work on non-Linux platforms
+
+    * De-select DyphalGenerator buttons after they're clicked upon.
 
     * Add some sort of "About" dialog in DyphalGenerator with credits and 
       licence details.
 
-    * Python type hints?
+    * What happens if there is an I/O error in a background task?  For 
+      instance, what happens to subsequent tasks if _bgCreateOutputDirectory 
+      fails?  What happens to exceptions from _bgGenerateAlbum?  Are there 
+      other potential unhandled exceptions lying around?
+
+    * Handle a failure to generate photo json
+
+    * Add a version tag to photo metadata files.
 
 For future versions:
 
-    * An automated test suite would be nice.
+    * More automated tests, including photo metadata handling and the git 
+      version commands in the installer.
 
     * Create an index view, populated from an index JSON that lists all albums. 
       Add album thumbnails to album JSON; load all album JSONs from the index 
@@ -76,6 +75,9 @@ For future versions:
     * Model-View separation in DyphalGenerator.  At the very least, I'd no 
       longer need to make foreground-thread callbacks every time I want to 
       change something.
+
+      Replace AlbumFile with a proper class that holds all album data.  Is 
+      there a way to specify the JSON encoding of a class?
 
     * Move the help content into a separate file and load both the help and 
       readme content in iframes on top of the album.
@@ -162,4 +164,12 @@ For future versions:
       to uninstall.
 
     * Get rid of ChangeLog in favour of git log?
+
+    * Python type hints?  Requires minimum Python 3.5.  Apparently type hints 
+      are ignored by Python and are only intended for third-party tools.  They 
+      should, however, make the code more readable.  See 
+      https://docs.python.org/3/library/typing.html and the PEP documents that 
+      it links for more details.
+
+    * Better fonts?
 

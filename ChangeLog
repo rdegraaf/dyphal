@@ -1,3 +1,27 @@
+2017-01-21  Rennie deGraaf <rennie.degraaf@gmail.com>
+
+    * tools/album.py: New file containing album parsing and serialization 
+      code for DyphalGenerator.  There are now separate ".dyphal" files 
+      containing the information necessary to re-load an album; the album 
+      JSON files no longer contain local paths or other data that's not 
+      necessary for the web page.  This necessitated a file format version.
+
+    * tools/DyphalGenerator: Use the new album load/save code.
+
+    * install.sh: Install the new file.
+
+    * test.sh, test/test_DyphalGenerator_Album_{load,save}.py, 
+      test/test_cases/test_DyphalGenerator_Album_{load,save}/*: Test scripts 
+      and data for saving and loading albums.
+
+    * test/album/album.json: Renamed to test/album/album_v1.json.
+
+    * test/album/album_v2.dyphal: Test album file for file format v2.
+
+    * www/dyphal.js: Verify that the album JSON is a supported version.
+
+    * README: Documented the new album save files.
+
 2017-01-07  Rennie deGraaf <rennie.degraaf@gmail.com>
 
     * install.sh: Fixed the version naming logic.  Apparently that git 
@@ -10,7 +34,7 @@
 2017-01-07  Rennie deGraaf <rennie.degraaf@gmail.com>
 
     * tools/DyphalGenerator.py: Removed the reference to ie8compat.js, since 
-      that files was deleted in the previous commit.
+      that file was deleted in the previous commit.
 
 2017-01-07  Rennie deGraaf <rennie.degraaf@gmail.com>
 
@@ -21,7 +45,7 @@
       for MSIE 8, as photo view was broken in it (bug 2017-01-07_001) and 
       it's been unmaintained for almost a year.  There are probably still 
       various things in the CSS and JS that were only needed for MSIE 8 that 
-      should get cleaned up some time.
+      should get cleaned up sometime.
 
 2017-01-07  Rennie deGraaf <rennie.degraaf@gmail.com>
 

@@ -97,18 +97,6 @@
     WONTFIX: Paths are necessarily system-specific and most contents of user 
     home directories are only readable by their owner.  There's no clear need 
     for users on the same system to be able to import each other's album files. 
-    Also, addressing this issue would aggrevate bug 2014-04-07_002.
-
-
-2014-04-07_002  Rennie deGraaf  <rennie.degraaf@gmail.com>
-    Album JSON files contain paths to the original photos and are shared to the 
-    world.  This leaks information about the user's system environment.
-
-    POSTPONED: This is an artefact of not wanting separate save and album 
-    files.  The paths likely aren't valid on the machine serving photo albums 
-    to the web, so the usefulness of the paths to an attacker is limited.  To 
-    fix this, I'll need to either create separate save files or encrypt the 
-    paths.
 
 
 2014-04-09_002  Rennie deGraaf  <rennie.degraaf@gmail.com>

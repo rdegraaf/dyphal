@@ -52,6 +52,7 @@ from PyQt4 import QtGui
 from dyphal.ui import Ui_MainWindow
 from dyphal.util import DirectoryHandleList, handle_exceptions, ensure_directory
 from dyphal.photo import PhotoFile
+from dyphal.album import Album, ParseError, SaveError
 
 # These variables may be re-written by the installation script
 DATA_PATH = os.path.expanduser("~/.share/dyphal/")
@@ -82,7 +83,6 @@ class Config(object):
     """
 
     PROGRAM_NAME = "Dyphal Generator"
-    FILE_FORMAT_VERSION = 1
     THUMB_WIDTH = 160
     THUMB_HEIGHT = 120
     THUMB_QUALITY = 50
@@ -219,7 +219,7 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
 
     FILTER_IMAGES = "Images (*.jpeg *.jpg *.png *.tiff *.tif)"
     FILTER_GTHUMB3_CATALOGS = "gThumb catalogs (*.catalog)"
-    FILTER_ALBUMS = "Albums (*.json)"
+    FILTER_ALBUMS = "Albums (*.dyphal);;JSON Albums (*.json);;All (*.*)"
 
     _addPhotoSignal = QtCore.pyqtSignal(PhotoFile, bool)  # A photo is ready to be added to the UI.
     _showErrorSignal = QtCore.pyqtSignal(str)  # An error message needs to be displayed.
@@ -733,7 +733,6 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
             album_dir_name = os.path.dirname(album_file_name)
 
             album = self._saveUIData()
-            album["albumVersion"] = Config.FILE_FORMAT_VERSION
             album["metadataDir"] = urllib.parse.quote(Config.METADATA_DIR + "/")
             album["title"] = self.titleText.toPlainText()
             album["description"] = self.descriptionText.toPlainText()
@@ -840,12 +839,11 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
         directories.add(name, dir_fd)
         self._incProgressSignal.emit()
 
-    def _bgGenerateAlbum(self, album, get_album_file_name, dir_creation_task):
+    def _bgGenerateAlbum(self, album_data, get_album_file_name, dir_creation_task):
         """Background task to generate an album JSON file."""
         if None is not dir_creation_task:
             concurrent.futures.wait([dir_creation_task])
-        with open(get_album_file_name(), "w") as album_file:
-            json.dump(album, album_file, sort_keys=True)
+        Album.save(get_album_file_name(), album_data)
         self._incProgressSignal.emit()
 
     def _bgTasksComplete(self, tasks, directories, message, cleansing=False):
@@ -869,6 +867,8 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
             except (subprocess.CalledProcessError, subprocess.TimeoutExpired):
                 # convert failed or timed out.
                 errors.append("Error resizing " + task.photoName)
+            except (SaveError) as exc:
+                errors.append(str(exc))
             except:
                 (exc_type, exc_value, exc_traceback) = sys.exc_info()
                 traceback.print_exception(exc_type, exc_value, exc_traceback)
@@ -955,7 +955,7 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
 
             album_file_name = QtGui.QFileDialog.getOpenFileName(self, "Select album", 
                                                                 self._config.outputDir, 
-                                                                self.FILTER_ALBUMS)
+                                                                self.tr(self.FILTER_ALBUMS))
             # The QT documentation says that getOpenFileName returns a null string on cancel.  But 
             # it returns an empty string here.  Maybe that's a PyQt bug?
             if "" != album_file_name:
@@ -969,16 +969,15 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
     def _bgLoadAlbum(self, album_file_name):
         """Background task to open and parse an album JSON file."""
         try:
-            with open(album_file_name) as album_file:
-                data = json.load(album_file)
-                if "albumVersion" in data and Config.FILE_FORMAT_VERSION == data["albumVersion"]:
-                    # Call back to the foreground to populate the UI.
-                    self._setAlbumDataSignal.emit(album_file_name, data)
-                else:
-                    raise ValueError("Invalid album file")
-        except (KeyError, ValueError, OSError):
-            self._showErrorSignal.emit("Unable to load an album from '%s'." % 
-                                       (os.path.basename(album_file_name)))
+            data = Album.load(album_file_name)
+            # Call back to the foreground to populate the UI.
+            self._setAlbumDataSignal.emit(album_file_name, data)
+        except (OSError) as exc:
+            self._showErrorSignal.emit("Error reading '%s': %s." % 
+                                       (os.path.basename(album_file_name)), str(exc))
+        except (ParseError) as exc:
+            self._showErrorSignal.emit("Error loading an album from '%s': %s" % 
+                                       (os.path.basename(album_file_name)), str(exc))
         self._backgroundCompleteSignal.emit(False)
 
     def _setAlbumData(self, album_file_name, data):

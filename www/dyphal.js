@@ -597,6 +597,7 @@ function loadAlbumContent() {
 // Sanity-check the album description.  Error out if it's invalid.
 function verifyAlbum(albumData) {
     if ((undefined === albumData) || 
+        (undefined === albumData.albumVersion) || 
         (undefined === albumData.title) || 
         (undefined === albumData.footer) || 
         (undefined === albumData.description) || 
@@ -612,6 +613,9 @@ function verifyAlbum(albumData) {
             (undefined === albumData.photos[i].orientation)) {
             throw new Error("Album data is invalid");
         }
+    }
+    if (1 != albumData.albumVersion && 2 != albumData.albumVersion) {
+        throw new Error("Album data version is not supported");
     }
 }
 
