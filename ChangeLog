@@ -1,5 +1,12 @@
 2017-01-21  Rennie deGraaf <rennie.degraaf@gmail.com>
 
+    * tools/photo.py, www/dyphal.js: Added an albumVersion field to photo 
+      JSON.
+
+    * www/dyphal.js: Corrected an unrelated JSLint warning.
+
+2017-01-21  Rennie deGraaf <rennie.degraaf@gmail.com>
+
     * tools/album.py: New file containing album parsing and serialization 
       code for DyphalGenerator.  There are now separate ".dyphal" files 
       containing the information necessary to re-load an album; the album 

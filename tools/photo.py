@@ -27,6 +27,7 @@ import math
 from PyQt4 import QtGui
 
 from dyphal.util import RefCounted
+from dyphal.album import Album
 
 class PropertyError(Exception):
     """Exception raised if a photo property has an unexpected value."""
@@ -287,6 +288,7 @@ class PhotoFile(RefCounted, QtGui.QListWidgetItem):
         (width, height) = self._rescale(width_base * height_base)
 
         data = {}
+        data["albumVersion"] = Album.CURRENT_VERSION
         data["photo"] = urllib.parse.quote(os.path.join(self._config.PHOTO_DIR, self._fileName))
         data["width"] = str(width)
         data["height"] = str(height)

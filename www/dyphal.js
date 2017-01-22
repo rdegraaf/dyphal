@@ -272,6 +272,12 @@ function verifyPhoto(photoData) {
         (undefined === photoData.caption)) {
         throw new Error("Photo data is invalid");
     }
+    // There are no differences between v1 and v2 photo JSON.  Early builds did not include a 
+    // version field.
+    if (undefined !== photoData.albumVersion 
+        && 1 != photoData.albumVersion && 2 != photoData.albumVersion) {
+        throw new Error("Album data version is not supported");
+    }
 }
 
 
@@ -614,6 +620,8 @@ function verifyAlbum(albumData) {
             throw new Error("Album data is invalid");
         }
     }
+    // The only changes in v2 album JSON were the removal of fields that are not used by the 
+    // web page.
     if (1 != albumData.albumVersion && 2 != albumData.albumVersion) {
         throw new Error("Album data version is not supported");
     }
@@ -725,7 +733,7 @@ function tryFullScreen(evt) {
                       || document.documentElement.mozRequestFullScreen
                       || document.documentElement.msRequestFullscreen;
             if (rfs) {
-                rfs.call(document.documentElement)
+                rfs.call(document.documentElement);
             }
         }
     } catch (e) {

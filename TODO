@@ -6,7 +6,7 @@ For version 3:
 
     * Fix bug 2016-12-20_001.
 
-    * Make DyphalGenerator work on non-Linux platforms
+    * Make DyphalGenerator work on non-Linux platforms.
 
     * De-select DyphalGenerator buttons after they're clicked upon.
 
@@ -18,9 +18,7 @@ For version 3:
       fails?  What happens to exceptions from _bgGenerateAlbum?  Are there 
       other potential unhandled exceptions lying around?
 
-    * Handle a failure to generate photo json
-
-    * Add a version tag to photo metadata files.
+    * Handle a failure to generate photo json.
 
 For future versions:
 
