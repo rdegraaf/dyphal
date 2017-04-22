@@ -1,3 +1,8 @@
+2017-04-22  Rennie deGraaf <rennie.degraaf@gmail.com>
+
+    * tools/photorename.sh: Use five-digit numbers in photo names rather than 
+      four-digit.
+
 2017-01-21  Rennie deGraaf <rennie.degraaf@gmail.com>
 
     * tools/About.ui: New file containing a QT Designer definition for an 
