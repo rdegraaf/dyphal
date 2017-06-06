@@ -1,3 +1,7 @@
+2017-06-05  Rennie deGraaf <rennie.degraaf@gmail.com>
+
+    * tools/photorename.sh: Use five-digit numbers in Gthumb XML files, too.
+
 2017-04-22  Rennie deGraaf <rennie.degraaf@gmail.com>
 
     * tools/photorename.sh: Use five-digit numbers in photo names rather than 

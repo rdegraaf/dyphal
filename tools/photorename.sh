@@ -73,7 +73,7 @@ do
     gthxml_name="$dir_name"/.comments/"$file_name".xml
     if [ -e "$gthxml_name" ]
     then
-        new_name=$(printf "%s/.comments/%s_%04i.jpeg.xml" "$dir_name" "$camera" "$number")
+        new_name=$(printf "%s/.comments/%s_%05i.jpeg.xml" "$dir_name" "$camera" "$number")
         if [ -e "$new_name" ] # this check is vulnerable to races, so don't rely on it
         then
             echo "\"$new_name\" already exists; skipping $file"
