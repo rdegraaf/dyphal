@@ -21,9 +21,11 @@
 # You should have received a copy of the GNU General Public License 
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-# Usage: photorename.sh <camera name> <photos...>
-# For example, "$ photorename.sh sx10 2014/*.JPG" will rename all ".JPG" files 
-# in "2014/" to names like "sx10_00023.jpeg".
+# Usage: photorename.sh [+<add>] <camera name> <photos...>
+# If the optional parameter "+<add>" is provided, then that number will be 
+# added to photo numbers.
+# For example, "$ photorename.sh +10000 sx10 2014/*.JPG" will rename all ".JPG" files 
+# in "2014/" to names like "sx10_10023.jpeg".
 
 # author: Rennie deGraaf <rennie.degraaf@gmail.com>
 # version: VERSION
@@ -32,8 +34,14 @@
 
 PATH=/bin:/usr/bin
 
+add=0
 if [ 1 -lt $# ]
 then
+    if [[ $1 == +* ]]
+    then
+        add=${1##+}
+        shift
+    fi
     camera=$1
     shift
 else
@@ -57,6 +65,7 @@ do
     number=$(echo "$file_name" | sed -re 's/^[^_]+_0*([0-9]+)\..*$/\1/')
     # I accidentally reset the numbering on my A80 in spring 2009.
     #number=$((number+4080))
+    number=$((number+add))
 
     # Rename the photo
     new_name=$(printf "%s/%s_%05i.jpeg" "$dir_name" "$camera" "$number")
