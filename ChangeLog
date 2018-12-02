@@ -1,3 +1,7 @@
+2018-12-01  Rennie deGraaf <rennie.degraaf@gmail.com>
+
+    * tools/photorename.sh: Added support for Panasonic's numbering scheme.
+
 2017-06-05  Rennie deGraaf <rennie.degraaf@gmail.com>
 
     * tools/photorename.sh: Added a parameter to add to photo numbers.

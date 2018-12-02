@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # photorename.sh
-# Copyright (c) Rennie deGraaf, 2010-2017.
+# Copyright (c) Rennie deGraaf, 2010-2018.
 #
 # Rename photos to encode a camera name into the file names rather than a 
 # meaningless string like "IMG".  Use a ".jpeg" suffix on the resulting 
@@ -24,8 +24,8 @@
 # Usage: photorename.sh [+<add>] <camera name> <photos...>
 # If the optional parameter "+<add>" is provided, then that number will be 
 # added to photo numbers.
-# For example, "$ photorename.sh +10000 sx10 2014/*.JPG" will rename all ".JPG" files 
-# in "2014/" to names like "sx10_10023.jpeg".
+# For example, "$ photorename.sh +10000 sx10 2014/*.JPG" will rename all ".JPG" 
+# files in "2014/" to names like "sx10_10023.jpeg".
 
 # author: Rennie deGraaf <rennie.degraaf@gmail.com>
 # version: VERSION
@@ -37,7 +37,7 @@ PATH=/bin:/usr/bin
 add=0
 if [ 1 -lt $# ]
 then
-    if [[ $1 == +* ]]
+    if [ 2 -lt $# ] && [[ $1 == +* ]]
     then
         add=${1##+}
         shift
@@ -45,7 +45,7 @@ then
     camera=$1
     shift
 else
-    echo "Usage: $0 <camera name> <photos...>"
+    echo "Usage: $0 [+<add>] <camera name> <photos...>"
     exit 1
 fi
 
@@ -53,18 +53,25 @@ for file in "$@"
 do
     dir_name=$(dirname "$file")
     file_name=$(basename "$file")
+    declare -i number
 
-    # Make sure we're dealing with a file name pattern that we can handle.
-    if ! echo "$file_name" | grep -Ei '^[^_]+_([0-9]{4,5})\.jpe?g$' > /dev/null
+    # Extract the photo's number
+    # Make sure to remove leading zeroes from the number, or bash will think 
+    # that the number is in octal.
+    if echo "$file_name" | grep -Ei '^[^_]+_([0-9]{4,5})\.jpe?g$' > /dev/null
     then
+        # Canon numbering pattern or similar
+        number=$(echo "$file_name" | sed -re 's/^[^_]+_0*([0-9]+)\..*$/\1/')
+    elif echo "$file_name" | grep -Ei '^P10([0-9]{5})\.jpe?g$' > /dev/null
+    then
+        # Panasonic numbering pattern
+        number=$(echo "$file_name" | sed -re 's/^P100*([0-9]+)\..*$/\1/')
+    else 
         echo "Unrecognized file name pattern '" "$file" "'"
         continue
     fi
 
-    # Extract the photo's number.
-    number=$(echo "$file_name" | sed -re 's/^[^_]+_0*([0-9]+)\..*$/\1/')
-    # I accidentally reset the numbering on my A80 in spring 2009.
-    #number=$((number+4080))
+    # Add to the number if requested
     number=$((number+add))
 
     # Rename the photo
