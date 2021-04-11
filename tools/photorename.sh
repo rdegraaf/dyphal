@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # photorename.sh
 # Copyright (c) Rennie deGraaf, 2010-2018.
