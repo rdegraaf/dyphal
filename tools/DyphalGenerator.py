@@ -428,7 +428,7 @@ class DyphalUI(QtWidgets.QMainWindow, Ui_MainWindow):
             file_names = QtWidgets.QFileDialog.getOpenFileNames(self, "Select photos", 
                                                                 self._config.photoDir, 
                                                                 self.FILTER_IMAGES)
-            assert (2 == len(file_names)) and (self.FILTER_IMAGES == file_names[1])
+            assert (2 == len(file_names)) and (file_names[1] in ['', self.FILTER_IMAGES])
             file_names = file_names[0]
             self._addPhotoFiles([(name, os.path.basename(name)) for name in file_names])
             if 0 < len(file_names):
@@ -439,7 +439,7 @@ class DyphalUI(QtWidgets.QMainWindow, Ui_MainWindow):
                                                                       self._config.gthumb3Dir, 
                                                                       self.FILTER_GTHUMB3_CATALOGS)
             assert (2 == len(catalog_file_name)) \
-                and (self.FILTER_GTHUMB3_CATALOGS == catalog_file_name[1])
+                and (catalog_file_name[1] in ['', self.FILTER_GTHUMB3_CATALOGS])
             catalog_file_name = catalog_file_name[0]
             # The QT documentation says that getOpenFileName returns a null string on cancel.  But 
             # it returns an empty string here.  Maybe that's a PyQt bug?

@@ -1,5 +1,10 @@
 2021-08-15  Rennie deGraaf <rennie.degraaf@gmail.com>
 
+    * tools/DyphalGenerator.py: fixed an assertion error due to an incorrect 
+      Qt5-related check
+
+2021-08-15  Rennie deGraaf <rennie.degraaf@gmail.com>
+
     * install.sh, tools/DyphalGenerator.py, tools/photo.py: update to PyQt5
       and recent versions of Pandoc.  NOT FULLY TESTED!
 
