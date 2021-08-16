@@ -200,3 +200,45 @@
     Keyboard navigation sometimes fails on Edge.
 
     OPEN
+
+
+2019-11-30_001	Rennie deGraaf	<rennie.degraaf@gmail.com>
+    In DyphalGenerator, when one tries to import a gThumb3 catalog containing 
+    references to a directory that doesn't exist, subsequent attempts to import 
+    a catalog mail fail with multiple errors akin to "Error opening photo 
+    /proc/17873/fs/20".
+    
+    On exit, the following message was logged to the console:
+    
+    Traceback (most recent call last):
+        File "/home/degraaf/bin/DyphalGenerator", line 1135, in main
+            sys.exit(app.exec_())
+        SystemExit: 0
+
+        During handling of the above exception, another exception occurred:
+
+        Traceback (most recent call last):
+        File "/home/degraaf/bin/DyphalGenerator", line 1139, in <module>
+            main()
+        File "/home/degraaf/bin/DyphalGenerator", line 1135, in main
+            sys.exit(app.exec_())
+        File "/home/degraaf/bin/DyphalGenerator", line 184, in __exit__
+            self.close()
+        File "/home/degraaf/bin/DyphalGenerator", line 174, in close
+            self.tempDir.cleanup()
+        File "/usr/lib64/python3.5/tempfile.py", line 812, in cleanup
+            _shutil.rmtree(self.name)
+        File "/usr/lib64/python3.5/shutil.py", line 471, in rmtree
+            onerror(os.lstat, path, sys.exc_info())
+        File "/usr/lib64/python3.5/shutil.py", line 469, in rmtree
+            orig_st = os.lstat(path)
+        FileNotFoundError: [Errno 2] No such file or directory: '/tmp/tmpocuu6hoj'
+
+    OPEN
+
+
+2019-11-30_002	Rennie deGraaf	<rennie.degraaf@gmail.com>
+    Provide better zoom behaviour in photo overlay view.
+
+    OPEN
+

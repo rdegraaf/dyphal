@@ -17,10 +17,16 @@ For version 3:
 
     * Handle a failure to generate photo json.
 
+    * Check for the presence of exiftool and other dependencies in 
+      gthumb_comment_update.py
+
 For future versions:
 
     * More automated tests, including photo metadata handling and the git 
       version commands in the installer.
+
+    * Replace external dependencies (convert, exiftool) with calls to some 
+      library.
 
     * Create an index view, populated from an index JSON that lists all albums. 
       Add album thumbnails to album JSON; load all album JSONs from the index 
@@ -144,7 +150,7 @@ For future versions:
       Re-loading the photo JSON and comparing it to fresh data is probably not 
       worth the effort, but substantial time could be saved by not 
       re-generating scaled photos.  However, this would require me to store 
-      some measure if whether the photo itself has changed.  Can I get a hash 
+      some measure of whether the photo itself has changed.  Can I get a hash 
       of the photo that excludes embedded metadata?
 
     * Better icons in DyphalGenerator.
@@ -168,3 +174,10 @@ For future versions:
 
     * Better fonts?
 
+    * Display time zones in photo metadata.
+
+    * Respect gThumb's order element, created if one manually re-orders photos.
+
+    * CSS layout ideas: flex and grid layouts
+      https://web.dev/one-line-layouts/
+      https://cssfordesigners.com/articles/things-i-wish-id-known-about-css

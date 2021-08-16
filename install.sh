@@ -59,9 +59,9 @@ cat "$BIN_PATH"/DyphalGenerator | sed \
         -e '/^#!.*/d' -e '/^import/,$d' \
     >"$PKG_PATH"/"$PKG_NAME"/__init__.py
 cp tools/ui-header.py "$PKG_PATH"/"$PKG_NAME"/ui.py
-pyuic4 tools/DyphalGenerator.ui >>"$PKG_PATH"/"$PKG_NAME"/ui.py
+pyuic5 tools/DyphalGenerator.ui >>"$PKG_PATH"/"$PKG_NAME"/ui.py
 cp tools/ui-header.py "$PKG_PATH"/"$PKG_NAME"/about.py
-pyuic4 tools/About.ui | sed -r \
+pyuic5 tools/About.ui | sed -r \
         -e "s/%VERSION%/${version}/" \
     >>"$PKG_PATH"/"$PKG_NAME"/about.py
 cp tools/util.py tools/photo.py tools/album.py "$PKG_PATH"/"$PKG_NAME"/
@@ -73,7 +73,8 @@ cat www/index.html | sed -r \
     >"$DATA_PATH"/index.html
 cat README | sed -r \
         -e "s@(^Version ).*\$@\1${version}, ${date}@" \
-    | pandoc -t html5 -s -S --template=misc/html5.pandoc  \
+    | pandoc -t html5+smart -s --template=misc/html5.pandoc \
+        --metadata pagetitle="Dyphal"  \
     >"$DATA_PATH"/README.html
 
 cat tools/gthumb-comment-update.py | sed -r \

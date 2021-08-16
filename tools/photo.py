@@ -1,5 +1,5 @@
 """Classes to represent a photo and its properties in DyphalGenerator.
-Copyright (c) Rennie deGraaf, 2005-2017.
+Copyright (c) Rennie deGraaf, 2005-2021.
 
 This program is free software; you can redistribute it and/or modify it 
 under the terms of the GNU General Public License as published by the 
@@ -24,9 +24,9 @@ import json
 import urllib.parse
 import math
 
-from PyQt4 import QtGui
+from PyQt5 import QtWidgets
 
-from dyphal.util import RefCounted
+from dyphal.util import RefCounted, safe_open_file
 from dyphal.album import Album
 
 class PropertyError(Exception):
@@ -97,7 +97,7 @@ def format_display_time(timestamp):
         raise PropertyError("Display time", timestamp)
 
 
-class PhotoFile(RefCounted, QtGui.QListWidgetItem):
+class PhotoFile(RefCounted, QtWidgets.QListWidgetItem):
     """A photo to add to the album.
 
     Attributes:
@@ -114,9 +114,7 @@ class PhotoFile(RefCounted, QtGui.QListWidgetItem):
                 the album.
         _thumbName (str): The name of the thumbnail file for this photo 
                 in the album.
-        _linkPath (str): The full path to the link to this photo in the 
-                album's temporary directory.
-        _fileDescriptor (int): A file descriptor for the photo file.
+        _file (varies): An object that protects the file from TOCTTOU.
         _width (int): The photo's width in pixels.
         _height (int): The photo's height in pixels.
         _config (Config): A reference to the global configuration object.
@@ -150,13 +148,13 @@ class PhotoFile(RefCounted, QtGui.QListWidgetItem):
         Property("File:FileSize", "File size"),
         Property("File:FileType", "File type"),
         Property("MakerNotes:MacroMode", "Macro mode"),
-        Property("MakerNotes:Rotation", "Rotation", transform=lambda i: str(i)+" degrees")
+        Property("MakerNotes:Rotation", "Rotation", transform=lambda i: str(i)+" degrees"),
+        Property("MakerNotes:HDR", "HDR")
     ]
 
     def __init__(self, filepath, fileName, config):
-        """Initializes a PhotoFile.  Opens the file, links it to a 
-        temporary directory, and extracts properties and captions 
-        from it."""
+        """Initializes a PhotoFile.  Opens the file and extracts 
+        properties and captions from it."""
         self._config = config
         self._fileName = fileName
         self._fileFullPath = re.sub("^"+os.path.expanduser("~"), "~", filepath)
@@ -164,28 +162,12 @@ class PhotoFile(RefCounted, QtGui.QListWidgetItem):
         self._jsonName = self._fileName + ".json"
         (name, suffix) = os.path.splitext(self._fileName)
         self._thumbName = name + ".thumbnail" + suffix
-        # Don't set linkPath until after the link has been created.  Otherwise, a FileExistsError 
-        # due to us already having the file open somewhere else will result in us deleting the link 
-        # when we try to clean up.
-        self._linkPath = None
-        self._fileDescriptor = None
-
-        # To avoid TOCTOU when passing file names to other programs, we do the following:
-        #  1. Create a secure temporary directory.
-        #  2. Open the file.  Get its file descriptor.
-        #  3. Construct the /proc/<pid>/fd/<fd> path to the file using the file descriptor.
-        #  4. Create a symlink from the temporary directory to the /proc path.  The link's name is 
-        #     unique but predictable; that's ok because the directory is secure.
-        #  5. Pass the symlink's path to other programs.
-
+        self._file = safe_open_file(filepath, fileName, config)
+        
         try:
-            self._fileDescriptor = os.open(filepath, os.O_RDONLY)
-            link_path = os.path.join(config.tempDir.name, self._fileName)
-            os.symlink("/proc/%d/fd/%d" % (os.getpid(), self._fileDescriptor), link_path)
-            self._linkPath = link_path
             # gThumb stores IPTC strings as UTF-8, but does not set CodedCharacterSet
             properties_text = subprocess.check_output(
-                ["exiftool", "-charset", "iptc=UTF8", "-json", "-a", "-G", "-All", self._linkPath], 
+                ["exiftool", "-charset", "iptc=UTF8", "-json", "-a", "-G", "-All", self._file.getPath()], 
                 timeout=self._config.BG_TIMEOUT, universal_newlines=True, stderr=subprocess.STDOUT)
             properties_obj = json.loads(properties_text)[0]
 
@@ -238,24 +220,13 @@ class PhotoFile(RefCounted, QtGui.QListWidgetItem):
             raise
 
     def _dispose(self):
-        """Close a photo file and unlink it from the temporary directory.
+        """Close a photo file.
         Overrides RefCounted._dispose()."""
-        try:
-            if None is not self._linkPath:
-                os.unlink(self._linkPath)
-        except OSError:
-            pass
-        self._linkPath = None
-        try:
-            if None is not self._fileDescriptor:
-                os.close(self._fileDescriptor)
-        except OSError:
-            pass
-        self._fileDescriptor = None
+        self._file.dispose()
 
     def getPath(self):
         """Return the path to the photo file."""
-        return self._linkPath
+        return self._file.getPath()
 
     def _rescale(self, pixels):
         """Calculate the optimal width and height for the photo to keep 
@@ -305,7 +276,7 @@ class PhotoFile(RefCounted, QtGui.QListWidgetItem):
         """Generate a scaled-down photo."""
         (width, height) = self._rescale(width_base * height_base)
         # See http://www.imagemagick.org/Usage/resize/
-        subprocess.check_call(["convert", self._linkPath, "-resize", "%dx%d>" % (width, height), 
+        subprocess.check_call(["convert", self.getPath(), "-resize", "%dx%d>" % (width, height), 
                                "-strip", "-quality", str(quality), 
                                os.path.join(out_dir_name, self._fileName)], 
                               timeout=self._config.BG_TIMEOUT)
@@ -317,7 +288,7 @@ class PhotoFile(RefCounted, QtGui.QListWidgetItem):
         if self._width < self._height:
             width, height = (height_base, width_base)
         # See http://www.imagemagick.org/Usage/thumbnails/
-        subprocess.check_call(["convert", self._linkPath, "-thumbnail", "%dx%d^" % (width, height), 
+        subprocess.check_call(["convert", self.getPath(), "-thumbnail", "%dx%d^" % (width, height), 
                                "-gravity", "center", "-extent", "%dx%d" % (width, height), 
                                "-quality", str(quality), 
                                os.path.join(out_dir_name, self._thumbName)], 

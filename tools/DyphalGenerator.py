@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 """Server-side data generator for Dyphal, the Dynamic Photo Album.
-Copyright (c) Rennie deGraaf, 2005-2017.
+Copyright (c) Rennie deGraaf, 2005-2021.
 
 DyphalGenerator is a tool to create photo albums to display using 
 Dyphal.  It can import metadata from a variety of embedded photo tags 
@@ -46,8 +46,9 @@ import functools
 import shutil
 import urllib.parse
 
-from PyQt4 import QtCore
-from PyQt4 import QtGui
+from PyQt5 import QtCore
+from PyQt5 import QtGui
+from PyQt5 import QtWidgets
 
 from dyphal.ui import Ui_MainWindow
 from dyphal.about import Ui_AboutDialog
@@ -151,6 +152,13 @@ class Config(object):
         # Not stored in the configuration file
         self.tempDir = tempfile.TemporaryDirectory()
 
+        # Do we have /prod/pid/fd?
+        try:
+            with open("/proc/%d/fd/0" % (os.getpid())) as fh:
+                self.haveProcPid = True
+        except (FileNotFoundException, os.error):
+            self.haveProcPid = False
+
     def save(self):
         """Save the current state to the configuration file."""
         # If we couldn't open or create the config file, don't bother saving.
@@ -202,7 +210,7 @@ class ListKeyFilter(QtCore.QObject):
         return False
 
 
-class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
+class DyphalUI(QtWidgets.QMainWindow, Ui_MainWindow):
     """The Dyphal Generator UI.
 
     Attributes (not including UI objects):
@@ -258,20 +266,20 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
         self.splitter.setCollapsible(0, False)
 
         # Set up the menu for the "Add Photos" button
-        self._addPhotosButtonMenu = QtGui.QMenu(self.addPhotosButton)
-        self._addPhotosFiles = QtGui.QAction("Add Files...", self._addPhotosButtonMenu)
-        self._addPhotosGthumb3 = QtGui.QAction("Add a gThumb 3 Catalog...", 
-                                               self._addPhotosButtonMenu)
+        self._addPhotosButtonMenu = QtWidgets.QMenu(self.addPhotosButton)
+        self._addPhotosFiles = QtWidgets.QAction("Add Files...", self._addPhotosButtonMenu)
+        self._addPhotosGthumb3 = QtWidgets.QAction("Add a gThumb 3 Catalog...", 
+                                                   self._addPhotosButtonMenu)
         self._addPhotosButtonMenu.addAction(self._addPhotosFiles)
         self._addPhotosButtonMenu.addAction(self._addPhotosGthumb3)
         self.addPhotosButton.setMenu(self._addPhotosButtonMenu)
 
         # Set up the menu for the "Add Caption" button
-        self._addCaptionButtonMenu = QtGui.QMenu(self.addCaptionButton)
+        self._addCaptionButtonMenu = QtWidgets.QMenu(self.addCaptionButton)
         self.addCaptionButton.setMenu(self._addCaptionButtonMenu)
 
         # Set up the menu for the "Add Property" button
-        self._addPropertyButtonMenu = QtGui.QMenu(self.addPropertyButton)
+        self._addPropertyButtonMenu = QtWidgets.QMenu(self.addPropertyButton)
         self.addPropertyButton.setMenu(self._addPropertyButtonMenu)
 
         # Listen for keyboard events in photosList, captionsList, and propertiesList
@@ -335,29 +343,29 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
 
         # Prompt if the album is dirty.
         if self._dirty and 0 < self.photosList.count() \
-           and QtGui.QMessageBox.No == QtGui.QMessageBox.warning(self, "Exit", 
-                      "The current album has not been saved.  Realy exit?", 
-                      QtGui.QMessageBox.Yes | QtGui.QMessageBox.No, QtGui.QMessageBox.No):
+           and QtWidgets.QMessageBox.No == QtWidgets.QMessageBox.warning(self, "Exit", 
+                   "The current album has not been saved.  Realy exit?", 
+                   QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No, QtWidgets.QMessageBox.No):
             event.ignore()
             return
 
         # Prompt if there are background operations in progress.
         if 0 != self._backgroundCount:
-            prompt_dialog = QtGui.QMessageBox(self)
+            prompt_dialog = QtWidgets.QMessageBox(self)
             prompt_dialog.setWindowTitle("Exit")
-            prompt_dialog.setIcon(QtGui.QMessageBox.Warning)
+            prompt_dialog.setIcon(QtWidgets.QMessageBox.Warning)
             prompt_dialog.setText("There is an operation in progress.  Wait for it to complete, " \
                                   "or exit anyway?")
-            wait_button = prompt_dialog.addButton("Wait", QtGui.QMessageBox.ApplyRole)
-            prompt_dialog.addButton("Exit", QtGui.QMessageBox.DestructiveRole)
+            wait_button = prompt_dialog.addButton("Wait", QtWidgets.QMessageBox.ApplyRole)
+            prompt_dialog.addButton("Exit", QtWidgets.QMessageBox.DestructiveRole)
             prompt_dialog.setDefaultButton(wait_button)
             prompt_dialog.setEscapeButton(wait_button)
             prompt_dialog.exec_()
             if wait_button is prompt_dialog.clickedButton():
                 # Disable UI controls, except the Cancel button.
-                for child in self.findChildren(QtGui.QWidget):
+                for child in self.findChildren(QtWidgets.QWidget):
                     if child is not self.cancelButton and child is not self.progressBar \
-                       and None is child.findChild(QtGui.QPushButton, "cancelButton"):
+                       and None is child.findChild(QtWidgets.QPushButton, "cancelButton"):
                         child.setEnabled(False)
 
                 # Post a background task to exit after everything else completes.
@@ -417,17 +425,22 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
         sender = self.sender()
         if self._addPhotosFiles is sender:
             # Browse for photos
-            file_names = QtGui.QFileDialog.getOpenFileNames(self, "Select photos", 
-                                                            self._config.photoDir, 
-                                                            self.FILTER_IMAGES)
+            file_names = QtWidgets.QFileDialog.getOpenFileNames(self, "Select photos", 
+                                                                self._config.photoDir, 
+                                                                self.FILTER_IMAGES)
+            assert (2 == len(file_names)) and (self.FILTER_IMAGES == file_names[1])
+            file_names = file_names[0]
             self._addPhotoFiles([(name, os.path.basename(name)) for name in file_names])
             if 0 < len(file_names):
                 self._config.photoDir = os.path.dirname(file_names[len(file_names)-1])
         elif self._addPhotosGthumb3 is sender:
             # Add a gThumb 3 catalog
-            catalog_file_name = QtGui.QFileDialog.getOpenFileName(self, "Select catalog", 
-                                                                  self._config.gthumb3Dir, 
-                                                                  self.FILTER_GTHUMB3_CATALOGS)
+            catalog_file_name = QtWidgets.QFileDialog.getOpenFileName(self, "Select catalog", 
+                                                                      self._config.gthumb3Dir, 
+                                                                      self.FILTER_GTHUMB3_CATALOGS)
+            assert (2 == len(catalog_file_name)) \
+                and (self.FILTER_GTHUMB3_CATALOGS == catalog_file_name[1])
+            catalog_file_name = catalog_file_name[0]
             # The QT documentation says that getOpenFileName returns a null string on cancel.  But 
             # it returns an empty string here.  Maybe that's a PyQt bug?
             if "" != catalog_file_name:
@@ -441,9 +454,9 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
                     self._addPhotoFiles([(name, os.path.basename(name)) for name in filenames])
                     self._config.gthumb3Dir = os.path.dirname(catalog_file_name)
                 else:
-                    QtGui.QMessageBox.warning(self, Config.PROGRAM_NAME, 
+                    QtWidgets.QMessageBox.warning(self, Config.PROGRAM_NAME, 
                                               "Unsupported gThumb catalog version", 
-                                              QtGui.QMessageBox.Ok, QtGui.QMessageBox.Ok)
+                                              QtWidgets.QMessageBox.Ok, QtWidgets.QMessageBox.Ok)
         else:
             print("ERROR: unknown item selected in 'Add Photos' control")
 
@@ -514,8 +527,8 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
 
     def _showError(self, err):
         """Show an error message."""
-        QtGui.QMessageBox.warning(self, Config.PROGRAM_NAME, err, QtGui.QMessageBox.Ok, 
-                                  QtGui.QMessageBox.Ok)
+        QtWidgets.QMessageBox.warning(self, Config.PROGRAM_NAME, err, QtWidgets.QMessageBox.Ok, 
+                                      QtWidgets.QMessageBox.Ok)
 
     def _incProgress(self):
         """Increment the progress bar counter."""
@@ -720,14 +733,16 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
             selected = self._currentAlbumFileName
         album_file_name = None
         while True:
-            album_file_name = QtGui.QFileDialog.getSaveFileName(self, "Album File", 
-                                                            selected, self.FILTER_ALBUMS, 
-                                                            QtGui.QFileDialog.DontConfirmOverwrite)
+            album_file_name = QtWidgets.QFileDialog.getSaveFileName(self, "Album File", 
+                                                selected, self.FILTER_ALBUMS, 
+                                                options=QtWidgets.QFileDialog.DontConfirmOverwrite)
+            assert 2 == len(album_file_name)
+            album_file_name = album_file_name[0]
             if self._currentAlbumFileName == album_file_name \
                or not os.path.isfile(album_file_name) \
-               or QtGui.QMessageBox.Yes == QtGui.QMessageBox.warning(self, "Album File", 
-                     self.tr("%s already exists.\nDo you want to replace it?") % (album_file_name), 
-                     QtGui.QMessageBox.Yes | QtGui.QMessageBox.No, QtGui.QMessageBox.No):
+               or QtWidgets.QMessageBox.Yes == QtWidgets.QMessageBox.warning(self, "Album File", 
+                   self.tr("%s already exists.\nDo you want to replace it?") % (album_file_name), 
+                   QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No, QtWidgets.QMessageBox.No):
                 break
             selected = album_file_name
 
@@ -941,9 +956,9 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
         """Create a new album."""
         # Prompt if the album is dirty.
         if not self._dirty or 0 == self.photosList.count() \
-           or QtGui.QMessageBox.Yes == QtGui.QMessageBox.warning(self, "New Album", 
-                      "The current album has not been saved.  Realy discard it?", 
-                      QtGui.QMessageBox.Yes | QtGui.QMessageBox.No, QtGui.QMessageBox.No):
+           or QtWidgets.QMessageBox.Yes == QtWidgets.QMessageBox.warning(self, "New Album", 
+                   "The current album has not been saved.  Realy discard it?", 
+                   QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No, QtWidgets.QMessageBox.No):
             self._closeAlbum(use_defaults=True)
 
     def _openAlbum(self):
@@ -951,15 +966,17 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
         background task to load it."""
         # Prompt if the album is dirty.
         if not self._dirty or 0 == self.photosList.count() \
-           or QtGui.QMessageBox.Yes == QtGui.QMessageBox.warning(self, "Open Album", 
-                      "The current album has not been saved.  Realy discard it?", 
-                      QtGui.QMessageBox.Yes | QtGui.QMessageBox.No, QtGui.QMessageBox.No):
+           or QtWidgets.QMessageBox.Yes == QtWidgets.QMessageBox.warning(self, "Open Album", 
+                  "The current album has not been saved.  Realy discard it?", 
+                  QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No, QtWidgets.QMessageBox.No):
 
-            album_file_name = QtGui.QFileDialog.getOpenFileName(self, "Select album", 
-                                                                self._config.outputDir, 
-                                                                self.tr(self.FILTER_ALBUMS))
+            album_file_name = QtWidgets.QFileDialog.getOpenFileName(self, "Select album", 
+                                                                    self._config.outputDir, 
+                                                                    self.tr(self.FILTER_ALBUMS))
             # The QT documentation says that getOpenFileName returns a null string on cancel.  But 
             # it returns an empty string here.  Maybe that's a PyQt bug?
+            assert 2 == len(album_file_name)
+            album_file_name = album_file_name[0]
             if "" != album_file_name:
                 self._closeAlbum(use_defaults=False)
                 # Load the file in a background thread.
@@ -997,20 +1014,20 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
             self.setWindowTitle(Config.PROGRAM_NAME + ": " + os.path.basename(album_file_name))
             self._dirty = False
         except KeyError:
-            QtGui.QMessageBox.warning(None, Config.PROGRAM_NAME, 
-                                      "Unable to load an album from '%s'." % 
-                                      (os.path.basename(album_file_name)), 
-                                      QtGui.QMessageBox.Ok, QtGui.QMessageBox.Ok)
+            QtWidgets.QMessageBox.warning(None, Config.PROGRAM_NAME, 
+                                          "Unable to load an album from '%s'." % 
+                                          (os.path.basename(album_file_name)), 
+                                          QtWidgets.QMessageBox.Ok, QtWidgets.QMessageBox.Ok)
 
     def _installTemplate(self):
         """Install the photo album template files.  Prompt the user for 
         a directory, then copy the files over on background threads."""
         # Get the destination directory
         # Using the Qt directory chooser to work around bug 2014-06-06_001.
-        out_dir = QtGui.QFileDialog.getExistingDirectory(self, "Album directory", 
-                                                         self._config.outputDir, 
-                                                         QtGui.QFileDialog.ShowDirsOnly|
-                                                         QtGui.QFileDialog.DontUseNativeDialog)
+        out_dir = QtWidgets.QFileDialog.getExistingDirectory(self, "Album directory", 
+                                                   self._config.outputDir, 
+                                                   options=QtWidgets.QFileDialog.ShowDirsOnly
+                                                       | QtWidgets.QFileDialog.DontUseNativeDialog)
 
         if "" != out_dir:
             self._backgroundInit(len(Config.TEMPLATE_FILE_NAMES) + 1)
@@ -1054,10 +1071,10 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
         """Prompt the user to rename photos that share names with other 
         photos that have already been loaded, then attempt to load them 
         again using the new names."""
-        prompt_dialog = QtGui.QMessageBox(self)
-        prompt_dialog.setIcon(QtGui.QMessageBox.Question)
-        rename_button = prompt_dialog.addButton("Rename...", QtGui.QMessageBox.YesRole)
-        prompt_dialog.addButton("Remove", QtGui.QMessageBox.NoRole)
+        prompt_dialog = QtWidgets.QMessageBox(self)
+        prompt_dialog.setIcon(QtWidgets.QMessageBox.Question)
+        rename_button = prompt_dialog.addButton("Rename...", QtWidgets.QMessageBox.YesRole)
+        prompt_dialog.addButton("Remove", QtWidgets.QMessageBox.NoRole)
 
         # Get new names for the files
         new_names = []
@@ -1068,14 +1085,15 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
             if rename_button is prompt_dialog.clickedButton():
                 # It seems that if I try to re-use the QFileDialog, changing the selected file has 
                 # no effect.
-                file_dialog = QtGui.QFileDialog(self, "New photo name", self._config.tempDir.name, 
-                                                self.FILTER_IMAGES)
-                file_dialog.setAcceptMode(QtGui.QFileDialog.AcceptSave)
-                file_dialog.setFileMode(QtGui.QFileDialog.AnyFile)
+                file_dialog = QtWidgets.QFileDialog(self, "New photo name", 
+                                                    self._config.tempDir.name, 
+                                                    self.FILTER_IMAGES)
+                file_dialog.setAcceptMode(QtWidgets.QFileDialog.AcceptSave)
+                file_dialog.setFileMode(QtWidgets.QFileDialog.AnyFile)
                 # The PhotoFile class won't let the user overwrite anything, but with overwrite 
                 # confirmations on, QFileDialog prompts to overwrite the directory if a user hits 
                 # "Save" with nothing selected.  Disabling confirmation avoids this.
-                file_dialog.setOption(QtGui.QFileDialog.DontConfirmOverwrite)
+                file_dialog.setOption(QtWidgets.QFileDialog.DontConfirmOverwrite)
                 file_dialog.selectFile(os.path.basename(photo_name))
                 file_dialog.exec_()
                 if 0 < len(file_dialog.selectedFiles()):
@@ -1088,7 +1106,7 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
 
     def _about(self):
         """Show the help dialog."""
-        dialog = QtGui.QDialog(self)
+        dialog = QtWidgets.QDialog(self)
         dialog.ui = Ui_AboutDialog()
         dialog.ui.setupUi(dialog)
         dialog.ui.closeButton.clicked.connect(dialog.close)
@@ -1097,36 +1115,36 @@ class DyphalUI(QtGui.QMainWindow, Ui_MainWindow):
 
 def main():
     """Main."""
-    app = QtGui.QApplication(sys.argv)
+    app = QtWidgets.QApplication(sys.argv)
 
     # Check that the Python version is at least 3.3, that we're on an OS with /proc/<pid>/fd/<fd>, 
     # and that exiftool and convert are available.  Error out if not.
     if sys.version_info.major < 3 or (sys.version_info.major == 3 and sys.version_info.minor < 3):
-        QtGui.QMessageBox.critical(None, Config.PROGRAM_NAME, 
-                                   "This program requires Python 3.3 or newer.", 
-                                   QtGui.QMessageBox.Ok, QtGui.QMessageBox.Ok)
+        QtWidgets.QMessageBox.critical(None, Config.PROGRAM_NAME, 
+                                       "This program requires Python 3.3 or newer.", 
+                                       QtWidgets.QMessageBox.Ok, QtWidgets.QMessageBox.Ok)
         sys.exit(1)
     try:
         with open("/proc/%d/fd/0" % (os.getpid())) as fd:
             pass
     except IOError:
-        QtGui.QMessageBox.critical(None, Config.PROGRAM_NAME, 
-                                   "This program currently only runs on Linux.", 
-                                   QtGui.QMessageBox.Ok, QtGui.QMessageBox.Ok)
+        QtWidgets.QMessageBox.critical(None, Config.PROGRAM_NAME, 
+                                       "This program currently only runs on Linux.", 
+                                       QtWidgets.QMessageBox.Ok, QtWidgets.QMessageBox.Ok)
         sys.exit(1)
     try:
         subprocess.check_call(["exiftool", "-ver"], stdout=subprocess.DEVNULL, timeout=1)
     except (IOError, subprocess.CalledProcessError, subprocess.TimeoutExpired):
-        QtGui.QMessageBox.critical(None, Config.PROGRAM_NAME, 
+        QtWidgets.QMessageBox.critical(None, Config.PROGRAM_NAME, 
                                    "This program requires that 'exiftool' be available in your " \
-                                   "PATH.", QtGui.QMessageBox.Ok, QtGui.QMessageBox.Ok)
+                                   "PATH.", QtWidgets.QMessageBox.Ok, QtWidgets.QMessageBox.Ok)
         sys.exit(1)
     try:
         subprocess.check_call(["convert", "--version"], stdout=subprocess.DEVNULL, timeout=1)
     except (IOError, subprocess.CalledProcessError, subprocess.TimeoutExpired):
-        QtGui.QMessageBox.critical(None, Config.PROGRAM_NAME, "This program requires that " \
-                                   "'convert' from the 'ImageMagick' package be available in " \
-                                   "your PATH.", QtGui.QMessageBox.Ok, QtGui.QMessageBox.Ok)
+        QtWidgets.QMessageBox.critical(None, Config.PROGRAM_NAME, "This program requires that " \
+                                  "'convert' from the 'ImageMagick' package be available in " \
+                                  "your PATH.", QtWidgets.QMessageBox.Ok, QtWidgets.QMessageBox.Ok)
         sys.exit(1)
 
     with Config() as config:

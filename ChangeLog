@@ -1,3 +1,16 @@
+2021-08-15  Rennie deGraaf <rennie.degraaf@gmail.com>
+
+    * install.sh, tools/DyphalGenerator.py, tools/photo.py: update to PyQt5
+      and recent versions of Pandoc.  NOT FULLY TESTED!
+
+    * tools/photo.py: added HDR setting to photo properties that can be 
+      displayed
+
+    * tools/photo.py, tools/util.py, test.sh, 
+      test/test-DyplayGenerator-LinuxSafeFile.py, 
+      test/test-DyphalGenerator-safe_file_open.py: PARTIAL, INCOMPLETE support 
+      for opening files on non-Linux platforms.
+
 2018-12-01  Rennie deGraaf <rennie.degraaf@gmail.com>
 
     * tools/photorename.sh: Added support for Panasonic's numbering scheme.

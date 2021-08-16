@@ -1,5 +1,5 @@
 """Utility functions and classes for DyphalGenerator.
-Copyright (c) Rennie deGraaf, 2005-2017.
+Copyright (c) Rennie deGraaf, 2005-2021.
 
 This program is free software; you can redistribute it and/or modify it 
 under the terms of the GNU General Public License as published by the 
@@ -128,4 +128,96 @@ def ensure_directory(name):
         os.makedirs(name, exist_ok=True)
     except FileExistsError:
         pass
+
+
+class LinuxSafeFile(object):
+    """
+    Attributes:
+        _linkPath (str): The full path to the link to this photo in the 
+                album's temporary directory.
+        _fileDescriptor (int): A file descriptor for the photo file.
+    """
+    def __init__(self, file_path, file_name, temp_dir_name):
+        # To avoid TOCTOU when passing file names to other programs, we do the following:
+        #  1. Create a secure temporary directory.
+        #  2. Open the file.  Get its file descriptor.
+        #  3. Construct the /proc/<pid>/fd/<fd> path to the file using the file descriptor.
+        #  4. Create a symlink from the temporary directory to the /proc path.  The link's name is 
+        #     unique but predictable; that's ok because the directory is secure.
+        #  5. Pass the symlink's path to other programs.
+
+        # Don't set linkPath until after the link has been created.  Otherwise, a FileExistsError 
+        # due to us already having the file open somewhere else will result in us deleting the link 
+        # when we try to clean up.
+        self._linkPath = None
+        self._fileDescriptor = None
+
+        try:
+            self._fileDescriptor = os.open(file_path, os.O_RDONLY)
+            link_path = os.path.join(temp_dir_name, file_name)
+            os.symlink("/proc/%d/fd/%d" % (os.getpid(), self._fileDescriptor), link_path)
+            self._linkPath = link_path
+        except:
+            # If something failed, make sure to not leave any dangling resources.  Ignore any 
+            # failures that this causes.
+            try:
+                self.dispose()
+            except:
+                pass
+            raise
+
+    def getPath(self):
+        return self._linkPath
+
+    def dispose(self):
+        try:
+            if None is not self._linkPath:
+                os.unlink(self._linkPath)
+        except OSError:
+            pass
+        self._linkPath = None
+        try:
+            if None is not self._fileDescriptor:
+                os.close(self._fileDescriptor)
+        except OSError:
+            pass
+        self._fileDescriptor = None
+
+
+class UnsafeLinkedFile(object):
+    def __init__(self, file_path, file_name, temp_dir_name):
+        # Don't set linkPath until after the link has been created.  Otherwise, a FileExistsError 
+        # due to us already having the file open somewhere else will result in us deleting the link 
+        # when we try to clean up.
+        self._linkPath = None
+        try:
+            link_path = os.path.join(temp_dir_name, file_name)
+            os.symlink(file_path, link_path)
+            self._linkPath = link_path
+        except:
+            # If something failed, make sure to not leave any dangling resources.  Ignore any 
+            # failures that this causes.
+            try:
+                self.dispose()
+            except:
+                pass
+            raise
+
+    def getPath(self):
+        return self._linkPath
+
+    def dispose(self):
+        try:
+            if None is not self._linkPath:
+                os.unlink(self._linkPath)
+        except OSError:
+            pass
+        self._linkPath = None
+
+
+def safe_open_file(file_path, file_name, config):
+    if config.haveProcPid:
+        return LinuxSafeFile(file_path, file_name, config.tempDir.name)
+    else:
+        return UnsafeLinkedFile(file_path, file_name)
 
