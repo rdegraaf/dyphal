@@ -1,3 +1,7 @@
+2021-08-28  Rennie deGraaf <rennie.degraaf@gmail.com>
+
+    * www/index.html: added "description" and "referrer" metas
+
 2021-08-15  Rennie deGraaf <rennie.degraaf@gmail.com>
 
     * tools/DyphalGenerator.py: fixed an assertion error due to an incorrect 
