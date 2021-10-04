@@ -211,6 +211,10 @@ a:active {
   width: 98%; /* compensate for an Android glitch */
 }
 
+p.footnote {
+  font-size: smaller;
+}
+
 @media (max-width: 1000px) {
   #titlePanel>h1 {
     font-size: 21pt;

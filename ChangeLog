@@ -1,3 +1,8 @@
+2021-10-03  Rennie deGraaf <rennie.degraaf@gmail.com>
+
+    * www/index.html, www/common.css: Fixed the footnote in the help text for
+      key bindings.
+
 2021-08-28  Rennie deGraaf <rennie.degraaf@gmail.com>
 
     * www/index.html: added "description" and "referrer" metas

@@ -202,7 +202,7 @@
     OPEN
 
 
-2019-11-30_001	Rennie deGraaf	<rennie.degraaf@gmail.com>
+2019-11-30_001  Rennie deGraaf  <rennie.degraaf@gmail.com>
     In DyphalGenerator, when one tries to import a gThumb3 catalog containing 
     references to a directory that doesn't exist, subsequent attempts to import 
     a catalog mail fail with multiple errors akin to "Error opening photo 
@@ -237,8 +237,38 @@
     OPEN
 
 
-2019-11-30_002	Rennie deGraaf	<rennie.degraaf@gmail.com>
+2019-11-30_002  Rennie deGraaf  <rennie.degraaf@gmail.com>
     Provide better zoom behaviour in photo overlay view.
 
     OPEN
 
+
+2021-08-16_001  Rennie deGraaf  <rennie.degraaf@gmail.com>
+    Doesn't handle image and thumbnail generation for rotated photos
+
+    IN PROGRESS: need to test, delete test outputs from www directory
+
+
+2021-08-17_001  Rennie deGraaf  <rennie.degraaf@gmail.com>
+    Don't allow "orientation" to be emitted to metadata; it's out of date 
+    after re-orientation
+
+    OPEN
+
+
+2021-08-17_002  Rennie deGraaf  <rennie.degraaf@gmail.com>
+    Albums in test directory don't load.
+
+    OPEN
+
+
+2021-10-03_001  Rennie deGraaf  <rennie.degraaf@gmail.com>
+    Tag my JavaScript with its license so that Gnu's checker knows that it's 
+    "free".
+    
+    EXTERNAL: I added "JavaScript License Web Labels" as described at 
+    https://www.gnu.org/licenses/javascript-labels.html to Dyphal. but LibreJS 
+    refused to recognize them.  It didn't output any useful debugging 
+    information.  I tried to debug into the extension but got nowhere.  Until 
+    they either fix their code or their documentation, there's no point in 
+    attempting this.
