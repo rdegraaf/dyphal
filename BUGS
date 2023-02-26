@@ -272,3 +272,17 @@
     information.  I tried to debug into the extension but got nowhere.  Until 
     they either fix their code or their documentation, there's no point in 
     attempting this.
+
+
+2022-03-20_002  Rennie deGraaf  <rennie.degraaf@gmail.com>
+    Photo album "skyline_divide.dyphal" fails to build with the following error:
+
+        1 errors were encountered while generating the album:
+        Error resizing /tmp/tmpc43ym7ls/pf1_20210925_134029.jpeg
+
+    This appears to be a timeout?  Unsure why; the following command completes 
+    quickly:
+
+        convert pf1_20210925_134029.jpeg -resize 1280x960> -strip -quality 75 -auto-orient ~/www/photos/photos/pf1_20210925_134029.jpeg
+
+    OPEN

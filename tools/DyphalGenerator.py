@@ -445,12 +445,11 @@ class DyphalUI(QtWidgets.QMainWindow, Ui_MainWindow):
             # it returns an empty string here.  Maybe that's a PyQt bug?
             if "" != catalog_file_name:
                 tree = xml.etree.ElementTree.parse(catalog_file_name)
-                # Files appear in arbitrary order in a gThumb 3 catalog file.
-                # I assume that the display order is the names sorted alphabetically.
                 if "1.0" == tree.getroot().get("version"):
-                    filenames = sorted(
-                            [QtCore.QUrl(urllib.parse.unquote(elmt.attrib["uri"])).toLocalFile() 
-                             for elmt in tree.getroot().iter("file")])
+                    # Files appear in arbitrary order in older gThumb 3 catalog files?
+                    # Maybe we need to sort by metadata timestamp?
+                    filenames = [QtCore.QUrl(urllib.parse.unquote(elmt.attrib["uri"])).toLocalFile()
+                                 for elmt in tree.getroot().iter("file")]
                     self._addPhotoFiles([(name, os.path.basename(name)) for name in filenames])
                     self._config.gthumb3Dir = os.path.dirname(catalog_file_name)
                 else:

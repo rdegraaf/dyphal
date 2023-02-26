@@ -20,13 +20,23 @@ For version 3:
     * Check for the presence of exiftool and other dependencies in 
       gthumb_comment_update.py
 
+    * Add album name to the "description" meta, as some browsers use it for 
+      bookmark descriptions?
+
 For future versions:
 
     * More automated tests, including photo metadata handling and the git 
       version commands in the installer.
 
     * Replace external dependencies (convert, exiftool) with calls to some 
-      library.
+      library.  This'll be hard: the Python bindings for exiftool all just 
+      call the program and parse its output; there're no proper library 
+      bindings.  There's not much point dragging in another dependency just to 
+      have the same drawbacks as the current design.  Other metadata parsers 
+      don't have exiftool's functionality.  There are proper library bindings 
+      for ImageMagick, but Wand 0.5.9 seem to have resource-management 
+      problems: it occasionally throw exceptions while attempting to process 
+      images.
 
     * Create an index view, populated from an index JSON that lists all albums. 
       Add album thumbnails to album JSON; load all album JSONs from the index 
