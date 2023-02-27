@@ -39,10 +39,9 @@ Dyphal was designed to satisfy the following goals:
     shared between pages.  
 6.  The album must use modern web standards with a minimum of cruft to support 
     old browsers.  It must follow security best practices and support CSP.
-7.  All features of the album must work properly on recent versions of Chrome, 
-    Firefox, Internet Explorer, and Android.  There should be no major problems 
-    in minor browsers such as Opera and on old but still common browsers such 
-    as Internet Explorer 9.  
+7.  All features of the album must work properly on recent versions of Chrome 
+    and Firefox.  There should be no major problems in minor browsers such as 
+    Opera or Edge.  
 8.  All content must be in HTML or be inserted at run-time.  All styling must 
     be in CSS or inserted at run-time.
 9.  Album styles should be changeable without needing to change scripts.
@@ -226,7 +225,7 @@ full-screen Internet Explorer because no ways to fix these issues using feature
 detection could be found.
 
 If my JavaScript has idiosyncrasies, it's probably because I'm a C++ programmer 
-who taught himself JavaScript by trial and error.
+who learned JavaScript by trial and error.
 
 
 History
@@ -241,10 +240,10 @@ Explorer 6 and albums built from that template consisted of a large number of
 repetitive generated HTML files.  
 
 At some point after 2008, gThumb removed the BestFit template without telling 
-its author (ie, me) why.  Since working with the gThumb maintainer in the past 
-had been a pain, I opted to not try to get it reinstated.  Instead, I dropped 
-support for IE6 (simplifying the code considerably) and started work on a 
-version where photos and metadata would be inserted into a single page at 
+its author (i.e., me) why.  Since working with the gThumb maintainer in the 
+past had been a pain, I opted to not try to get it reinstated.  Instead, I 
+dropped support for IE6 (simplifying the code considerably) and started work on 
+a version where photos and metadata would be inserted into a single page at 
 run-time using JavaScript.  I eventually merged the album and photo pages, 
 accidentally re-invented JSON before learning how to use JSON properly, and 
 ended up with this.  
@@ -303,7 +302,7 @@ separation to be attacked?  Practice.
 Licence
 -------
 
-Dyphal is copyright (c) Rennie deGraaf, 2005-2017.  It is distributed under the 
+Dyphal is copyright (c) Rennie deGraaf, 2005-2023.  It is distributed under the 
 terms of the GNU General Public Licence, either version 2 or (at your option) 
 version 3.  See LICENCE or <http://www.gnu.org/licenses/> for details.
 

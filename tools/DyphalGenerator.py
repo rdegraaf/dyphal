@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 """Server-side data generator for Dyphal, the Dynamic Photo Album.
-Copyright (c) Rennie deGraaf, 2005-2021.
+Copyright (c) Rennie deGraaf, 2005-2023.
 
 DyphalGenerator is a tool to create photo albums to display using 
 Dyphal.  It can import metadata from a variety of embedded photo tags 

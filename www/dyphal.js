@@ -1,6 +1,6 @@
 /**
   Scripts for Dyphal, the Dynamic Photo Album.
-  Copyright (c) Rennie deGraaf, 2005-2017.
+  Copyright (c) Rennie deGraaf, 2005-2023.
 
   This program is free software; you can redistribute it and/or modify 
   it under the terms of the GNU General Public License as published by 
@@ -550,6 +550,7 @@ function loadAlbumContent() {
 
         // Set the title
         document.title = album.title;
+        document.getElementById("pageDescription").content = album.title + " photo album";
         document.getElementById("titleContent").textContent = album.title;
         document.getElementById("footerContent").textContent = album.footer;
         document.getElementById("description").textContent = album.description;

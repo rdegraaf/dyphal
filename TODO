@@ -20,9 +20,6 @@ For version 3:
     * Check for the presence of exiftool and other dependencies in 
       gthumb_comment_update.py
 
-    * Add album name to the "description" meta, as some browsers use it for 
-      bookmark descriptions?
-
 For future versions:
 
     * More automated tests, including photo metadata handling and the git 

@@ -1,3 +1,25 @@
+2023-02-26  Rennie deGraaf <rennie.degraaf@gmail.com>
+
+    * tools/About.ui, tools/ui-header.py, tools/DyphalGenerator.py: update 
+      copyright date to 2023.
+    
+    * www/dyphal.js, www/index.html: put the album description in the meta 
+      "description" tag for the benefit of browsers that use it for bookmark 
+      titles.
+    
+    * tools/photo.py: better support for rotated input images.
+      
+    * README: minor updates.
+
+2023-02-26  Rennie deGraaf <rennie.degraaf@gmail.com>
+
+    * tools/DyphalGenerator.py: Rather than sorting by file name, use
+      the order from imported gThumb albums.  There was a comment in the
+      code that files appeared in arbitrary order, so maybe older
+      versions of gThumb 3 behaved differently?  Maybe the correct thing
+      to do is to sort by metadata date?
+
+
 2021-10-03  Rennie deGraaf <rennie.degraaf@gmail.com>
 
     * www/index.html, www/common.css: Fixed the footnote in the help text for

@@ -23,6 +23,7 @@ import subprocess
 import json
 import urllib.parse
 import math
+#import wand.image
 
 from PyQt5 import QtWidgets
 
@@ -167,7 +168,8 @@ class PhotoFile(RefCounted, QtWidgets.QListWidgetItem):
         try:
             # gThumb stores IPTC strings as UTF-8, but does not set CodedCharacterSet
             properties_text = subprocess.check_output(
-                ["exiftool", "-charset", "iptc=UTF8", "-json", "-a", "-G", "-All", self._file.getPath()], 
+                ["exiftool", "-charset", "iptc=UTF8", "-json", "-a", "-G", "-EXIF:Orientation#", 
+                 "-All", self._file.getPath()], 
                 timeout=self._config.BG_TIMEOUT, universal_newlines=True, stderr=subprocess.STDOUT)
             properties_obj = json.loads(properties_text)[0]
 
@@ -186,6 +188,12 @@ class PhotoFile(RefCounted, QtWidgets.QListWidgetItem):
             # Get the photo dimensions
             self._width = properties_obj["File:ImageWidth"]
             self._height = properties_obj["File:ImageHeight"]
+            # If the image needs to be rotated, swap the width and height
+            if 5 <= properties_obj["EXIF:Orientation"] <= 8:
+                self._width, self._height = self._height, self._width
+                if "Image dimensions" in self.properties:
+                    self.properties["Image dimensions"] = \
+                                                       "%dx%d pixels" % (self._width, self._height)
 
             self.captions = {}
 
@@ -277,9 +285,17 @@ class PhotoFile(RefCounted, QtWidgets.QListWidgetItem):
         (width, height) = self._rescale(width_base * height_base)
         # See http://www.imagemagick.org/Usage/resize/
         subprocess.check_call(["convert", self.getPath(), "-resize", "%dx%d>" % (width, height), 
-                               "-strip", "-quality", str(quality), 
+                               "-strip", "-quality", str(quality), "-auto-orient",
                                os.path.join(out_dir_name, self._fileName)], 
                               timeout=self._config.BG_TIMEOUT)
+        # Doesn't work reliably -- Wand 0.5.9 may throw the following:
+        #   wand.exceptions.CacheError: cache resources exhausted `/tmp/tmpfyoznu59/pf1_20210710_130553.jpeg' @ error/cache.c/OpenPixelCache/4083
+        #with wand.image.Image(filename=self.getPath()) as img:
+        #    img.auto_orient()
+        #    img.strip()
+        #    img.resize(width=width, height=height)
+        #    img.compression_quality = quality
+        #    img.save(filename=os.path.join(out_dir_name, self._fileName))
 
     def generateThumbnail(self, out_dir_name, width_base, height_base, quality):
         """Generate a thumbnail for the photo."""
@@ -290,6 +306,15 @@ class PhotoFile(RefCounted, QtWidgets.QListWidgetItem):
         # See http://www.imagemagick.org/Usage/thumbnails/
         subprocess.check_call(["convert", self.getPath(), "-thumbnail", "%dx%d^" % (width, height), 
                                "-gravity", "center", "-extent", "%dx%d" % (width, height), 
-                               "-quality", str(quality), 
+                               "-quality", str(quality), "-auto-orient",
                                os.path.join(out_dir_name, self._thumbName)], 
                               timeout=self._config.BG_TIMEOUT)
+        # Doesn't work reliably -- Wand 0.5.9 may throw the following:
+        #   wand.exceptions.CacheError: cache resources exhausted `/tmp/tmpfyoznu59/pf1_20210710_130553.jpeg' @ error/cache.c/OpenPixelCache/4083
+        #with wand.image.Image(filename=self.getPath()) as img:
+        #    img.auto_orient()
+        #    img.thumbnail(width=width, height=height)
+        #    img.gravity = 'center'
+        #    img.extent(width=width, height=height)
+        #    img.compression_quality = quality
+        #    img.save(filename=os.path.join(out_dir_name, self._thumbName))
