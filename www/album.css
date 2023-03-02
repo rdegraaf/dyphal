@@ -78,6 +78,7 @@ body.album #description {
   body.album #description {
     padding-left: 5px;
     padding-right: 5px;
+    text-align: start;
   }
 }
 
