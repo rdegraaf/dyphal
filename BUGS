@@ -262,18 +262,6 @@
     OPEN
 
 
-2021-10-03_001  Rennie deGraaf  <rennie.degraaf@gmail.com>
-    Tag my JavaScript with its license so that Gnu's checker knows that it's 
-    "free".
-    
-    EXTERNAL: I added "JavaScript License Web Labels" as described at 
-    https://www.gnu.org/licenses/javascript-labels.html to Dyphal. but LibreJS 
-    refused to recognize them.  It didn't output any useful debugging 
-    information.  I tried to debug into the extension but got nowhere.  Until 
-    they either fix their code or their documentation, there's no point in 
-    attempting this.
-
-
 2022-03-20_002  Rennie deGraaf  <rennie.degraaf@gmail.com>
     Photo album "skyline_divide.dyphal" fails to build with the following error:
 

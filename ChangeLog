@@ -1,3 +1,12 @@
+2023-03-01  Rennie deGraaf <rennie.degraaf@gmail.com>
+
+    * www/dyphal.js: LibreJS support
+
+2023-03-01  Rennie deGraaf <rennie.degraaf@gmail.com>
+
+    * www/album.css: left-justify only in small-screen mode to avoid spacing 
+      issues.
+
 2023-02-26  Rennie deGraaf <rennie.degraaf@gmail.com>
 
     * tools/About.ui, tools/ui-header.py, tools/DyphalGenerator.py: update 

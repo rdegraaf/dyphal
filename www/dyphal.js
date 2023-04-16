@@ -1,3 +1,4 @@
+/*  @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&dn=gpl-2.0.txt GPL-2.0 */
 /**
   Scripts for Dyphal, the Dynamic Photo Album.
   Copyright (c) Rennie deGraaf, 2005-2023.
@@ -970,3 +971,4 @@ log(navigator.userAgent);
 log(window.innerWidth + "x" + window.innerHeight);
 
 }());
+/* @license-end */
